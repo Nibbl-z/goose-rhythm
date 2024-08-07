@@ -15,11 +15,22 @@ end
 
 function love.update(dt)
     conductor:Update(dt)
+    conductor:GetHitAccuracy()
 end
 
 function conductor.Metronome()
     testDraw = not testDraw
-    metronome:play()
+    --metronome:play()
+end
+
+function love.mousepressed()
+    if conductor:GetHitAccuracy() <= 0.05 then
+        print("PERFECT!")
+    elseif conductor:GetHitAccuracy() <= 0.1 then
+        print("Okay")
+    elseif conductor:GetHitAccuracy() <= 0.2 then
+        print("doinked")
+    end
 end
 
 function love.draw()

@@ -8,7 +8,7 @@ conductor.SecondsPerBeat = 0.0
 
 function conductor:Update(dt)
     self.SecondsPerBeat = 60 / self.BPM
-
+    
     self.SongPosition = self.SongPosition + dt
     
     if self.SongPosition > self.LastBeat + self.SecondsPerBeat then
@@ -18,5 +18,19 @@ function conductor:Update(dt)
         if self.Metronome ~= nil then
             self.Metronome()
         end
+    end
+end
+
+function conductor:GetHitAccuracy()
+    local time = self.SongPosition
+    local nextBeat = self.LastBeat + self.SecondsPerBeat
+    
+    local lastDiff = math.abs(self.LastBeat - time)
+    local nextDiff = math.abs(nextBeat - time)
+    
+    if lastDiff > nextDiff then
+        return nextDiff
+    else
+        return lastDiff
     end
 end
