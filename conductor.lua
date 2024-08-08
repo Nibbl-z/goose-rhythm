@@ -6,10 +6,13 @@ conductor.SongPosition = 0.0
 conductor.LastBeat = 0.0
 conductor.SecondsPerBeat = 0.0
 
-conductor.LastChartBeat = 0.0
-conductor.NextChartBeat = 0.0
+conductor.LastChartBeat = {B = 0.0, N = 0.0}
+conductor.NextChartBeat = {B = 0.0, N = 0.0}
 conductor.NoteIndex = 1
 conductor.ChartFinished = false
+
+local settings = require("settings")
+
 function conductor:Update(dt)
     self.SecondsPerBeat = 60 / self.BPM
     
@@ -24,15 +27,14 @@ function conductor:Update(dt)
         end
     end
     
-    if self.SongPositionInBeats > self.NextChartBeat then
+    if self.SongPositionInBeats > self.NextChartBeat.B then
         if not self.ChartFinished then
-            print("!")
             if self.Chart[self.NoteIndex] == nil then
                 self.ChartFinished = true
                 return
             end
             self.LastChartBeat = self.NextChartBeat
-            self.NextChartBeat = self.Chart[self.NoteIndex].B
+            self.NextChartBeat = self.Chart[self.NoteIndex]
             
             self.NoteIndex = self.NoteIndex + 1
             
@@ -44,22 +46,27 @@ end
 function conductor:LoadChart()
     self.Chart = require("chart")
     
-    self.NextChartBeat = self.Chart[1].B
+    self.NextChartBeat = self.Chart[1]
     conductor.NoteIndex = conductor.NoteIndex + 1
 end
 
-function conductor:GetHitAccuracy()
+function conductor:GetHitAccuracy(key)
     local time = self.SongPositionInBeats
-
-    local lastDiff = math.abs(self.LastChartBeat - time)
-    local nextDiff = math.abs(self.NextChartBeat - time)
     
-    print(nextDiff, lastDiff)
-    print(self.LastChartBeat, self.NextChartBeat)
+    local lastDiff = math.abs(self.LastChartBeat.B - time)
+    local nextDiff = math.abs(self.NextChartBeat.B - time)
+    
+    if lastDiff > 1 and nextDiff > 1 then return end
 
     if lastDiff > nextDiff then
-        return nextDiff
+        if key == settings.Keybinds[self.NextChartBeat.N] then
+            self.NextChartBeat.H = true
+            return nextDiff
+        end
     else
-        return lastDiff
+        if key == settings.Keybinds[self.LastChartBeat.N] then
+            self.LastChartBeat.H = true
+            return lastDiff
+        end
     end
 end

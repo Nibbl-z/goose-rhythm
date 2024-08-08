@@ -28,20 +28,32 @@ end
 local status = ""
 
 function love.mousepressed()
-    if conductor:GetHitAccuracy() <= 0.05 then
+
+end
+
+function love.keypressed(key)
+    local result = conductor:GetHitAccuracy(key)
+    if result == nil then return end
+
+    if result <= 0.05 then
         status = "Perfect"
-    elseif conductor:GetHitAccuracy() <= 0.2 then
+    elseif result <= 0.2 then
         status = "Okay"
-    elseif conductor:GetHitAccuracy() > 0.3 then
+    elseif result > 0.3 then
         status = "Miss"
     end
-    --metronome:play()
 end
 
 function love.draw()
-    love.graphics.rectangle("fill", 200, 400, 2, 200)
+    for i = 1, 4 do
+        love.graphics.circle("line", i * 70 + 200, 500, 30)
+    end
+    
     for _, v in ipairs(conductor.Chart) do
-        love.graphics.rectangle("fill", (v.B - conductor.SongPositionInBeats) * 300 + 200, 500, 10, 10)
+        if v.H ~= true then
+            love.graphics.circle("fill", v.N * 70 + 200, (v.B - conductor.SongPositionInBeats) * -300 + 500, 30)
+        end
+        
     end
 
     love.graphics.print(status)
