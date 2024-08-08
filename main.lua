@@ -1,5 +1,6 @@
 require("conductor")
 local editor = require("editor")
+local uimgr = require("yan.uimanager")
 local song = "/kk_intermission.ogg"
 
 local testDraw = true
@@ -8,7 +9,7 @@ function love.load()
     love.window.setMode(800,600,{resizable=true})
     
     if editor.Enabled == true then
-        
+        editor:Init()
     else
         loadedSong = love.audio.newSource(song, "stream")
         metronome = love.audio.newSource("/select.wav", "static")
@@ -23,6 +24,7 @@ function love.load()
 end
 
 function love.update(dt)
+    uimgr:Update()
     if editor.Enabled == true then
         editor:Update()
     else
@@ -84,4 +86,6 @@ function love.draw()
             love.graphics.rectangle("fill", 10, 10, 20, 20)
         end
     end
+
+    uimgr:Draw()
 end
