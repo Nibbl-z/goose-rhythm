@@ -98,8 +98,9 @@ function editor:Draw()
         love.graphics.circle("line", i * 70 + xOffset, 500, 30)
     end
     
-    love.graphics.print(tostring(quadrant))
-    love.graphics.print((math.abs(beatQuadrant - 8)), 0, 50)
+    for _, note in ipairs(chart) do
+        love.graphics.circle("fill", (note.N) * 70 + xOffset, (-(note.B - 8) * (530 / 8)) - 30, 30)
+    end
 end
 
 return editor
