@@ -11,30 +11,42 @@ function love.load()
     loadedSong:play()
     loadedSong:setVolume(0.2)
     love.graphics.setFont(love.graphics.newFont(32))
+
+    conductor:LoadChart()
 end
 
 function love.update(dt)
     conductor:Update(dt)
-    conductor:GetHitAccuracy()
+    --conductor:GetHitAccuracy()
 end
 
 function conductor.Metronome()
     testDraw = not testDraw
-    --metronome:play()
+    
 end
+
+local status = ""
 
 function love.mousepressed()
     if conductor:GetHitAccuracy() <= 0.05 then
-        print("PERFECT!")
-    elseif conductor:GetHitAccuracy() <= 0.1 then
-        print("Okay")
+        status = "Perfect"
     elseif conductor:GetHitAccuracy() <= 0.2 then
-        print("doinked")
+        status = "Okay"
+    elseif conductor:GetHitAccuracy() > 0.3 then
+        status = "Miss"
     end
+    --metronome:play()
 end
 
 function love.draw()
-    if testDraw then
-        love.graphics.rectangle("fill", 100, 100, 100, 100)
+    love.graphics.rectangle("fill", 200, 400, 2, 200)
+    for _, v in ipairs(conductor.Chart) do
+        love.graphics.rectangle("fill", (v.B - conductor.SongPositionInBeats) * 300 + 200, 500, 10, 10)
     end
+
+    love.graphics.print(status)
+
+    --[[if testDraw then
+        love.graphics.rectangle("fill", 100, 100, 100, 100)
+    end]]
 end
