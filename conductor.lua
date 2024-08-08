@@ -10,6 +10,7 @@ conductor.LastChartBeat = {B = 0.0, N = 0.0}
 conductor.NextChartBeat = {B = 0.0, N = 0.0}
 conductor.NoteIndex = 1
 conductor.ChartFinished = false
+conductor.Chart = {}
 
 local settings = require("settings")
 
@@ -37,14 +38,27 @@ function conductor:Update(dt)
             self.NextChartBeat = self.Chart[self.NoteIndex]
             
             self.NoteIndex = self.NoteIndex + 1
-            
-           
         end
     end
 end
 
 function conductor:LoadChart()
-    self.Chart = require("chart")
+    local combineIndex = 0
+    local previousBeat = nil
+    for i, v in ipairs(require("chart")) do
+        --print(v.N, v.B)
+        print(previousBeat, v.B)
+        if previousBeat == v.B then
+            print(self.Chart[combineIndex])
+            table.insert(self.Chart[combineIndex].N, v.N)
+        else
+            combineIndex = combineIndex + 1
+            self.Chart[combineIndex] = {B = v.B, N = {v.N}}
+            print(self.Chart[combineIndex])
+        end
+       
+        previousBeat = v.B
+    end
     
     self.NextChartBeat = self.Chart[1]
     conductor.NoteIndex = conductor.NoteIndex + 1
@@ -59,14 +73,19 @@ function conductor:GetHitAccuracy(key)
     if lastDiff > 1 and nextDiff > 1 then return end
 
     if lastDiff > nextDiff then
-        if key == settings.Keybinds[self.NextChartBeat.N] then
-            self.NextChartBeat.H = true
-            return nextDiff
+        for _, n in ipairs(self.NextChartBeat.N) do
+            if key == settings.Keybinds[n] then
+                self.NextChartBeat.H = true
+                return nextDiff
+            end
         end
+        
     else
-        if key == settings.Keybinds[self.LastChartBeat.N] then
-            self.LastChartBeat.H = true
-            return lastDiff
+        for _, n in ipairs(self.LastChartBeat.N) do
+            if key == settings.Keybinds[n] then
+                self.LastChartBeat.H = true
+                return lastDiff
+            end
         end
     end
 end

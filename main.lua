@@ -34,7 +34,7 @@ end
 function love.keypressed(key)
     local result = conductor:GetHitAccuracy(key)
     if result == nil then return end
-
+    
     if result <= 0.05 then
         status = "Perfect"
     elseif result <= 0.2 then
@@ -51,9 +51,10 @@ function love.draw()
     
     for _, v in ipairs(conductor.Chart) do
         if v.H ~= true then
-            love.graphics.circle("fill", v.N * 70 + 200, (v.B - conductor.SongPositionInBeats) * -300 + 500, 30)
+            for _, n in ipairs(v.N) do
+                love.graphics.circle("fill", n * 70 + 200, (v.B - conductor.SongPositionInBeats) * -300 + 500, 30)
+            end
         end
-        
     end
 
     love.graphics.print(status)
