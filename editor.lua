@@ -11,7 +11,7 @@ local utils = require("yan.utils")
 
 local textinput = require("yan.instance.ui.textinput")
 
-editor.Enabled = true
+editor.Enabled = false
 
 local scrollOffset = 0
 local quadrant = -1
@@ -47,7 +47,7 @@ function DeleteNote()
             table.remove(chart,i)
         end
     end
-
+    
     Export()
 end
 
@@ -106,7 +106,7 @@ function editor:Init()
     snapInput.Size = UIVector2.new(0.1,0,0.05,0)
     snapInput.TextColor = Color.new(0,0,0,1)
     snapInput.MouseDown = function () 
-        
+
     end 
 
     snapInput.OnEnter = function ()

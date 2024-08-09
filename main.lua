@@ -2,13 +2,33 @@ require("conductor")
 local editor = require("editor")
 local uimgr = require("yan.uimanager")
 local song = "/kk_intermission.ogg"
+local settings = require("settings")
 
 local testDraw = true
 
 
 local started = false
 
+local sprites = {
+    BG = "bg.png",
+    GooseFace = "goose_face.png",
+    GooseHonk = "goose_honking.png",
+    GooseAngry = "goose_angry.png",
+    Bread = "bread.png"
+}
+
+local colors = {
+    {1, 80/255, 0},
+    {72/255, 0, 1},
+    {0, 38/255, 1},
+    {1,1,1}
+}
+
 function love.load()
+    for name, sprite in pairs(sprites) do
+        sprites[name] = love.graphics.newImage("/img/"..sprite)
+    end
+
     conductor:Init()
     startTime = love.timer.getTime() + 1
     
@@ -84,19 +104,30 @@ function love.textinput(t)
 end
 
 function love.draw()
+    love.graphics.draw(sprites.BG)
     if editor.Enabled == true then
         editor:Draw()
     else
         local circleXOffset = (love.graphics.getWidth() - 4 * 70) / 2 - 35
         
         for i = 1, 4 do
-            love.graphics.circle("line", i * 70 + circleXOffset, 500, 30)
+            love.graphics.setColor(colors[i][1],colors[i][2],colors[i][3],1)
+            love.graphics.circle("fill", i * 70 + circleXOffset, 500, 30)
+            love.graphics.setColor(1,1,1,1)
+            love.graphics.draw(sprites.GooseFace, i * 70 + circleXOffset - 30, 470)
+            
+            if love.keyboard.isDown(settings.Keybinds[i]) then
+                love.graphics.draw(sprites.GooseHonk, i * 70 + circleXOffset - 30, 470)
+            end
         end
+        
+        love.graphics.setColor(1,1,1,1)
         
         for _, v in ipairs(conductor.Chart) do
             if v.H ~= true then
                 for _, n in ipairs(v.N) do
-                    love.graphics.circle("fill", n * 70 + circleXOffset, (v.B - conductor.SongPositionInBeats) * -300 + 470, 30)
+                    love.graphics.draw(sprites.Bread, n * 70 + circleXOffset - 30, (v.B - conductor.SongPositionInBeats) * -300 + 440)
+                   --love.graphics.circle("fill", n * 70 + circleXOffset, (v.B - conductor.SongPositionInBeats) * -300 + 470, 30)
                 end
             end
         end
