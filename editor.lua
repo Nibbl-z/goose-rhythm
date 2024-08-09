@@ -14,7 +14,7 @@ local scrollOffset = 0
 local quadrant = -1
 local totalYOffset = 100
 local xOffset = (love.graphics.getWidth() - 4 * 70) / 2 - 35
-local snap = 1
+local snap = 0.25
 local beats = 8
 local beatQuadrant = {}
 
@@ -26,7 +26,7 @@ local pixelsPerBeat = 300
 function PlaceNote()
     if beatQuadrant.b == nil then return end
     table.insert(chart, {B = beatQuadrant.b, N = quadrant, Y = beatQuadrant.y1})
-
+    
     Export()
 end
 
@@ -112,16 +112,24 @@ function editor:Update()
     lines = {}
     beatQuadrant = {}
     local beat = 0
-    for i = 0, -1000, -1 do
+    for i = 0, -1000, -snap do
         local line = {x1 = xOffset, x2 = love.graphics.getWidth() - xOffset, y1 = i * pixelsPerBeat + 500, y2 = i * pixelsPerBeat + 500, b = beat}
         
+        line.b = tonumber(string.format('%.3f', line.b))
+
+        if math.floor(line.b) ~= line.b then
+            line.partial = true
+        else
+            line.partial = false
+        end
+
         table.insert(lines, line)
        
         if math.abs((i * pixelsPerBeat + 500 + scrollOffset) - (mY)) < 20 then
             beatQuadrant = line
         end
-
-        beat = beat + 1
+        
+        beat = beat + snap
     end
 
     
@@ -145,9 +153,16 @@ function editor:Draw()
     end
 
     for _, l in ipairs(lines) do
+        if l.partial == false then
+            love.graphics.setColor(1,1,1,1)
+        else
+            love.graphics.setColor(0.5,0.5,0.5,1)
+        end
         love.graphics.print(l.b, xOffset - 30, l.y1 + scrollOffset)
         love.graphics.line(l.x1, l.y1 + scrollOffset, l.x2, l.y2 + scrollOffset)
     end
+    
+    love.graphics.setColor(1,1,1,1)
 end
 
 return editor
