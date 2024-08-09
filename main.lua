@@ -9,7 +9,8 @@ local testDraw = true
 local started = false
 
 function love.load()
-    startTime = love.timer.getTime() + 3
+    conductor:Init()
+    startTime = love.timer.getTime() + 1
     
     if editor.Enabled == true then
         editor:Init()
@@ -27,7 +28,7 @@ end
 function love.update(dt)
     
     if editor.Enabled == true then
-        editor:Update()
+        editor:Update(dt)
         uimgr:Update()
     else
         if love.timer.getTime() > startTime and not started then
@@ -62,7 +63,7 @@ end
 
 function love.keypressed(key)
     if editor.Enabled == true then
-    
+        editor:KeyPressed(key)
     else
         local result = conductor:GetHitAccuracy(key)
         if result == nil then return end

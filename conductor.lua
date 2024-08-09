@@ -14,6 +14,10 @@ conductor.Chart = {}
 
 local settings = require("settings")
 
+function conductor:Init()
+    self.SecondsPerBeat = 60 / self.BPM
+end
+
 function conductor:Update(dt)
     self.SecondsPerBeat = 60 / self.BPM
     

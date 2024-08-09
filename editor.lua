@@ -26,6 +26,8 @@ local pixelsPerBeat = 300
 
 local snapIndex = 1
 local snaps = {1, 1/2, 1/3, 1/4, 1/6, 1/8, 1/16}
+local song = "/kk_intermission.ogg"
+local playing = false
 
 function PlaceNote()
     if beatQuadrant.b == nil then return end
@@ -61,6 +63,9 @@ function Export()
 end
 
 function editor:Init()
+    loadedSong = love.audio.newSource(song, "static")
+    loadedSong:setVolume(0.2)
+
     mainBeatFont = love.graphics.newFont(25)
     smallBeatFont = love.graphics.newFont(15)
 
@@ -126,7 +131,7 @@ function editor:MousePressed(x, y, button)
     end
 end
 
-function editor:Update()
+function editor:Update(dt)
     local mX, mY = love.mouse.getPosition()
 
     lines = {}
@@ -142,7 +147,7 @@ function editor:Update()
         else
             line.partial = false
         end
-
+        
         table.insert(lines, line)
        
         if math.abs((i * pixelsPerBeat + 500 + scrollOffset) - (mY)) < 20 then
@@ -152,7 +157,38 @@ function editor:Update()
         beat = beat + snap
     end
 
-    
+    if playing then
+        conductor:Update(dt)
+
+        scrollOffset = conductor.SongPositionInBeats * pixelsPerBeat
+    end
+end
+
+function StartPlayback()
+    playing = true
+    conductor.SongPositionInBeats = scrollOffset / pixelsPerBeat
+    conductor.SongPosition = scrollOffset / pixelsPerBeat * conductor.SecondsPerBeat
+    loadedSong:play()
+    print(scrollOffset / pixelsPerBeat * conductor.SecondsPerBeat)
+    loadedSong:seek(scrollOffset / pixelsPerBeat * conductor.SecondsPerBeat, "seconds")
+end
+
+function StopPlayback()
+    playing = false
+    loadedSong:stop()
+
+    scrollOffset = math.ceil(scrollOffset / pixelsPerBeat) * pixelsPerBeat
+end
+
+function editor:KeyPressed(key)
+    if key == "space" then
+        if playing == false then
+            StartPlayback()
+        else
+            StopPlayback()
+        end
+        
+    end
 end
 
 function editor:WheelMoved(x, y)
@@ -163,6 +199,9 @@ function editor:WheelMoved(x, y)
     end
     
     scrollOffset = scrollOffset + y * 20
+    if scrollOffset < 0 then
+        scrollOffset = 0
+    end
 end
 
 function editor:Draw()
