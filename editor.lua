@@ -9,13 +9,15 @@ local UIVector2 = require("yan.datatypes.uivector2")
 local Vector2 = require("yan.datatypes.vector2")
 local utils = require("yan.utils")
 
+local textinput = require("yan.instance.ui.textinput")
+
 editor.Enabled = true
 
 local scrollOffset = 0
 local quadrant = -1
 local totalYOffset = 100
 local xOffset = (love.graphics.getWidth() - 4 * 70) / 2 - 35
-local snap = 1
+local snap = 0.5
 local beats = 8
 local beatQuadrant = {}
 
@@ -24,10 +26,13 @@ local chart = {}
 local notePlaceLines = {}
 local pixelsPerBeat = 300
 
-local snapIndex = 1
-local snaps = {1, 1/2, 1/3, 1/4, 1/6, 1/8, 1/16}
+local snapIndex = 2
+local snaps = {1, 1/2, 1/3, 1/4, 1/6, 1/8, 1/16, 0}
 local song = "/kk_intermission.ogg"
 local playing = false
+
+local minVisibleBeat = 0
+local maxVisibleBeat = 6
 
 function PlaceNote()
     if beatQuadrant.b == nil then return end
@@ -69,19 +74,19 @@ function editor:Init()
     mainBeatFont = love.graphics.newFont(25)
     smallBeatFont = love.graphics.newFont(15)
 
-    noteDetector = screen:New()
-    noteDetector.Enabled = true
+    editorui = screen:New()
+    editorui.Enabled = true
     
     noteColumns = {}
     
-    placerContainer = frame:New(noteDetector)
+    placerContainer = frame:New(editorui)
     placerContainer.Size = UIVector2.new(0,70 * 4,1,0)
     placerContainer.Position = UIVector2.new(0.5,0,0,0)
     placerContainer.AnchorPoint = Vector2.new(0.5,0)
     placerContainer.Color = Color.new(1,1,1,0)
     
     for i = 1, 4 do
-        local noteDetector = btn:New(noteDetector, "", 20, "center", "center")
+        local noteDetector = btn:New(editorui, "", 20, "center", "center")
         noteDetector.Position = UIVector2.new(0.25 * (i - 1), 0, 0, 0)
         noteDetector.Size = UIVector2.new(0.25,0,1,0)
         noteDetector:SetParent(placerContainer)
@@ -96,6 +101,21 @@ function editor:Init()
         end
     end
     
+    snapInput = textinput:New(editorui, "0.5", 16, "left", "center")
+    snapInput.Position = UIVector2.new(0, 10, 0, 10)
+    snapInput.Size = UIVector2.new(0.1,0,0.05,0)
+    snapInput.TextColor = Color.new(0,0,0,1)
+    snapInput.MouseDown = function () 
+        
+    end 
+
+    snapInput.OnEnter = function ()
+        if tonumber(snapInput.Text) ~= nil then
+            if tonumber(snapInput.Text) > 0 then
+                snap = tonumber(snapInput.Text)
+            end
+        end
+    end
     --[[beatDetector = screen:New()
     beatDetector.Enabled = true
     
@@ -133,27 +153,33 @@ end
 
 function editor:Update(dt)
     local mX, mY = love.mouse.getPosition()
-
+    local csb = math.floor(scrollOffset / pixelsPerBeat)
+    
+    minVisibleBeat = csb - 2
+    maxVisibleBeat = csb + 4
     lines = {}
     beatQuadrant = {}
     local beat = 0
     for i = 0, -1000, -snap do
-        local line = {x1 = xOffset, x2 = love.graphics.getWidth() - xOffset, y1 = i * pixelsPerBeat + 500, y2 = i * pixelsPerBeat + 500, b = beat}
-        
-        line.b = tonumber(string.format('%.3f', line.b))
+        if beat >= minVisibleBeat and beat <= maxVisibleBeat then
+            local line = {x1 = xOffset, x2 = love.graphics.getWidth() - xOffset, y1 = i * pixelsPerBeat + 500, y2 = i * pixelsPerBeat + 500, b = beat}
+            
+            line.b = tonumber(string.format('%.3f', line.b))
 
-        if math.floor(line.b) ~= line.b then
-            line.partial = true
-        else
-            line.partial = false
-        end
+            if math.floor(line.b) ~= line.b then
+                line.partial = true
+            else
+                line.partial = false
+            end
+            
+            table.insert(lines, line)
         
-        table.insert(lines, line)
-       
-        if math.abs((i * pixelsPerBeat + 500 + scrollOffset) - (mY)) < 20 then
-            beatQuadrant = line
+            if math.abs((i * pixelsPerBeat + 500 + scrollOffset) - (mY)) < 20 then
+                beatQuadrant = line
+            end
+            
+            
         end
-        
         beat = beat + snap
     end
 
@@ -176,8 +202,8 @@ end
 function StopPlayback()
     playing = false
     loadedSong:stop()
-
-    scrollOffset = math.ceil(scrollOffset / pixelsPerBeat) * pixelsPerBeat
+    
+    --scrollOffset = math.ceil(scrollOffset / pixelsPerBeat / snap) * pixelsPerBeat * snap
 end
 
 function editor:KeyPressed(key)
@@ -187,7 +213,6 @@ function editor:KeyPressed(key)
         else
             StopPlayback()
         end
-        
     end
 end
 
@@ -218,6 +243,8 @@ function editor:Draw()
     end
 
     for _, l in ipairs(lines) do
+        
+
         if l.partial == false then
             love.graphics.setFont(mainBeatFont)
             love.graphics.setColor(1,1,1,1)

@@ -10,6 +10,7 @@
         "lowercase-global",
         "param-type-mismatch",
         "assign-type-mismatch",
-        "duplicate-set-field"
+        "duplicate-set-field",
+        "cast-local-type"
     ]
 }

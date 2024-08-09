@@ -61,7 +61,8 @@ function love.wheelmoved(x, y)
     editor:WheelMoved(x, y)
 end
 
-function love.keypressed(key)
+function love.keypressed(key, scancode, rep)
+    uimgr:KeyPressed(key, scancode, rep)
     if editor.Enabled == true then
         editor:KeyPressed(key)
     else
@@ -76,6 +77,10 @@ function love.keypressed(key)
             status = "Miss"
         end
     end
+end
+
+function love.textinput(t)
+    uimgr:TextInput(t)
 end
 
 function love.draw()
