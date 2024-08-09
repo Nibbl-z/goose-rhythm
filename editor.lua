@@ -10,19 +10,40 @@ local Vector2 = require("yan.datatypes.vector2")
 
 editor.Enabled = true
 
-local offset = 0
+local scrollOffset = 0
 local quadrant = -1
 local totalYOffset = 100
 local xOffset = (love.graphics.getWidth() - 4 * 70) / 2 - 35
 local snap = 1
 local beats = 8
-local beatQuadrant = 1
+local beatQuadrant = {}
 
 local chart = {}
 
+local notePlaceLines = {}
+local pixelsPerBeat = 300
+
 function PlaceNote()
-    print( math.abs(beatQuadrant - 8), quadrant)
-    table.insert(chart, {B = math.abs(beatQuadrant - 8), N = quadrant})
+    if beatQuadrant.b == nil then return end
+    table.insert(chart, {B = beatQuadrant.b, N = quadrant, Y = beatQuadrant.y1})
+
+    Export()
+end
+
+function Export()
+    local result = "{"
+    
+    for i, note in ipairs(chart) do
+        result = result.."{B = "..note.B..", N = "..note.N
+
+        if i == #chart then
+            result = result.."}}"
+        else
+            result = result.."},"
+        end
+    end
+
+    print(result)
 end
 
 function editor:Init()
@@ -35,7 +56,7 @@ function editor:Init()
     placerContainer.Size = UIVector2.new(0,70 * 4,1,0)
     placerContainer.Position = UIVector2.new(0.5,0,0,0)
     placerContainer.AnchorPoint = Vector2.new(0.5,0)
-    placerContainer.Color = Color.new(1,1,1,0.5)
+    placerContainer.Color = Color.new(1,1,1,0)
     
     for i = 1, 4 do
         local noteDetector = btn:New(noteDetector, "", 20, "center", "center")
@@ -57,9 +78,9 @@ function editor:Init()
         end
     end
     
-    beatDetector = screen:New()
+    --[[beatDetector = screen:New()
     beatDetector.Enabled = true
-
+    
     beatRows = {}
     
     beatDetectorContainer = frame:New(noteDetector)
@@ -82,16 +103,37 @@ function editor:Init()
         beatDetector.MouseLeave = function ()
             beatQuadrant = -1
         end
-    end
+    end]]
 end
 
 function editor:Update()
-    local mx, my = love.mouse.getPosition()
+    local mX, mY = love.mouse.getPosition()
+
+    lines = {}
+    beatQuadrant = {}
+    local beat = 0
+    for i = 0, -1000, -1 do
+        local line = {x1 = xOffset, x2 = love.graphics.getWidth() - xOffset, y1 = i * pixelsPerBeat + 500, y2 = i * pixelsPerBeat + 500, b = beat}
+        
+        table.insert(lines, line)
+       
+        if math.abs((i * pixelsPerBeat + 500 + scrollOffset) - (mY)) < 20 then
+            beatQuadrant = line
+        end
+
+        beat = beat + 1
+    end
+
+    
+end
+
+function editor:WheelMoved(x, y)
+    scrollOffset = scrollOffset + y * 20
 end
 
 function editor:Draw()
-    if quadrant ~= -1 then
-        love.graphics.circle("line", (quadrant) * 70 + xOffset, beatQuadrant * (530 / 8) - 30, 30)
+    if quadrant ~= -1 and beatQuadrant.y1 ~= nil then
+        love.graphics.circle("line", (quadrant) * 70 + xOffset, beatQuadrant.y1 + scrollOffset, 30)
     end
     
     for i = 1, 4 do
@@ -99,7 +141,12 @@ function editor:Draw()
     end
     
     for _, note in ipairs(chart) do
-        love.graphics.circle("fill", (note.N) * 70 + xOffset, (-(note.B - 8) * (530 / 8)) - 30, 30)
+        love.graphics.circle("fill", (note.N) * 70 + xOffset, note.Y + scrollOffset, 30)
+    end
+
+    for _, l in ipairs(lines) do
+        love.graphics.print(l.b, xOffset - 30, l.y1 + scrollOffset)
+        love.graphics.line(l.x1, l.y1 + scrollOffset, l.x2, l.y2 + scrollOffset)
     end
 end
 

@@ -5,7 +5,11 @@ local song = "/kk_intermission.ogg"
 
 local testDraw = true
 
+
+local started = false
+
 function love.load()
+    startTime = love.timer.getTime() + 3
     love.window.setMode(800,600,{resizable=true})
     
     if editor.Enabled == true then
@@ -18,17 +22,25 @@ function love.load()
         love.graphics.setFont(love.graphics.newFont(32))
 
         conductor:LoadChart()
-
-        loadedSong:play()
     end
 end
 
 function love.update(dt)
-    uimgr:Update()
+    
     if editor.Enabled == true then
         editor:Update()
+        uimgr:Update()
     else
-        conductor:Update(dt)
+        if love.timer.getTime() > startTime and not started then
+            loadedSong:play()
+            conductor:Update(dt)
+            started = true
+        end
+
+        if started then
+            conductor:Update(dt)
+        end
+        
     end
     
     --conductor:GetHitAccuracy()
@@ -43,6 +55,10 @@ local status = ""
 
 function love.mousepressed()
 
+end
+
+function love.wheelmoved(x, y)
+    editor:WheelMoved(x, y)
 end
 
 function love.keypressed(key)
