@@ -7,6 +7,7 @@ local screen = require("yan.instance.ui.screen")
 local Color = require("yan.datatypes.color")
 local UIVector2 = require("yan.datatypes.uivector2")
 local Vector2 = require("yan.datatypes.vector2")
+local utils = require("yan.utils")
 
 editor.Enabled = true
 
@@ -14,7 +15,7 @@ local scrollOffset = 0
 local quadrant = -1
 local totalYOffset = 100
 local xOffset = (love.graphics.getWidth() - 4 * 70) / 2 - 35
-local snap = 0.25
+local snap = 1
 local beats = 8
 local beatQuadrant = {}
 
@@ -23,10 +24,23 @@ local chart = {}
 local notePlaceLines = {}
 local pixelsPerBeat = 300
 
+local snapIndex = 1
+local snaps = {1, 1/2, 1/3, 1/4, 1/6, 1/8, 1/16}
+
 function PlaceNote()
     if beatQuadrant.b == nil then return end
     table.insert(chart, {B = beatQuadrant.b, N = quadrant, Y = beatQuadrant.y1})
     
+    Export()
+end
+
+function DeleteNote()
+    for i, v in ipairs(chart) do
+        if v.B == beatQuadrant.b and v.N == quadrant then
+            table.remove(chart,i)
+        end
+    end
+
     Export()
 end
 
@@ -35,18 +49,21 @@ function Export()
     
     for i, note in ipairs(chart) do
         result = result.."{B = "..note.B..", N = "..note.N
-
+        
         if i == #chart then
             result = result.."}}"
         else
             result = result.."},"
         end
     end
-
+    
     print(result)
 end
 
 function editor:Init()
+    mainBeatFont = love.graphics.newFont(25)
+    smallBeatFont = love.graphics.newFont(15)
+
     noteDetector = screen:New()
     noteDetector.Enabled = true
     
@@ -71,10 +88,6 @@ function editor:Init()
 
         noteDetector.MouseLeave = function ()
             quadrant = -1
-        end
-
-        noteDetector.MouseDown = function ()
-            PlaceNote()
         end
     end
     
@@ -104,6 +117,13 @@ function editor:Init()
             beatQuadrant = -1
         end
     end]]
+end
+
+function editor:MousePressed(x, y, button)
+    if quadrant ~= -1 then
+        if button == 1 then PlaceNote() end
+        if button == 2 then DeleteNote() end
+    end
 end
 
 function editor:Update()
@@ -136,6 +156,12 @@ function editor:Update()
 end
 
 function editor:WheelMoved(x, y)
+    if love.keyboard.isDown("lctrl") then
+        snapIndex = utils:Clamp(snapIndex + y, 1, #snaps)
+        snap = snaps[snapIndex]
+        return
+    end
+    
     scrollOffset = scrollOffset + y * 20
 end
 
@@ -154,11 +180,16 @@ function editor:Draw()
 
     for _, l in ipairs(lines) do
         if l.partial == false then
+            love.graphics.setFont(mainBeatFont)
             love.graphics.setColor(1,1,1,1)
+            love.graphics.print(l.b, xOffset - 80, l.y1 + scrollOffset - (mainBeatFont:getHeight() / 2))
+            
         else
+            love.graphics.setFont(smallBeatFont)
             love.graphics.setColor(0.5,0.5,0.5,1)
+            love.graphics.print(l.b, xOffset - 80, l.y1 + scrollOffset - (smallBeatFont:getHeight() / 2))
         end
-        love.graphics.print(l.b, xOffset - 30, l.y1 + scrollOffset)
+        
         love.graphics.line(l.x1, l.y1 + scrollOffset, l.x2, l.y2 + scrollOffset)
     end
     

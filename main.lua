@@ -10,7 +10,6 @@ local started = false
 
 function love.load()
     startTime = love.timer.getTime() + 3
-    love.window.setMode(800,600,{resizable=true})
     
     if editor.Enabled == true then
         editor:Init()
@@ -53,8 +52,8 @@ end
 
 local status = ""
 
-function love.mousepressed()
-
+function love.mousepressed(x, y, button)
+    editor:MousePressed(x, y, button)
 end
 
 function love.wheelmoved(x, y)
