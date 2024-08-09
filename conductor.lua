@@ -69,6 +69,8 @@ function conductor:LoadChart()
 end
 
 function conductor:GetHitAccuracy(key)
+    
+
     local time = self.SongPositionInBeats
     
     local lastDiff = math.abs(self.LastChartBeat.B - time)

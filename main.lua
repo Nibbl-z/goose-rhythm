@@ -14,7 +14,9 @@ local sprites = {
     GooseFace = "goose_face.png",
     GooseHonk = "goose_honking.png",
     GooseAngry = "goose_angry.png",
-    Bread = "bread.png"
+    Bread = "bread.png",
+    Crust = "crust.png",
+    CrustPressed = "crust_pressed.png"
 }
 
 local colors = {
@@ -111,13 +113,15 @@ function love.draw()
         local circleXOffset = (love.graphics.getWidth() - 4 * 70) / 2 - 35
         
         for i = 1, 4 do
-            love.graphics.setColor(colors[i][1],colors[i][2],colors[i][3],1)
-            love.graphics.circle("fill", i * 70 + circleXOffset, 500, 30)
-            love.graphics.setColor(1,1,1,1)
-            love.graphics.draw(sprites.GooseFace, i * 70 + circleXOffset - 30, 470)
+            --love.graphics.setColor(colors[i][1],colors[i][2],colors[i][3],1)
+            --love.graphics.circle("fill", i * 70 + circleXOffset, 500, 30)
+            --love.graphics.setColor(1,1,1,1)
+            
             
             if love.keyboard.isDown(settings.Keybinds[i]) then
-                love.graphics.draw(sprites.GooseHonk, i * 70 + circleXOffset - 30, 470)
+                love.graphics.draw(sprites.CrustPressed, i * 70 + circleXOffset - 30, 470)
+            else
+                love.graphics.draw(sprites.Crust, i * 70 + circleXOffset - 30, 470)
             end
         end
         
