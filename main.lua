@@ -2,7 +2,7 @@ require("conductor")
 require("yan")
 local editor = require("editor")
 local uimgr = require("yan.uimanager")
-local song = "/kk_intermission.ogg"
+local song = "/music/greengoose.mp3"
 local settings = require("settings")
 
 local testDraw = true
@@ -52,7 +52,7 @@ function love.load()
     goose.Offset = Vector2.new(25, 50)
     goose.Size = Vector2.new(2,2)
     
-    gooseBopTween = yan:NewTween(goose, yan:TweenInfo(0.3, EasingStyle.QuadOut), {Size = Vector2.new(2,2)})
+    gooseBopTween = yan:NewTween(goose, yan:TweenInfo(0.3, EasingStyle.Linear), {Size = Vector2.new(2,2)})
     doBop = false
     
     hud = yan:Screen()
@@ -113,6 +113,7 @@ function conductor.Metronome()
     --metronome:play()
     
     goose.Size = Vector2.new(2.5, 1.5)
+    --yan:NewTween(goose, yan:TweenInfo(0.3, EasingStyle.QuadOut), {Size = Vector2.new(2,2)}):Pla
     gooseBopTween:Play()
 end
 
@@ -187,22 +188,25 @@ function love.draw()
         
         
         for _, v in ipairs(conductor.Chart) do
-            if v.H ~= true and v.M ~= true then
-                for _, n in ipairs(v.N) do
-                    love.graphics.draw(sprites.Bread, n * 70 + circleXOffset - 30, (v.B - conductor.SongPositionInBeats) * -300 + 440)
-                   --love.graphics.circle("fill", n * 70 + circleXOffset, (v.B - conductor.SongPositionInBeats) * -300 + 470, 30)
-
-                    if (v.B - conductor.SongPositionInBeats) * -300 + 440 > 600 then
-                        v.M = true
-
-                        goose:SetLoadedSprite(sprites.GreenGooseMiss)
-    
-                        misses = misses + 1
-                        combo = 0
-                        status = "Miss"
+            if (v.B - conductor.SongPositionInBeats) > -2 and (v.B - conductor.SongPositionInBeats) < 4 then
+                if v.H ~= true and v.M ~= true then
+                    for _, n in ipairs(v.N) do
+                        love.graphics.draw(sprites.Bread, n * 70 + circleXOffset - 30, (v.B - conductor.SongPositionInBeats) * -300 + 440)
+                       --love.graphics.circle("fill", n * 70 + circleXOffset, (v.B - conductor.SongPositionInBeats) * -300 + 470, 30)
+                       
+                       --[[if (v.B - conductor.SongPositionInBeats) * -300 + 440 > 600 then
+                            v.M = true
+                            
+                            goose:SetLoadedSprite(sprites.GreenGooseMiss)
+        
+                            misses = misses + 1
+                            combo = 0
+                            status = "Miss"
+                        end]]
                     end
                 end
             end
+           
         end
         
         love.graphics.print(status)

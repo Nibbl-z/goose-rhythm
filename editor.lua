@@ -28,7 +28,7 @@ local pixelsPerBeat = 300
 
 local snapIndex = 2
 local snaps = {1, 1/2, 1/3, 1/4, 1/6, 1/8, 1/16}
-local song = "/kk_intermission.ogg"
+local song = "/music/greengoose.mp3"
 local playing = false
 
 local minVisibleBeat = 0
@@ -55,7 +55,7 @@ function Export()
     local result = "{"
     
     for i, note in ipairs(chart) do
-        result = result.."{B = "..note.B..", N = "..note.N
+        result = result.."{B = "..note.B..", N = "..note.N..", Y = "..note.Y
         
         if i == #chart then
             result = result.."}}"
@@ -64,7 +64,7 @@ function Export()
         end
     end
     
-    print(result)
+    love.system.setClipboardText(result)
 end
 
 function editor:Init()

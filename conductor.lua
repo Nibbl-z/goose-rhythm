@@ -1,6 +1,6 @@
 conductor = {}
 
-conductor.BPM = 128
+conductor.BPM = 150
 conductor.SongPositionInBeats = 0
 conductor.SongPosition = 0.0
 conductor.LastBeat = 0.0
@@ -61,7 +61,7 @@ end
 function conductor:LoadChart()
     local combineIndex = 0
     local previousBeat = nil
-    for i, v in ipairs(require("chart")) do
+    for i, v in ipairs(require("greengoose")) do
         --print(v.N, v.B)
         print(previousBeat, v.B)
         if previousBeat == v.B then
