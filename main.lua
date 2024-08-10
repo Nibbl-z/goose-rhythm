@@ -42,7 +42,7 @@ function love.load()
         loadedSong:setVolume(0.2)
         
         love.graphics.setFont(love.graphics.newFont(32))
-
+        
         conductor:LoadChart()
     end
     
@@ -57,19 +57,19 @@ function love.load()
     
     hud = yan:Screen()
     
-    breadLabel = yan:Label(hud, "Bread: 0", 24, "center", "center", nil)
+    breadLabel = yan:Label(hud, "Bread: 0", 24, "center", "center", "/ComicNeue.ttf")
     breadLabel.Position = UIVector2.new(0.66,0,1,0)
     breadLabel.Size = UIVector2.new(0.33,0,0.1,0)
     breadLabel.AnchorPoint = Vector2.new(0,1)
     breadLabel.TextColor = Color.new(1,1,1,1)
 
-    comboLabel = yan:Label(hud, "Combo: 0 (Full Combo)", 24, "center", "center", nil)
+    comboLabel = yan:Label(hud, "Combo: 0 (Full Combo)", 24, "center", "center", "/ComicNeue.ttf")
     comboLabel.Position = UIVector2.new(0.33,0,1,0)
     comboLabel.Size = UIVector2.new(0.33,0,0.1,0)
     comboLabel.AnchorPoint = Vector2.new(0,1)
     comboLabel.TextColor = Color.new(1,1,1,1)
     
-    missesLabel = yan:Label(hud, "Misses: 0", 24, "center", "center", nil)
+    missesLabel = yan:Label(hud, "Misses: 0", 24, "center", "center", "/ComicNeue.ttf")
     missesLabel.Position = UIVector2.new(0,0,1,0)
     missesLabel.Size = UIVector2.new(0.33,0,0.1,0)
     missesLabel.AnchorPoint = Vector2.new(0,1)

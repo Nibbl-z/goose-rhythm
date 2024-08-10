@@ -27,7 +27,7 @@ local notePlaceLines = {}
 local pixelsPerBeat = 300
 
 local snapIndex = 2
-local snaps = {1, 1/2, 1/3, 1/4, 1/6, 1/8, 1/16, 0}
+local snaps = {1, 1/2, 1/3, 1/4, 1/6, 1/8, 1/16}
 local song = "/kk_intermission.ogg"
 local playing = false
 

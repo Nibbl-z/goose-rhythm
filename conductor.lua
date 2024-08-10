@@ -91,18 +91,21 @@ function conductor:GetHitAccuracy(key)
     if lastDiff > 1 and nextDiff > 1 then return end
 
     if lastDiff > nextDiff then
-        for _, n in ipairs(self.NextChartBeat.N) do
-            if key == settings.Keybinds[n] then
-                self.NextChartBeat.H = true
-                return nextDiff
+        if self.NextChartBeat.H ~= true then
+            for _, n in ipairs(self.NextChartBeat.N) do
+                if key == settings.Keybinds[n] then
+                    self.NextChartBeat.H = true
+                    return nextDiff
+                end
             end
         end
-        
     else
-        for _, n in ipairs(self.LastChartBeat.N) do
-            if key == settings.Keybinds[n] then
-                self.LastChartBeat.H = true
-                return lastDiff
+        if self.LastChartBeat.H ~= true then
+            for _, n in ipairs(self.LastChartBeat.N) do
+                if key == settings.Keybinds[n] then
+                    self.LastChartBeat.H = true
+                    return lastDiff
+                end
             end
         end
     end
