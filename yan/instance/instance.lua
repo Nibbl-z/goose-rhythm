@@ -34,6 +34,10 @@ function instance:New(name)
         o.Sprite = love.graphics.newImage(spritePath)
     end
 
+    function o:SetLoadedSprite(sprite)
+        o.Sprite = sprite
+    end
+
     function o:Draw()
         if not o.Visible then return end
         if o.SceneEnabled == false then return end

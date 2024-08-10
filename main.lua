@@ -17,17 +17,14 @@ local sprites = {
     GooseAngry = "goose_angry.png",
     Bread = "bread.png",
     Crust = "crust.png",
-    CrustPressed = "crust_pressed.png"
+    CrustPressed = "crust_pressed.png",
+    GreenGoose = "greengoose.png",
+    GreenGooseMiss = "greengoose_miss.png"
 }
 
-local colors = {
-    {1, 80/255, 0},
-    {72/255, 0, 1},
-    {0, 38/255, 1},
-    {1,1,1}
-}
-
-
+local bread = 0
+local combo = 0
+local misses = 0
 
 function love.load()
     for name, sprite in pairs(sprites) do
@@ -50,13 +47,33 @@ function love.load()
     end
     
     goose = yan:Instance("Goose")
-    goose:SetSprite("/img/greengoose.png")
+    goose:SetLoadedSprite(sprites.GreenGoose)
     goose.Position = Vector2.new(650,500)
     goose.Offset = Vector2.new(25, 50)
     goose.Size = Vector2.new(2,2)
     
     gooseBopTween = yan:NewTween(goose, yan:TweenInfo(0.3, EasingStyle.QuadOut), {Size = Vector2.new(2,2)})
     doBop = false
+    
+    hud = yan:Screen()
+    
+    breadLabel = yan:Label(hud, "Bread: 0", 24, "center", "center", nil)
+    breadLabel.Position = UIVector2.new(0.66,0,1,0)
+    breadLabel.Size = UIVector2.new(0.33,0,0.1,0)
+    breadLabel.AnchorPoint = Vector2.new(0,1)
+    breadLabel.TextColor = Color.new(1,1,1,1)
+
+    comboLabel = yan:Label(hud, "Combo: 0 (Full Combo)", 24, "center", "center", nil)
+    comboLabel.Position = UIVector2.new(0.33,0,1,0)
+    comboLabel.Size = UIVector2.new(0.33,0,0.1,0)
+    comboLabel.AnchorPoint = Vector2.new(0,1)
+    comboLabel.TextColor = Color.new(1,1,1,1)
+    
+    missesLabel = yan:Label(hud, "Misses: 0", 24, "center", "center", nil)
+    missesLabel.Position = UIVector2.new(0,0,1,0)
+    missesLabel.Size = UIVector2.new(0.33,0,0.1,0)
+    missesLabel.AnchorPoint = Vector2.new(0,1)
+    missesLabel.TextColor = Color.new(1,1,1,1)
 end
 
 function love.update(dt)
@@ -76,7 +93,15 @@ function love.update(dt)
         
         if doBop then
             doBop = false
-           
+        end
+        
+        breadLabel.Text = "Bread: "..bread
+        missesLabel.Text = "Misses: "..misses
+
+        if misses == 0 then
+            comboLabel.Text = "Combo: "..combo.." (Full Combo)"
+        else
+            comboLabel.Text = "Combo: "..combo
         end
     end
     
@@ -111,11 +136,23 @@ function love.keypressed(key, scancode, rep)
         
         if result <= 0.05 then
             status = "Perfect"
+
+            combo = combo + 1
+            goose:SetLoadedSprite(sprites.GreenGoose)
         elseif result <= 0.2 then
             status = "Okay"
+
+            combo = combo + 1
+            goose:SetLoadedSprite(sprites.GreenGoose)
         elseif result > 0.3 then
+            goose:SetLoadedSprite(sprites.GreenGooseMiss)
+
+            misses = misses + 1
+            combo = 0
             status = "Miss"
         end
+
+        bread = bread + (10 - math.floor(result * 10))
     end
 end
 
@@ -130,7 +167,10 @@ function love.draw()
         editor:Draw()
     else
         local circleXOffset = (love.graphics.getWidth() - 4 * 70) / 2 - 35
-        
+        love.graphics.setColor(0,0,0,0.5)
+        love.graphics.rectangle("fill", circleXOffset + 35, 0, 70 * 4, love.graphics.getHeight())
+
+        love.graphics.setColor(1,1,1,1)
         for i = 1, 4 do
             --love.graphics.setColor(colors[i][1],colors[i][2],colors[i][3],1)
             --love.graphics.circle("fill", i * 70 + circleXOffset, 500, 30)
@@ -144,7 +184,7 @@ function love.draw()
             end
         end
         
-        love.graphics.setColor(1,1,1,1)
+        
         
         for _, v in ipairs(conductor.Chart) do
             if v.H ~= true then
@@ -162,5 +202,5 @@ function love.draw()
         end
     end
 
-    uimgr:Draw()
+    yan:Draw()
 end
