@@ -187,10 +187,20 @@ function love.draw()
         
         
         for _, v in ipairs(conductor.Chart) do
-            if v.H ~= true then
+            if v.H ~= true and v.M ~= true then
                 for _, n in ipairs(v.N) do
                     love.graphics.draw(sprites.Bread, n * 70 + circleXOffset - 30, (v.B - conductor.SongPositionInBeats) * -300 + 440)
                    --love.graphics.circle("fill", n * 70 + circleXOffset, (v.B - conductor.SongPositionInBeats) * -300 + 470, 30)
+
+                    if (v.B - conductor.SongPositionInBeats) * -300 + 440 > 600 then
+                        v.M = true
+
+                        goose:SetLoadedSprite(sprites.GreenGooseMiss)
+    
+                        misses = misses + 1
+                        combo = 0
+                        status = "Miss"
+                    end
                 end
             end
         end

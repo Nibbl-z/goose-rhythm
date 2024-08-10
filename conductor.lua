@@ -6,11 +6,12 @@ conductor.SongPosition = 0.0
 conductor.LastBeat = 0.0
 conductor.SecondsPerBeat = 0.0
 
-conductor.LastChartBeat = {B = 0.0, N = 0.0}
-conductor.NextChartBeat = {B = 0.0, N = 0.0}
+conductor.LastChartBeat = {B = 0.0, N = {}}
+conductor.NextChartBeat = {B = 0.0, N = {}}
 conductor.NoteIndex = 1
 conductor.ChartFinished = false
 conductor.Chart = {}
+conductor.BeatToMiss = nil
 
 local settings = require("settings")
 
@@ -38,12 +39,23 @@ function conductor:Update(dt)
                 self.ChartFinished = true
                 return
             end
+           
+
             self.LastChartBeat = self.NextChartBeat
             self.NextChartBeat = self.Chart[self.NoteIndex]
+            self.BeatToMiss = self.LastChartBeat
             
             self.NoteIndex = self.NoteIndex + 1
         end
     end
+    
+    --[[if self.BeatToMiss ~= nil then
+        if self.SongPositionInBeats > self.BeatToMiss.B + 1 then
+            self.Missed()
+            self.BeatToMiss = nil
+        end
+    end]]
+    
 end
 
 function conductor:LoadChart()
