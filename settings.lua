@@ -1,5 +1,5 @@
 local settings = {}
 
-settings.Keybinds = {"a", "s", "k", "l"}
+settings.Keybinds = {"a", "s", "d", "f"}
 
 return settings

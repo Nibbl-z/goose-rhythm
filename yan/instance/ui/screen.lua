@@ -10,7 +10,7 @@ function screen:New()
     setmetatable(o, self)
     
     o.Type = "Screen"
-    o.Enabled = false
+    o.Enabled = true
     o.Elements = {}
     o.ZIndex = 1
 

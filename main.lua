@@ -1,4 +1,5 @@
 require("conductor")
+require("yan")
 local editor = require("editor")
 local uimgr = require("yan.uimanager")
 local song = "/kk_intermission.ogg"
@@ -26,6 +27,8 @@ local colors = {
     {1,1,1}
 }
 
+
+
 function love.load()
     for name, sprite in pairs(sprites) do
         sprites[name] = love.graphics.newImage("/img/"..sprite)
@@ -45,13 +48,21 @@ function love.load()
 
         conductor:LoadChart()
     end
+    
+    goose = yan:Instance("Goose")
+    goose:SetSprite("/img/greengoose.png")
+    goose.Position = Vector2.new(650,500)
+    goose.Offset = Vector2.new(25, 50)
+    goose.Size = Vector2.new(2,2)
+    
+    gooseBopTween = yan:NewTween(goose, yan:TweenInfo(0.3, EasingStyle.QuadOut), {Size = Vector2.new(2,2)})
+    doBop = false
 end
 
 function love.update(dt)
-    
+    yan:Update(dt)
     if editor.Enabled == true then
         editor:Update(dt)
-        uimgr:Update()
     else
         if love.timer.getTime() > startTime and not started then
             loadedSong:play()
@@ -63,6 +74,10 @@ function love.update(dt)
             conductor:Update(dt)
         end
         
+        if doBop then
+            doBop = false
+           
+        end
     end
     
     --conductor:GetHitAccuracy()
@@ -71,6 +86,9 @@ end
 function conductor.Metronome()
     testDraw = not testDraw
     --metronome:play()
+    
+    goose.Size = Vector2.new(2.5, 1.5)
+    gooseBopTween:Play()
 end
 
 local status = ""
@@ -107,6 +125,7 @@ end
 
 function love.draw()
     love.graphics.draw(sprites.BG)
+    goose:Draw()
     if editor.Enabled == true then
         editor:Draw()
     else

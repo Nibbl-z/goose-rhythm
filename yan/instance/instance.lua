@@ -29,43 +29,39 @@ function instance:New(name)
         math.randomseed(love.timer.getTime())
         o.Name = tostring(love.timer.getTime() * 1000 * math.random(1,1000))
     end
-
-    return o
-end
-
-function instance:SetName(name)
-    self.Name = name
-end
-
-function instance:SetSprite(spritePath)
-    self.Sprite = love.graphics.newImage(spritePath)
-end
-
-function instance:Draw()
-    if not self.Visible then return end
-    if self.SceneEnabled == false then return end
-    love.graphics.setColor(self.Color:GetColors())
-
-    if self.Sprite ~= nil then
-        love.graphics.draw(
-            self.Sprite,
-            self.Position.X,
-            self.Position.Y,
-            self.Rotation,
-            self.Size.X,
-            self.Size.Y,
-            self.Offset.X,
-            self.Offset.Y
-        )
-    elseif self.Shape == "rectangle" then
-        love.graphics.rectangle(
-            "fill",
-            self.Position.X,
-            self.Position.Y,
-            self.Size.X,
-            self.Size.Y
-        )
+    
+    function o:SetSprite(spritePath)
+        o.Sprite = love.graphics.newImage(spritePath)
     end
+
+    function o:Draw()
+        if not o.Visible then return end
+        if o.SceneEnabled == false then return end
+        love.graphics.setColor(o.Color:GetColors())
+    
+        if o.Sprite ~= nil then
+            love.graphics.draw(
+                o.Sprite,
+                o.Position.X,
+                o.Position.Y,
+                o.Rotation,
+                o.Size.X,
+                o.Size.Y,
+                o.Offset.X,
+                o.Offset.Y
+            )
+        elseif o.Shape == "rectangle" then
+            love.graphics.rectangle(
+                "fill",
+                o.Position.X,
+                o.Position.Y,
+                o.Size.X,
+                o.Size.Y
+            )
+        end
+    end
+    
+    return o
 end
 
 return instance
