@@ -29,9 +29,11 @@ function tweenmanager:NewTween(instance, tweeninfo, goal)
         tween.OriginalProperties[key] = instance[key]
     end
     
-    table.insert(tweenmanager.ActiveTweens, tween)
+    
     
     function tween:Play()
+        table.insert(tweenmanager.ActiveTweens, tween)
+        tween.Index = #tweenmanager.ActiveTweens
         for key, value in pairs(tween.Goal) do
             tween.OriginalProperties[key] = instance[key]
         end
@@ -247,6 +249,7 @@ local function UpdateTween(tween, dt)
     end
 
     if tween.Progress >= 1.0 then
+        table.remove(tweenmanager.ActiveTweens, tween.Index)
         tween.Finished = true
         tween.IsPlaying = false
     end

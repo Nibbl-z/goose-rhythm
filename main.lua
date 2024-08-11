@@ -19,7 +19,11 @@ local sprites = {
     Crust = "crust.png",
     CrustPressed = "crust_pressed.png",
     GreenGoose = "greengoose.png",
-    GreenGooseMiss = "greengoose_miss.png"
+    GreenGooseMiss = "greengoose_miss.png",
+    
+    BGPurpleGoose = "bg_purplegoose.png",
+    PurpleGoose = "purplegoose.png",
+    PurpleGooseMiss = "purplegoose_miss.png"
 }
 
 local bread = 0
@@ -32,8 +36,7 @@ function love.load()
     end
 
     conductor:Init()
-    startTime = love.timer.getTime() + 1
-    
+    startTime = love.timer.getTime()
     if editor.Enabled == true then
         editor:Init()
     else
@@ -47,33 +50,35 @@ function love.load()
     end
     
     goose = yan:Instance("Goose")
-    goose:SetLoadedSprite(sprites.GreenGoose)
+    goose:SetLoadedSprite(sprites.PurpleGoose)
     goose.Position = Vector2.new(650,500)
     goose.Offset = Vector2.new(25, 50)
     goose.Size = Vector2.new(2,2)
     
-    gooseBopTween = yan:NewTween(goose, yan:TweenInfo(0.3, EasingStyle.Linear), {Size = Vector2.new(2,2)})
+    gooseBopTween = yan:NewTween(goose, yan:TweenInfo(0.2, EasingStyle.Linear), {Size = Vector2.new(2,2)})
     doBop = false
     
     hud = yan:Screen()
     
     breadLabel = yan:Label(hud, "Bread: 0", 24, "center", "center", "/ComicNeue.ttf")
-    breadLabel.Position = UIVector2.new(0.66,0,1,0)
-    breadLabel.Size = UIVector2.new(0.33,0,0.1,0)
+    breadLabel.Position = UIVector2.new(0.75,0,1,0)
+    breadLabel.Size = UIVector2.new(0.25,0,0.1,0)
     breadLabel.AnchorPoint = Vector2.new(0,1)
     breadLabel.TextColor = Color.new(1,1,1,1)
-
+    
     comboLabel = yan:Label(hud, "Combo: 0 (Full Combo)", 24, "center", "center", "/ComicNeue.ttf")
-    comboLabel.Position = UIVector2.new(0.33,0,1,0)
-    comboLabel.Size = UIVector2.new(0.33,0,0.1,0)
+    comboLabel.Position = UIVector2.new(0.25,0,1,0)
+    comboLabel.Size = UIVector2.new(0.5,0,0.1,0)
     comboLabel.AnchorPoint = Vector2.new(0,1)
     comboLabel.TextColor = Color.new(1,1,1,1)
     
     missesLabel = yan:Label(hud, "Misses: 0", 24, "center", "center", "/ComicNeue.ttf")
     missesLabel.Position = UIVector2.new(0,0,1,0)
-    missesLabel.Size = UIVector2.new(0.33,0,0.1,0)
+    missesLabel.Size = UIVector2.new(0.25,0,0.1,0)
     missesLabel.AnchorPoint = Vector2.new(0,1)
     missesLabel.TextColor = Color.new(1,1,1,1)
+    
+    loadedSong:play()
 end
 
 function love.update(dt)
@@ -86,7 +91,7 @@ function love.update(dt)
             conductor:Update(dt)
             started = true
         end
-
+        
         if started then
             conductor:Update(dt)
         end
@@ -97,7 +102,7 @@ function love.update(dt)
         
         breadLabel.Text = "Bread: "..bread
         missesLabel.Text = "Misses: "..misses
-
+        
         if misses == 0 then
             comboLabel.Text = "Combo: "..combo.." (Full Combo)"
         else
@@ -137,16 +142,16 @@ function love.keypressed(key, scancode, rep)
         
         if result <= 0.05 then
             status = "Perfect"
-
+            
             combo = combo + 1
-            goose:SetLoadedSprite(sprites.GreenGoose)
+            goose:SetLoadedSprite(sprites.PurpleGoose)
         elseif result <= 0.2 then
             status = "Okay"
 
             combo = combo + 1
-            goose:SetLoadedSprite(sprites.GreenGoose)
+            goose:SetLoadedSprite(sprites.PurpleGoose)
         elseif result > 0.3 then
-            goose:SetLoadedSprite(sprites.GreenGooseMiss)
+            goose:SetLoadedSprite(sprites.PurpleGooseMiss)
 
             misses = misses + 1
             combo = 0
@@ -162,7 +167,7 @@ function love.textinput(t)
 end
 
 function love.draw()
-    love.graphics.draw(sprites.BG)
+    love.graphics.draw(sprites.BGPurpleGoose)
     goose:Draw()
     if editor.Enabled == true then
         editor:Draw()
@@ -194,15 +199,15 @@ function love.draw()
                         love.graphics.draw(sprites.Bread, n * 70 + circleXOffset - 30, (v.B - conductor.SongPositionInBeats) * -300 + 440)
                        --love.graphics.circle("fill", n * 70 + circleXOffset, (v.B - conductor.SongPositionInBeats) * -300 + 470, 30)
                        
-                       --[[if (v.B - conductor.SongPositionInBeats) * -300 + 440 > 600 then
+                        if (v.B - conductor.SongPositionInBeats) * -300 + 440 > 600 then
                             v.M = true
                             
-                            goose:SetLoadedSprite(sprites.GreenGooseMiss)
+                            goose:SetLoadedSprite(sprites.PurpleGooseMiss)
         
                             misses = misses + 1
                             combo = 0
                             status = "Miss"
-                        end]]
+                        end
                     end
                 end
             end
