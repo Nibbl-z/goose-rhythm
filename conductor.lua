@@ -153,5 +153,7 @@ function conductor:ReleaseHeldNote(key)
     local time = self.SongPositionInBeats
     local diff = math.abs((heldNote.B + heldNote.D[tostring(index)]) - time)
     
+    table.remove(self.HoldingBeats, index)
+
     return diff
 end
