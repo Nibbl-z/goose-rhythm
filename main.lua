@@ -2,7 +2,7 @@ require("conductor")
 require("yan")
 local editor = require("editor")
 local uimgr = require("yan.uimanager")
-local song = "/music/purplegoose.mp3"
+local song = "/music/greengoose.mp3"
 local settings = require("settings")
 
 local testDraw = true
@@ -43,7 +43,7 @@ function love.load()
         loadedSong = love.audio.newSource(song, "static")
         metronome = love.audio.newSource("/select.wav", "static")
         loadedSong:setVolume(0.2)
-        
+
         love.graphics.setFont(love.graphics.newFont(32))
         
         conductor:LoadChart()
@@ -117,9 +117,9 @@ function conductor.Metronome()
     testDraw = not testDraw
     --metronome:play()
     
-    goose.Size = Vector2.new(2.5, 1.5)
+    --goose.Size = Vector2.new(2.5, 1.5)
     --yan:NewTween(goose, yan:TweenInfo(0.3, EasingStyle.QuadOut), {Size = Vector2.new(2,2)}):Pla
-    gooseBopTween:Play()
+    --gooseBopTween:Play()
 end
 
 local status = ""
@@ -198,7 +198,7 @@ function love.draw()
         local circleXOffset = (love.graphics.getWidth() - 4 * 70) / 2 - 35
         love.graphics.setColor(0,0,0,0.5)
         love.graphics.rectangle("fill", circleXOffset + 35, 0, 70 * 4, love.graphics.getHeight())
-
+        
         love.graphics.setColor(1,1,1,1)
         for i = 1, 4 do
             --love.graphics.setColor(colors[i][1],colors[i][2],colors[i][3],1)
@@ -212,8 +212,6 @@ function love.draw()
                 love.graphics.draw(sprites.Crust, i * 70 + circleXOffset - 30, 470)
             end
         end
-        
-        
         
         for _, v in ipairs(conductor.Chart) do
             if (v.B - conductor.SongPositionInBeats) > -10 and (v.B - conductor.SongPositionInBeats) < 10 then
@@ -238,7 +236,6 @@ function love.draw()
                 if v.D ~= nil then
                     for _, n in ipairs(v.N) do
                         if v.D[tostring(n)] ~= nil then
-                            print(v.D[tostring(v.N)])
                             love.graphics.setColor(1, 183/255, 135/255)
                             love.graphics.rectangle("fill",
                             n * 70 + circleXOffset - 10, 

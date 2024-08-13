@@ -1,6 +1,6 @@
 conductor = {}
 
-conductor.BPM = 128
+conductor.BPM = 150
 conductor.SongPositionInBeats = 0
 conductor.SongPosition = 0.0
 conductor.LastBeat = 0.0
@@ -41,10 +41,11 @@ function conductor:Update(dt)
                 self.ChartFinished = true
                 return
             end
-
+            print("Picking next beat")
+            print("Its going to be at Beat "..self.Chart[self.NoteIndex].B)
+            print("and the one before was "..self.NextChartBeat.B)
             self.LastChartBeat = self.NextChartBeat
             self.NextChartBeat = self.Chart[self.NoteIndex]
-            self.BeatToMiss = self.LastChartBeat
             
             self.NoteIndex = self.NoteIndex + 1
         end
@@ -62,7 +63,12 @@ end
 function conductor:LoadChart()
     local combineIndex = 0
     local previousBeat = nil
-    for i, v in ipairs(require("chart")) do
+
+    local loadedChart = require("charts.greengoose")
+    table.sort(loadedChart, function (a, b)
+        return a.B < b.B
+    end)
+    for i, v in ipairs(loadedChart) do
         --print(v.N, v.B)
         if previousBeat == v.B then
             --print(self.Chart[combineIndex])
@@ -88,7 +94,9 @@ function conductor:LoadChart()
        
         previousBeat = v.B
     end
-    
+
+   
+     
     self.NextChartBeat = self.Chart[1]
     conductor.NoteIndex = conductor.NoteIndex + 1
 end
@@ -100,7 +108,8 @@ function conductor:GetHitAccuracy(key)
     local nextDiff = math.abs(self.NextChartBeat.B - time)
     
     if lastDiff > 1 and nextDiff > 1 then return end
-
+    print(key)
+    print(lastDiff, nextDiff)
     if lastDiff > nextDiff then
         if self.NextChartBeat.H ~= true then
             for _, n in ipairs(self.NextChartBeat.N) do
@@ -144,16 +153,18 @@ function conductor:ReleaseHeldNote(key)
             break
         end
     end
-
+    
     if index == 0 then return end
     
     local heldNote = self.HoldingBeats[index]
     if heldNote == nil then return end
 
+    if heldNote.D[tostring(index)] == nil then return end
+
     local time = self.SongPositionInBeats
     local diff = math.abs((heldNote.B + heldNote.D[tostring(index)]) - time)
     
     table.remove(self.HoldingBeats, index)
-
+    
     return diff
 end
