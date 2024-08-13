@@ -16,17 +16,19 @@ function menu:Init()
     playLevels.Size = UIVector2.new(0.5, 0, 0.15, 0)
     playLevels.AnchorPoint = Vector2.new(0.5,0)
     
-    playHoverTween = yan:NewTween(playLevels, yan:TweenInfo(0.2, EasingStyle.QuadOut), {Size = UIVector2.new(0.5, 50, 0.15, 0)})
+    playHoverTween = yan:NewTween(playLevels, yan:TweenInfo(0.2, EasingStyle.QuadOut), {Size = UIVector2.new(0.6, 0, 0.15, 0)})
     playLeaveTween = yan:NewTween(playLevels, yan:TweenInfo(0.2, EasingStyle.QuadOut), {Size = UIVector2.new(0.5, 0, 0.15, 0)})
-
+    
     playLevels.MouseEnter = function ()
-        playHoverTween:Play()
-        playLeaveTween:Stop()
+        print("play enter")
+        
+        yan:NewTween(playLevels, yan:TweenInfo(0.2, EasingStyle.QuadOut), {Size = UIVector2.new(0.6, 0, 0.15, 0)}):Play()
     end
     
     playLevels.MouseLeave = function ()
-        playHoverTween:Stop()
-        playLeaveTween:Play()
+        print("play leave")
+        --playHoverTween:Stop() 
+        yan:NewTween(playLevels, yan:TweenInfo(0.2, EasingStyle.QuadOut), {Size = UIVector2.new(0.5, 0, 0.15, 0)}):Play()
     end
     
     openEditor = yan:TextButton(self.Screen, "open editor", 50, "center", "center", "/ComicNeue.ttf")
@@ -38,31 +40,32 @@ function menu:Init()
     editorLeaveTween = yan:NewTween(openEditor, yan:TweenInfo(0.2, EasingStyle.QuadOut), {Size = UIVector2.new(0.5, 0, 0.15, 0)})
     
     openEditor.MouseEnter = function ()
-        editorHoverTween:Play()
-        editorLeaveTween:Stop()
+      --  editorLeaveTween:Stop()
+      yan:NewTween(openEditor, yan:TweenInfo(0.2, EasingStyle.QuadOut), {Size = UIVector2.new(0.5, 50, 0.15, 0)}):Play()
     end
     
     openEditor.MouseLeave = function ()
-        editorHoverTween:Stop()
-        editorLeaveTween:Play()
+       -- editorHoverTween:Stop()
+       yan:NewTween(openEditor, yan:TweenInfo(0.2, EasingStyle.QuadOut), {Size = UIVector2.new(0.5, 0, 0.15, 0)}):Play()
     end
 
     settingsBtn = yan:TextButton(self.Screen, "settings", 50, "center", "center", "/ComicNeue.ttf")
     settingsBtn.Position = UIVector2.new(0.5,0,0.6,20)
     settingsBtn.Size = UIVector2.new(0.5, 0, 0.15, 0)
     settingsBtn.AnchorPoint = Vector2.new(0.5,0)
-
+    
     settingsHoverTween = yan:NewTween(settingsBtn, yan:TweenInfo(0.2, EasingStyle.QuadOut), {Size = UIVector2.new(0.5, 50, 0.15, 0)})
     settingsLeaveTween = yan:NewTween(settingsBtn, yan:TweenInfo(0.2, EasingStyle.QuadOut), {Size = UIVector2.new(0.5, 0, 0.15, 0)})
     
     settingsBtn.MouseEnter = function ()
-        settingsHoverTween:Play()
-        settingsLeaveTween:Stop()
+       -- settingsLeaveTween:Stop()
+       yan:NewTween(settingsBtn, yan:TweenInfo(0.2, EasingStyle.QuadOut), {Size = UIVector2.new(0.5, 50, 0.15, 0)}):Play()
+       
     end
     
     settingsBtn.MouseLeave = function ()
-        settingsHoverTween:Stop()
-        settingsLeaveTween:Play()
+        --settingsHoverTween:Stop()
+        yan:NewTween(settingsBtn, yan:TweenInfo(0.2, EasingStyle.QuadOut), {Size = UIVector2.new(0.5, 0, 0.15, 0)}):Play()
     end
 end
 

@@ -1,5 +1,5 @@
 local tweenmanager = {}
-tweenmanager.ActiveTweens = {}
+local activeTweens = {}
 
 local EasingStyle = require("yan.datatypes.easingstyle")
 local utils = require("yan.utils")
@@ -32,19 +32,25 @@ function tweenmanager:NewTween(instance, tweeninfo, goal)
     
     
     function tween:Play()
-        if tween.IsPlaying == true then return end
-        table.insert(tweenmanager.ActiveTweens, tween)
-        tween.Index = #tweenmanager.ActiveTweens
-        for key, value in pairs(tween.Goal) do
-            tween.OriginalProperties[key] = instance[key]
+        print("playing!")
+        for _, v in ipairs(activeTweens) do
+            if v.Instance == tween.Instance then
+                v:Pause()
+            end
         end
+
+        table.insert(activeTweens, tween)
+        tween.Index = #activeTweens
+        --[[for key, value in pairs(tween.Goal) do
+            tween.OriginalProperties[key] = instance[key]
+        end]]
         
         tween.Progress = 0.0
         tween.TimePosition = 0.0
         tween.IsPlaying = true
         tween.Finished = false
     end
-
+    
     function tween:Pause()
         tween.IsPlaying = false
     end
@@ -55,7 +61,7 @@ function tweenmanager:NewTween(instance, tweeninfo, goal)
         tween.IsPlaying = false
         tween.Finished = true
         
-        table.remove(tweenmanager.ActiveTweens, tween.Index)
+        table.remove(activeTweens, tween.Index)
     end
 
     return tween
@@ -246,6 +252,7 @@ local EasingFuncs = {
 
 local function UpdateTween(tween, dt)
     tween.TimePosition = tween.TimePosition + dt
+    print(utils:Clamp(tween.TimePosition / tween.TweenInfo.Duration, 0.0, 1.0))
     tween.Progress = utils:Clamp(tween.TimePosition / tween.TweenInfo.Duration, 0.0, 1.0)
     
     for key, value in pairs(tween.Goal) do
@@ -253,15 +260,15 @@ local function UpdateTween(tween, dt)
     end
 
     if tween.Progress >= 1.0 then
-        print("gu")
-        table.remove(tweenmanager.ActiveTweens, tween.Index)
+        local b = table.remove(activeTweens, tween.Index)
+        print(b)
         tween.Finished = true
         tween.IsPlaying = false
     end
 end
 
 function tweenmanager:Update(dt)
-    for _, tween in ipairs(self.ActiveTweens) do
+    for i, tween in ipairs(activeTweens) do
         if tween.IsPlaying and not tween.Finished then
             UpdateTween(tween, dt)
         end

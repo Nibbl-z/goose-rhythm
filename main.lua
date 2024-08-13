@@ -238,7 +238,7 @@ function love.draw()
     if editor.Enabled == true then
         editor:Draw()
     elseif menu.Enabled == true then
-        -- a
+        
     else
         local circleXOffset = (love.graphics.getWidth() - 4 * 70) / 2 - 35
         love.graphics.setColor(0,0,0,0.5)
