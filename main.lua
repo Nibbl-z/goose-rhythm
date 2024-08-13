@@ -9,39 +9,48 @@ local testDraw = true
 
 
 local started = false
+local startedSong = false
+local startDelay = 0
 
 local sprites = {
-    BG = "bg.png",
     GooseFace = "goose_face.png",
     GooseHonk = "goose_honking.png",
     GooseAngry = "goose_angry.png",
     Bread = "bread.png",
     Crust = "crust.png",
-    CrustPressed = "crust_pressed.png",
-    GreenGoose = "greengoose.png",
-    GreenGooseMiss = "greengoose_miss.png",
-    
-    BGPurpleGoose = "bg_purplegoose.png",
-    PurpleGoose = "purplegoose.png",
-    PurpleGooseMiss = "purplegoose_miss.png"
+    CrustPressed = "crust_pressed.png"
 }
+
+local BGSprite = nil
+local GooseSprite = nil
+local GooseMissSprite = nil
 
 local bread = 0
 local combo = 0
 local misses = 0
 
-function StartSong(songPath, bpm, chartPath)
-    loadedSong = love.audio.newSource(songPath, "static")
-    conductor.BPM = bpm
-    conductor:LoadChart(chartPath)
+function StartSong(chartPath)
+    local chartData = love.filesystem.read(chartPath.."/chart.lua")
+    local loadedChart = loadstring(chartData)()
 
+    local metadata = love.filesystem.read(chartPath.."/metadata.lua")
+    local loadedMetadata = loadstring(metadata)()
+    
+    loadedSong = love.audio.newSource(chartPath.."/song.mp3", "static")
+    conductor.BPM = loadedMetadata.BPM
+    conductor:Init()
+    conductor:LoadChart(loadedChart)
+    
+    BGSprite = love.graphics.newImage(chartPath.."/assets/bg.png")
+    GooseSprite = love.graphics.newImage(chartPath.."/assets/goose.png")
+    GooseMissSprite = love.graphics.newImage(chartPath.."/assets/goose_miss.png")
+    goose:SetLoadedSprite(GooseSprite)
+    
     metronome = love.audio.newSource("/select.wav", "static")
     loadedSong:setVolume(0.2)
     
-    love.graphics.setFont(love.graphics.newFont(32))
-    
-    loadedSong:play()
-
+    startedSong = false
+    startTime = love.timer.getTime() + conductor.SecondsPerBeat * 3
     started = true
 end
 
@@ -59,7 +68,6 @@ function love.load()
     end
     
     goose = yan:Instance("Goose")
-    goose:SetLoadedSprite(sprites.PurpleGoose)
     goose.Position = Vector2.new(650,500)
     goose.Offset = Vector2.new(25, 50)
     goose.Size = Vector2.new(2,2)
@@ -87,7 +95,7 @@ function love.load()
     missesLabel.AnchorPoint = Vector2.new(0,1)
     missesLabel.TextColor = Color.new(1,1,1,1)
     
-    
+   -- love.graphics.setFont(love.graphics.newFont(32))
 end
 
 function love.update(dt)
@@ -95,7 +103,12 @@ function love.update(dt)
     if editor.Enabled == true then
         editor:Update(dt)
     else
+
         if started then
+            if love.timer.getTime() >= startTime and not startedSong then
+                loadedSong:play()
+                startedSong = true
+            end
             conductor:Update(dt)
         end
         
@@ -120,9 +133,9 @@ function conductor.Metronome()
     testDraw = not testDraw
     --metronome:play()
     
-    --goose.Size = Vector2.new(2.5, 1.5)
+    goose.Size = Vector2.new(2.5, 1.5)
     --yan:NewTween(goose, yan:TweenInfo(0.3, EasingStyle.QuadOut), {Size = Vector2.new(2,2)}):Pla
-    --gooseBopTween:Play()
+    gooseBopTween:Play()
 end
 
 local status = ""
@@ -137,9 +150,9 @@ end
 
 function love.keypressed(key, scancode, rep)
     if key == "p" then
-        StartSong("/music/greengoose.mp3", 150, "charts.greengoose")
+        StartSong("/charts/greengoose")
     end
-
+    
     uimgr:KeyPressed(key, scancode, rep)
     if editor.Enabled == true then
         editor:KeyPressed(key)
@@ -151,14 +164,14 @@ function love.keypressed(key, scancode, rep)
             status = "Perfect"
             
             combo = combo + 1
-            goose:SetLoadedSprite(sprites.PurpleGoose)
+            goose:SetLoadedSprite(GooseSprite)
         elseif result <= 0.2 then
             status = "Okay"
 
             combo = combo + 1
-            goose:SetLoadedSprite(sprites.PurpleGoose)
+            goose:SetLoadedSprite(GooseSprite)
         elseif result > 0.3 then
-            goose:SetLoadedSprite(sprites.PurpleGooseMiss)
+            goose:SetLoadedSprite(GooseMissSprite)
             
             misses = misses + 1
             combo = 0
@@ -176,13 +189,13 @@ function love.keyreleased(key)
         if result <= 0.05 then
             status = "Perfect"
             
-            goose:SetLoadedSprite(sprites.PurpleGoose)
+            goose:SetLoadedSprite(GooseSprite)
         elseif result <= 0.2 then
             status = "Okay"
-
-            goose:SetLoadedSprite(sprites.PurpleGoose)
+            
+            goose:SetLoadedSprite(GooseSprite)
         elseif result > 0.3 then
-            goose:SetLoadedSprite(sprites.PurpleGooseMiss)
+            goose:SetLoadedSprite(GooseMissSprite)
             
             misses = misses + 1
             combo = 0
@@ -197,7 +210,10 @@ function love.textinput(t)
 end
 
 function love.draw()
-    love.graphics.draw(sprites.BGPurpleGoose)
+    if BGSprite ~= nil then
+        love.graphics.draw(BGSprite)
+    end
+   
     goose:Draw()
     if editor.Enabled == true then
         editor:Draw()
@@ -231,7 +247,7 @@ function love.draw()
                         if (v.B - conductor.SongPositionInBeats) * -300 + 440 > 600 then
                             v.M = true
                             
-                            goose:SetLoadedSprite(sprites.PurpleGooseMiss)
+                            goose:SetLoadedSprite(GooseMissSprite)
         
                             misses = misses + 1
                             combo = 0

@@ -60,15 +60,18 @@ function conductor:Update(dt)
     
 end
 
-function conductor:LoadChart(chartPath)
+function conductor:LoadChart(chart)
     local combineIndex = 0
     local previousBeat = nil
+    
+    for _, v in ipairs(chart) do
+        v.B = v.B + 4
+    end
 
-    local loadedChart = require(chartPath)
-    table.sort(loadedChart, function (a, b)
+    table.sort(chart, function (a, b)
         return a.B < b.B
     end)
-    for i, v in ipairs(loadedChart) do
+    for i, v in ipairs(chart) do
         --print(v.N, v.B)
         if previousBeat == v.B then
             --print(self.Chart[combineIndex])
