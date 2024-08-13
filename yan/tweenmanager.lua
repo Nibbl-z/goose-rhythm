@@ -32,6 +32,7 @@ function tweenmanager:NewTween(instance, tweeninfo, goal)
     
     
     function tween:Play()
+        if tween.IsPlaying == true then return end
         table.insert(tweenmanager.ActiveTweens, tween)
         tween.Index = #tweenmanager.ActiveTweens
         for key, value in pairs(tween.Goal) do
@@ -47,10 +48,14 @@ function tweenmanager:NewTween(instance, tweeninfo, goal)
     function tween:Pause()
         tween.IsPlaying = false
     end
-
+    
     function tween:Stop()
+        tween.Progress = 0.0
+        tween.TimePosition = 0.0
         tween.IsPlaying = false
         tween.Finished = true
+        
+        table.remove(tweenmanager.ActiveTweens, tween.Index)
     end
 
     return tween
@@ -248,6 +253,7 @@ local function UpdateTween(tween, dt)
     end
 
     if tween.Progress >= 1.0 then
+        print("gu")
         table.remove(tweenmanager.ActiveTweens, tween.Index)
         tween.Finished = true
         tween.IsPlaying = false

@@ -1,6 +1,7 @@
 require("conductor")
 require("yan")
 local editor = require("editor")
+local menu = require("menu")
 local uimgr = require("yan.uimanager")
 local song = "/music/greengoose.mp3"
 local settings = require("settings")
@@ -29,7 +30,18 @@ local bread = 0
 local combo = 0
 local misses = 0
 
+function Reset()
+    bread = 0
+    combo = 0
+    misses = 0
+
+    if loadedSong ~= nil then
+        loadedSong:stop()
+    end
+end
+
 function StartSong(chartPath)
+    Reset()
     local chartData = love.filesystem.read(chartPath.."/chart.lua")
     local loadedChart = loadstring(chartData)()
 
@@ -55,6 +67,7 @@ function StartSong(chartPath)
 end
 
 function love.load()
+    menu:Init()
     for name, sprite in pairs(sprites) do
         sprites[name] = love.graphics.newImage("/img/"..sprite)
     end
@@ -102,8 +115,12 @@ function love.update(dt)
     yan:Update(dt)
     if editor.Enabled == true then
         editor:Update(dt)
+        hud.Enabled = false
+    elseif menu.Enabled == true then
+        menu.Screen.Enabled = true
+        hud.Enabled = false
     else
-
+        menu.Screen.Enabled = false
         if started then
             if love.timer.getTime() >= startTime and not startedSong then
                 loadedSong:play()
@@ -151,6 +168,9 @@ end
 function love.keypressed(key, scancode, rep)
     if key == "p" then
         StartSong("/charts/greengoose")
+    end
+    if key == "o" then
+        StartSong("/charts/purplegoose")
     end
     
     uimgr:KeyPressed(key, scancode, rep)
@@ -217,6 +237,8 @@ function love.draw()
     goose:Draw()
     if editor.Enabled == true then
         editor:Draw()
+    elseif menu.Enabled == true then
+        -- a
     else
         local circleXOffset = (love.graphics.getWidth() - 4 * 70) / 2 - 35
         love.graphics.setColor(0,0,0,0.5)

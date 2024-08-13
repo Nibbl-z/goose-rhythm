@@ -11,13 +11,21 @@ conductor.NextChartBeat = {B = 0.0, N = {}}
 conductor.NoteIndex = 1
 conductor.ChartFinished = false
 conductor.Chart = {}
-conductor.BeatToMiss = nil
 
 conductor.HoldingBeats = {nil, nil, nil, nil}
 
 local settings = require("settings")
 
 function conductor:Init()
+    self.SongPosition = 0
+    self.SongPositionInBeats = 0
+    self.LastBeat = 0
+    self.LastChartBeat = {B = 0.0, N = {}}
+    self.NextChartBeat = {B = 0.0, N = {}}
+    self.ChartFinished = false
+    self.NoteIndex = 1
+    self.HoldingBeats = {nil, nil, nil, nil}
+
     self.SecondsPerBeat = 60 / self.BPM
 end
 
