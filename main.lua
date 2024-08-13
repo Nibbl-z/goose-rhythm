@@ -168,7 +168,7 @@ function love.keyreleased(key)
         
         if result <= 0.05 then
             status = "Perfect"
-
+            
             goose:SetLoadedSprite(sprites.GreenGoose)
         elseif result <= 0.2 then
             status = "Okay"
@@ -237,12 +237,16 @@ function love.draw()
                 
                 if v.D ~= nil then
                     for _, n in ipairs(v.N) do
-                        love.graphics.rectangle("fill",
-                        n * 70 + circleXOffset - 10, 
-                        (v.B - conductor.SongPositionInBeats) * -300 + 440 - v.D * 300,
-                        20,
-                        v.D * 300
-                    )
+                        if v.D[tostring(n)] ~= nil then
+                            print(v.D[tostring(v.N)])
+                            love.graphics.rectangle("fill",
+                            n * 70 + circleXOffset - 10, 
+                            (v.B - conductor.SongPositionInBeats) * -300 + 440 - v.D[tostring(n)] * 300,
+                            20,
+                            v.D[tostring(n)] * 300)
+                        end
+                       
+                    
                     end
                 end
             end

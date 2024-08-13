@@ -67,9 +67,22 @@ function conductor:LoadChart()
         if previousBeat == v.B then
             --print(self.Chart[combineIndex])
             table.insert(self.Chart[combineIndex].N, v.N)
+            self.Chart[combineIndex].D[tostring(v.N)] = v.D
+            
+            
+            if v.D ~= nil then
+                if self.Chart[combineIndex].D == nil then
+                    self.Chart[combineIndex].D = {}
+                end
+                self.Chart[combineIndex].D[tostring(v.N)] = v.D
+            end
         else
             combineIndex = combineIndex + 1
-            self.Chart[combineIndex] = {B = v.B, N = {v.N}, D = v.D}
+            self.Chart[combineIndex] = {B = v.B, N = {v.N}}
+            
+            if v.D ~= nil then
+                self.Chart[combineIndex].D = {[tostring(v.N)] = v.D}
+            end
             --print(self.Chart[combineIndex])
         end
        
@@ -94,7 +107,7 @@ function conductor:GetHitAccuracy(key)
                 if key == settings.Keybinds[n] then
                     self.NextChartBeat.H = true
                     
-                    if self.NextChartBeat.D ~= nil then
+                    if self.NextChartBeat.D[tostring(n)] ~= nil then
                         self.HoldingBeats[n] = self.NextChartBeat
                     end
 
@@ -108,7 +121,7 @@ function conductor:GetHitAccuracy(key)
                 if key == settings.Keybinds[n] then
                     self.LastChartBeat.H = true
 
-                    if self.LastChartBeat.D ~= nil then
+                    if self.LastChartBeat.D[tostring(n)] ~= nil then
                         self.HoldingBeats[n] = self.LastChartBeat
                     end
                     
@@ -134,7 +147,7 @@ function conductor:ReleaseHeldNote(key)
     if heldNote == nil then return end
 
     local time = self.SongPositionInBeats
-    local diff = math.abs((heldNote.B + heldNote.D) - time)
+    local diff = math.abs((heldNote.B + heldNote.D[tostring(index)]) - time)
     
     return diff
 end
