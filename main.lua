@@ -50,7 +50,7 @@ function love.load()
     end
     
     goose = yan:Instance("Goose")
-    goose:SetLoadedSprite(sprites.PurpleGoose)
+    goose:SetLoadedSprite(sprites.GreenGoose)
     goose.Position = Vector2.new(650,500)
     goose.Offset = Vector2.new(25, 50)
     goose.Size = Vector2.new(2,2)
@@ -144,22 +144,45 @@ function love.keypressed(key, scancode, rep)
             status = "Perfect"
             
             combo = combo + 1
-            goose:SetLoadedSprite(sprites.PurpleGoose)
+            goose:SetLoadedSprite(sprites.GreenGoose)
         elseif result <= 0.2 then
             status = "Okay"
 
             combo = combo + 1
-            goose:SetLoadedSprite(sprites.PurpleGoose)
+            goose:SetLoadedSprite(sprites.GreenGoose)
         elseif result > 0.3 then
-            goose:SetLoadedSprite(sprites.PurpleGooseMiss)
-
+            goose:SetLoadedSprite(sprites.GreenGooseMiss)
+            
             misses = misses + 1
             combo = 0
             status = "Miss"
         end
-
+        
         bread = bread + (10 - math.floor(result * 10))
     end
+end
+
+function love.keyreleased(key)
+    local result = conductor:ReleaseHeldNote(key)
+        if result == nil then return end
+        
+        if result <= 0.05 then
+            status = "Perfect"
+
+            goose:SetLoadedSprite(sprites.GreenGoose)
+        elseif result <= 0.2 then
+            status = "Okay"
+
+            goose:SetLoadedSprite(sprites.GreenGoose)
+        elseif result > 0.3 then
+            goose:SetLoadedSprite(sprites.GreenGooseMiss)
+            
+            misses = misses + 1
+            combo = 0
+            status = "Miss"
+        end
+        
+        bread = bread + (10 - math.floor(result * 10))
 end
 
 function love.textinput(t)
@@ -167,7 +190,7 @@ function love.textinput(t)
 end
 
 function love.draw()
-    love.graphics.draw(sprites.BGPurpleGoose)
+    love.graphics.draw(sprites.BG)
     goose:Draw()
     if editor.Enabled == true then
         editor:Draw()
@@ -193,21 +216,33 @@ function love.draw()
         
         
         for _, v in ipairs(conductor.Chart) do
-            if (v.B - conductor.SongPositionInBeats) > -2 and (v.B - conductor.SongPositionInBeats) < 4 then
+            if (v.B - conductor.SongPositionInBeats) > -10 and (v.B - conductor.SongPositionInBeats) < 10 then
                 if v.H ~= true and v.M ~= true then
                     for _, n in ipairs(v.N) do
                         love.graphics.draw(sprites.Bread, n * 70 + circleXOffset - 30, (v.B - conductor.SongPositionInBeats) * -300 + 440)
                        --love.graphics.circle("fill", n * 70 + circleXOffset, (v.B - conductor.SongPositionInBeats) * -300 + 470, 30)
+                        
                        
                         if (v.B - conductor.SongPositionInBeats) * -300 + 440 > 600 then
                             v.M = true
                             
-                            goose:SetLoadedSprite(sprites.PurpleGooseMiss)
+                            goose:SetLoadedSprite(sprites.GreenGooseMiss)
         
                             misses = misses + 1
                             combo = 0
                             status = "Miss"
                         end
+                    end
+                end
+                
+                if v.D ~= nil then
+                    for _, n in ipairs(v.N) do
+                        love.graphics.rectangle("fill",
+                        n * 70 + circleXOffset - 10, 
+                        (v.B - conductor.SongPositionInBeats) * -300 + 440 - v.D * 300,
+                        20,
+                        v.D * 300
+                    )
                     end
                 end
             end

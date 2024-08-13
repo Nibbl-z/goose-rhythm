@@ -244,7 +244,6 @@ local function UpdateTween(tween, dt)
     tween.Progress = utils:Clamp(tween.TimePosition / tween.TweenInfo.Duration, 0.0, 1.0)
     
     for key, value in pairs(tween.Goal) do
-        print(tostring(value))
         tween.Instance[key] = tween.OriginalProperties[key] + (value - tween.OriginalProperties[key]) * EasingFuncs[tween.TweenInfo.EasingStyle](tween.Progress)
     end
 

@@ -195,7 +195,7 @@ function StartPlayback()
     conductor.SongPositionInBeats = scrollOffset / pixelsPerBeat
     conductor.SongPosition = scrollOffset / pixelsPerBeat * conductor.SecondsPerBeat
     loadedSong:play()
-    print(scrollOffset / pixelsPerBeat * conductor.SecondsPerBeat)
+    --print(scrollOffset / pixelsPerBeat * conductor.SecondsPerBeat)
     loadedSong:seek(scrollOffset / pixelsPerBeat * conductor.SecondsPerBeat, "seconds")
 end
 
