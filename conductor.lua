@@ -1,6 +1,6 @@
 conductor = {}
 
-conductor.BPM = 150
+conductor.BPM = 128
 conductor.SongPositionInBeats = 0
 conductor.SongPosition = 0.0
 conductor.LastBeat = 0.0
@@ -67,7 +67,7 @@ function conductor:LoadChart()
         if previousBeat == v.B then
             --print(self.Chart[combineIndex])
             table.insert(self.Chart[combineIndex].N, v.N)
-            self.Chart[combineIndex].D[tostring(v.N)] = v.D
+            --self.Chart[combineIndex].D[tostring(v.N)] = v.D
             
             
             if v.D ~= nil then
@@ -107,9 +107,12 @@ function conductor:GetHitAccuracy(key)
                 if key == settings.Keybinds[n] then
                     self.NextChartBeat.H = true
                     
-                    if self.NextChartBeat.D[tostring(n)] ~= nil then
-                        self.HoldingBeats[n] = self.NextChartBeat
+                    if self.NextChartBeat.D ~= nil then
+                        if self.NextChartBeat.D[tostring(n)] ~= nil then
+                            self.HoldingBeats[n] = self.NextChartBeat
+                        end
                     end
+                    
 
                     return nextDiff
                 end
@@ -120,9 +123,10 @@ function conductor:GetHitAccuracy(key)
             for _, n in ipairs(self.LastChartBeat.N) do
                 if key == settings.Keybinds[n] then
                     self.LastChartBeat.H = true
-
-                    if self.LastChartBeat.D[tostring(n)] ~= nil then
-                        self.HoldingBeats[n] = self.LastChartBeat
+                    if self.LastChartBeat.D ~= nil then
+                        if self.LastChartBeat.D[tostring(n)] ~= nil then
+                            self.HoldingBeats[n] = self.LastChartBeat
+                        end
                     end
                     
                     return lastDiff

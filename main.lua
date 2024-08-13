@@ -2,7 +2,7 @@ require("conductor")
 require("yan")
 local editor = require("editor")
 local uimgr = require("yan.uimanager")
-local song = "/music/greengoose.mp3"
+local song = "/music/purplegoose.mp3"
 local settings = require("settings")
 
 local testDraw = true
@@ -50,7 +50,7 @@ function love.load()
     end
     
     goose = yan:Instance("Goose")
-    goose:SetLoadedSprite(sprites.GreenGoose)
+    goose:SetLoadedSprite(sprites.PurpleGoose)
     goose.Position = Vector2.new(650,500)
     goose.Offset = Vector2.new(25, 50)
     goose.Size = Vector2.new(2,2)
@@ -144,14 +144,14 @@ function love.keypressed(key, scancode, rep)
             status = "Perfect"
             
             combo = combo + 1
-            goose:SetLoadedSprite(sprites.GreenGoose)
+            goose:SetLoadedSprite(sprites.PurpleGoose)
         elseif result <= 0.2 then
             status = "Okay"
 
             combo = combo + 1
-            goose:SetLoadedSprite(sprites.GreenGoose)
+            goose:SetLoadedSprite(sprites.PurpleGoose)
         elseif result > 0.3 then
-            goose:SetLoadedSprite(sprites.GreenGooseMiss)
+            goose:SetLoadedSprite(sprites.PurpleGooseMiss)
             
             misses = misses + 1
             combo = 0
@@ -169,13 +169,13 @@ function love.keyreleased(key)
         if result <= 0.05 then
             status = "Perfect"
             
-            goose:SetLoadedSprite(sprites.GreenGoose)
+            goose:SetLoadedSprite(sprites.PurpleGoose)
         elseif result <= 0.2 then
             status = "Okay"
 
-            goose:SetLoadedSprite(sprites.GreenGoose)
+            goose:SetLoadedSprite(sprites.PurpleGoose)
         elseif result > 0.3 then
-            goose:SetLoadedSprite(sprites.GreenGooseMiss)
+            goose:SetLoadedSprite(sprites.PurpleGooseMiss)
             
             misses = misses + 1
             combo = 0
@@ -190,7 +190,7 @@ function love.textinput(t)
 end
 
 function love.draw()
-    love.graphics.draw(sprites.BG)
+    love.graphics.draw(sprites.BGPurpleGoose)
     goose:Draw()
     if editor.Enabled == true then
         editor:Draw()
@@ -226,7 +226,7 @@ function love.draw()
                         if (v.B - conductor.SongPositionInBeats) * -300 + 440 > 600 then
                             v.M = true
                             
-                            goose:SetLoadedSprite(sprites.GreenGooseMiss)
+                            goose:SetLoadedSprite(sprites.PurpleGooseMiss)
         
                             misses = misses + 1
                             combo = 0

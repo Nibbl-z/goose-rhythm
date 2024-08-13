@@ -11,7 +11,7 @@ local utils = require("yan.utils")
 
 local textinput = require("yan.instance.ui.textinput")
 
-editor.Enabled = true
+editor.Enabled = false
 
 local scrollOffset = 0
 local quadrant = -1
@@ -28,7 +28,7 @@ local pixelsPerBeat = 300
 
 local snapIndex = 2
 local snaps = {1, 1/2, 1/3, 1/4, 1/6, 1/8, 1/16}
-local song = "/music/greengoose.mp3"
+local song = "/music/purplegoose.mp3"
 local playing = false
 
 local minVisibleBeat = 0
