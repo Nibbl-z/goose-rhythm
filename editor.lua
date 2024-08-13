@@ -11,7 +11,7 @@ local utils = require("yan.utils")
 
 local textinput = require("yan.instance.ui.textinput")
 
-editor.Enabled = false
+editor.Enabled = true
 
 local scrollOffset = 0
 local quadrant = -1
@@ -56,7 +56,9 @@ function Export()
     
     for i, note in ipairs(chart) do
         result = result.."{B = "..note.B..", N = "..note.N..", Y = "..note.Y
-        
+        if note.D ~= nil then
+            result = result..", D = "..note.D
+        end
         if i == #chart then
             result = result.."}}"
         else
@@ -106,7 +108,7 @@ function editor:Init()
     snapInput.Size = UIVector2.new(0.1,0,0.05,0)
     snapInput.TextColor = Color.new(0,0,0,1)
     snapInput.MouseDown = function () 
-
+    
     end 
 
     snapInput.OnEnter = function ()
@@ -222,6 +224,27 @@ function editor:WheelMoved(x, y)
         snap = snaps[snapIndex]
         return
     end
+
+    if love.keyboard.isDown("lshift") then
+        for i, v in ipairs(chart) do
+            if v.B == beatQuadrant.b and v.N == quadrant then
+                
+                if chart[i].D == nil then
+                    chart[i].D = 0
+                end
+
+                chart[i].D = chart[i].D + snap * y
+
+                if chart[i].D < 0 then
+                    chart[i].D = nil
+                end
+
+                print(chart[i].D, snap * y)
+            end
+        end
+
+        return
+    end
     
     scrollOffset = scrollOffset + y * 20
     if scrollOffset < 0 then
@@ -240,6 +263,9 @@ function editor:Draw()
     
     for _, note in ipairs(chart) do
         love.graphics.circle("fill", (note.N) * 70 + xOffset, note.Y + scrollOffset, 30)
+        if note.D ~= nil then
+            love.graphics.rectangle("fill", (note.N) * 70 + xOffset - 10, note.Y + scrollOffset - note.D * 300, 20, note.D * 300, 10, 10)
+        end                  
     end
 
     for _, l in ipairs(lines) do

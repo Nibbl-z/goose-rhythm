@@ -239,14 +239,16 @@ function love.draw()
                     for _, n in ipairs(v.N) do
                         if v.D[tostring(n)] ~= nil then
                             print(v.D[tostring(v.N)])
+                            love.graphics.setColor(1, 183/255, 135/255)
                             love.graphics.rectangle("fill",
                             n * 70 + circleXOffset - 10, 
                             (v.B - conductor.SongPositionInBeats) * -300 + 440 - v.D[tostring(n)] * 300,
                             20,
-                            v.D[tostring(n)] * 300)
+                            v.D[tostring(n)] * 300, 10, 10)
+                            love.graphics.setColor(1,1,1,1)
                         end
                        
-                    
+                        
                     end
                 end
             end
