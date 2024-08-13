@@ -30,6 +30,21 @@ local bread = 0
 local combo = 0
 local misses = 0
 
+function StartSong(songPath, bpm, chartPath)
+    loadedSong = love.audio.newSource(songPath, "static")
+    conductor.BPM = bpm
+    conductor:LoadChart(chartPath)
+
+    metronome = love.audio.newSource("/select.wav", "static")
+    loadedSong:setVolume(0.2)
+    
+    love.graphics.setFont(love.graphics.newFont(32))
+    
+    loadedSong:play()
+
+    started = true
+end
+
 function love.load()
     for name, sprite in pairs(sprites) do
         sprites[name] = love.graphics.newImage("/img/"..sprite)
@@ -40,13 +55,7 @@ function love.load()
     if editor.Enabled == true then
         editor:Init()
     else
-        loadedSong = love.audio.newSource(song, "static")
-        metronome = love.audio.newSource("/select.wav", "static")
-        loadedSong:setVolume(0.2)
-
-        love.graphics.setFont(love.graphics.newFont(32))
         
-        conductor:LoadChart()
     end
     
     goose = yan:Instance("Goose")
@@ -78,7 +87,7 @@ function love.load()
     missesLabel.AnchorPoint = Vector2.new(0,1)
     missesLabel.TextColor = Color.new(1,1,1,1)
     
-    loadedSong:play()
+    
 end
 
 function love.update(dt)
@@ -86,12 +95,6 @@ function love.update(dt)
     if editor.Enabled == true then
         editor:Update(dt)
     else
-        if love.timer.getTime() > startTime and not started then
-            loadedSong:play()
-            conductor:Update(dt)
-            started = true
-        end
-        
         if started then
             conductor:Update(dt)
         end
@@ -133,6 +136,10 @@ function love.wheelmoved(x, y)
 end
 
 function love.keypressed(key, scancode, rep)
+    if key == "p" then
+        StartSong("/music/greengoose.mp3", 150, "charts.greengoose")
+    end
+
     uimgr:KeyPressed(key, scancode, rep)
     if editor.Enabled == true then
         editor:KeyPressed(key)

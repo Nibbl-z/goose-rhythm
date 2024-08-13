@@ -60,11 +60,11 @@ function conductor:Update(dt)
     
 end
 
-function conductor:LoadChart()
+function conductor:LoadChart(chartPath)
     local combineIndex = 0
     local previousBeat = nil
 
-    local loadedChart = require("charts.greengoose")
+    local loadedChart = require(chartPath)
     table.sort(loadedChart, function (a, b)
         return a.B < b.B
     end)
