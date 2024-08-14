@@ -32,7 +32,6 @@ function tweenmanager:NewTween(instance, tweeninfo, goal)
     
     
     function tween:Play()
-        print("playing!")
         for _, v in ipairs(activeTweens) do
             if v.Instance == tween.Instance then
                 v:Pause()
@@ -252,7 +251,6 @@ local EasingFuncs = {
 
 local function UpdateTween(tween, dt)
     tween.TimePosition = tween.TimePosition + dt
-    print(utils:Clamp(tween.TimePosition / tween.TweenInfo.Duration, 0.0, 1.0))
     tween.Progress = utils:Clamp(tween.TimePosition / tween.TweenInfo.Duration, 0.0, 1.0)
     
     for key, value in pairs(tween.Goal) do
@@ -261,7 +259,6 @@ local function UpdateTween(tween, dt)
 
     if tween.Progress >= 1.0 then
         local b = table.remove(activeTweens, tween.Index)
-        print(b)
         tween.Finished = true
         tween.IsPlaying = false
     end

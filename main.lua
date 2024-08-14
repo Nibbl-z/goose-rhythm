@@ -5,6 +5,7 @@ local menu = require("menu")
 local uimgr = require("yan.uimanager")
 local song = "/music/greengoose.mp3"
 local settings = require("settings")
+local transitions = require("transitions")
 
 local testDraw = true
 
@@ -12,6 +13,9 @@ local testDraw = true
 local started = false
 local startedSong = false
 local startDelay = 0
+
+local fading = false
+local fadingDelay = 0
 
 local sprites = {
     GooseFace = "goose_face.png",
@@ -73,17 +77,18 @@ function menu.playsong(chart)
 end
 
 function ReturnToMenu()
-    menu.Enabled = true
-    editor.Enabled = false
-    editor.Screen.Enabled = false
-    hud.Enabled = false
-    Reset()
-    menu:Reset()
+    print("h")
+    transitions:FadeIn(0.3)
+    fading = true
+    fadingDelay = love.timer.getTime() + 0.5
+
+   
 end
 
 function editor.ReturnToMenu()
-    ReturnToMenu()
-    menu:Reset()
+    transitions:FadeIn(0.3)
+    fading = true
+    fadingDelay = love.timer.getTime() + 0.5
 end
 
 function love.load()
@@ -93,12 +98,9 @@ function love.load()
     end
 
     conductor:Init()
+    editor:Init()
     startTime = love.timer.getTime()
-    if editor.Enabled == true then
-        editor:Init()
-    else
-        
-    end
+    
     
     goose = yan:Instance("Goose")
     goose.Position = Vector2.new(650,500)
@@ -133,15 +135,33 @@ end
 
 function love.update(dt)
     yan:Update(dt)
+
+    
+    if fading then
+        if love.timer.getTime() > fadingDelay then
+            menu.Enabled = true
+            editor.Enabled = false
+            
+            hud.Enabled = false
+            Reset()
+            menu:Reset()
+            fading = false
+            editor.Screen.Enabled = false
+            print(editor.Screen.Enabled)
+            transitions:FadeOut(0.3)
+        end
+    end
+
     if editor.Enabled == true then
         editor:Update(dt)
         hud.Enabled = false
     elseif menu.Enabled == true then
         menu.Screen.Enabled = true
         hud.Enabled = false
-
+        editor.Screen.Enabled = false
         menu:Update(dt)
     else
+        editor.Screen.Enabled = false
         menu.Screen.Enabled = false
         if started then
             if love.timer.getTime() >= startTime and not startedSong then
@@ -188,9 +208,7 @@ function love.wheelmoved(x, y)
 end
 
 function love.keypressed(key, scancode, rep)
-    if key == "escape" then
-        ReturnToMenu()
-    end
+    
     
     uimgr:KeyPressed(key, scancode, rep)
     if editor.Enabled == true then
@@ -198,6 +216,9 @@ function love.keypressed(key, scancode, rep)
     elseif menu.Enabled == true then
         menu:KeyPressed(key)
     else
+        if key == "escape" then
+            ReturnToMenu()
+        end
         local result = conductor:GetHitAccuracy(key)
         if result == nil then return end
         

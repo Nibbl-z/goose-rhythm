@@ -25,16 +25,23 @@ local fadeDelay = 0
 local fading = nil
 
 function menu:Reset()
+    transitions:FadeIn(0)
+    transitions:FadeOut(0.5)
     menuMusic:play()
+
+    mainPage.Position = UIVector2.new(0,0,0,0)
+    levelsPage.Position = UIVector2.new(1,0,0,0)
+    levelsContainer.Position = UIVector2.new(0,0,0,0)
 end
 
 function menu:Init()
     transitions:Init()
+    
     menuMusic = love.audio.newSource("/music/menu.mp3", "stream")
     menuMusic:setLooping(true)
     menuMusic:setVolume(0.2)
     menuMusic:play()
-
+    
     bgImage = love.graphics.newImage("/img/menu_bg.png")
     bgImage:setWrap("repeat", "repeat")
     bgQuad = love.graphics.newQuad(0, 0, 200000, 200000, 800, 600)
@@ -114,12 +121,12 @@ function menu:Init()
     end
     
     openEditor.MouseDown = function ()
-        transitions:FadeIn(1)
-
+        transitions:FadeIn(0.2)
+        
         fading = "editor"
-        fadeDelay = love.timer.getTime() + 1
+        fadeDelay = love.timer.getTime() + 0.5
     end
-
+    
     settingsBtn = yan:TextButton(self.Screen, "settings", 50, "center", "center", "/ComicNeue.ttf")
     settingsBtn.Position = UIVector2.new(0.5,0,0.7,20)
     settingsBtn.Size = UIVector2.new(0.5, 0, 0.15, 0)
@@ -186,11 +193,10 @@ function menu:Init()
         playButton.AnchorPoint = Vector2.new(0.5, 1)
         
         playButton.MouseDown = function ()
-            if previewMusic ~= nil then 
-                previewMusic:stop()
-            end
+            transitions:FadeIn(0.2)
 
-            menu.playsong(chart)
+            fading = "play"
+            fadeDelay = love.timer.getTime() + 0.5
             menuMusic:stop()
         end
 
@@ -219,13 +225,28 @@ function menu:Update(dt)
     if fading ~= nil then
         if love.timer.getTime() > fadeDelay then
             if fading == "editor" then
-                transitions:FadeOut(1)
-                
-                editor:Init()
+                transitions:FadeOut(0.5)
                 editor.Enabled = true
+                editor:Init()
+                
                 self.Enabled = false
                 self.Screen.Enabled = false
                 menuMusic:stop()
+                fading = nil
+            end
+
+            if fading == "play" then
+                transitions:FadeOut(0.3)
+                
+                if previewMusic ~= nil then 
+                    previewMusic:stop()
+                end
+    
+                menu.playsong(charts[chartSelectionIndex])
+
+                self.Enabled = false
+                menuMusic:stop()
+                fading = nil
             end
         end
     end
@@ -233,7 +254,7 @@ end
 
 function menu:KeyPressed(key)
     if page == "levels" then
-        if key == "left" then
+        if key == "left" or key == "a" then
             if chartSelectionIndex > 1 then
                 chartSelectionIndex = chartSelectionIndex - 1
                 selectionPos = selectionPos + 1
@@ -248,7 +269,7 @@ function menu:KeyPressed(key)
                 previewMusic:play()
                
             end
-        elseif key == "right" then
+        elseif key == "right" or key == "d" then
             if chartSelectionIndex < #charts then
                 chartSelectionIndex = chartSelectionIndex + 1
                 selectionPos = selectionPos - 1

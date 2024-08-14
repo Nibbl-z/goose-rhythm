@@ -24,6 +24,7 @@ local beatQuadrant = {}
 local chart = {}
 
 local notePlaceLines = {}
+local lines = {}
 local pixelsPerBeat = 300
 
 local snapIndex = 2
@@ -210,8 +211,6 @@ end
 
 function editor:KeyPressed(key)
     if key == "escape" then
-        self.Enabled = false
-        
         self.ReturnToMenu()
     end
     if key == "space" then
