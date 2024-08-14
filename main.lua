@@ -75,12 +75,15 @@ end
 function ReturnToMenu()
     menu.Enabled = true
     editor.Enabled = false
+    editor.Screen.Enabled = false
     hud.Enabled = false
     Reset()
+    menu:Reset()
 end
 
 function editor.ReturnToMenu()
     ReturnToMenu()
+    menu:Reset()
 end
 
 function love.load()
@@ -136,6 +139,8 @@ function love.update(dt)
     elseif menu.Enabled == true then
         menu.Screen.Enabled = true
         hud.Enabled = false
+
+        menu:Update(dt)
     else
         menu.Screen.Enabled = false
         if started then

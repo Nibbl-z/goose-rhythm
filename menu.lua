@@ -3,6 +3,7 @@ local menu = {}
 menu.Enabled = true
 
 local editor = require("editor")
+local transitions = require("transitions")
 require("yan") -- i cant wait to use tweens
 -- i could wait to use tweens
 -- they dont work im sad
@@ -20,11 +21,24 @@ local previewMusic = nil
 local scrollX = 0
 local scrollY = 0
 
+local fadeDelay = 0
+local fading = nil
+
+function menu:Reset()
+    menuMusic:play()
+end
+
 function menu:Init()
+    transitions:Init()
+    menuMusic = love.audio.newSource("/music/menu.mp3", "stream")
+    menuMusic:setLooping(true)
+    menuMusic:setVolume(0.2)
+    menuMusic:play()
+
     bgImage = love.graphics.newImage("/img/menu_bg.png")
     bgImage:setWrap("repeat", "repeat")
     bgQuad = love.graphics.newQuad(0, 0, 200000, 200000, 800, 600)
-
+    
     self.Screen = yan:Screen()
     
     mainPage = yan:Frame(self.Screen)
@@ -78,6 +92,7 @@ function menu:Init()
         previewMusic = love.audio.newSource( charts[chartSelectionIndex].."/song.mp3", "stream")
         previewMusic:setVolume(0.1)
         previewMusic:play()
+        menuMusic:pause()
     end 
     
     openEditor = yan:TextButton(self.Screen, "open editor", 50, "center", "center", "/ComicNeue.ttf")
@@ -99,10 +114,10 @@ function menu:Init()
     end
     
     openEditor.MouseDown = function ()
-        editor:Init()
-        editor.Enabled = true
-        self.Enabled = false
-        self.Screen.Enabled = false
+        transitions:FadeIn(1)
+
+        fading = "editor"
+        fadeDelay = love.timer.getTime() + 1
     end
 
     settingsBtn = yan:TextButton(self.Screen, "settings", 50, "center", "center", "/ComicNeue.ttf")
@@ -176,6 +191,7 @@ function menu:Init()
             end
 
             menu.playsong(chart)
+            menuMusic:stop()
         end
 
         frame:SetParent(levelsContainer)
@@ -197,6 +213,22 @@ end
 function menu:MouseMoved(_, _, x, y)
     scrollX = scrollX + x * 0.2
     scrollY = scrollY + y * 0.2
+end
+
+function menu:Update(dt)
+    if fading ~= nil then
+        if love.timer.getTime() > fadeDelay then
+            if fading == "editor" then
+                transitions:FadeOut(1)
+                
+                editor:Init()
+                editor.Enabled = true
+                self.Enabled = false
+                self.Screen.Enabled = false
+                menuMusic:stop()
+            end
+        end
+    end
 end
 
 function menu:KeyPressed(key)
@@ -241,6 +273,8 @@ function menu:KeyPressed(key)
             if previewMusic ~= nil then 
                 previewMusic:stop()
             end
+
+            menuMusic:play()
         end
     end
 end

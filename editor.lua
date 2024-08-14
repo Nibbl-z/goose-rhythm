@@ -76,19 +76,19 @@ function editor:Init()
     mainBeatFont = love.graphics.newFont(25)
     smallBeatFont = love.graphics.newFont(15)
 
-    editorui = screen:New()
-    editorui.Enabled = true
+    self.Screen = screen:New()
+    self.Screen.Enabled = true
     
     noteColumns = {}
     
-    placerContainer = frame:New(editorui)
+    placerContainer = frame:New(self.Screen)
     placerContainer.Size = UIVector2.new(0,70 * 4,1,0)
     placerContainer.Position = UIVector2.new(0.5,0,0,0)
     placerContainer.AnchorPoint = Vector2.new(0.5,0)
     placerContainer.Color = Color.new(1,1,1,0)
     
     for i = 1, 4 do
-        local noteDetector = btn:New(editorui, "", 20, "center", "center")
+        local noteDetector = btn:New(self.Screen, "", 20, "center", "center")
         noteDetector.Position = UIVector2.new(0.25 * (i - 1), 0, 0, 0)
         noteDetector.Size = UIVector2.new(0.25,0,1,0)
         noteDetector:SetParent(placerContainer)
@@ -103,7 +103,7 @@ function editor:Init()
         end
     end
     
-    snapInput = textinput:New(editorui, "0.5", 16, "left", "center")
+    snapInput = textinput:New(self.Screen, "0.5", 16, "left", "center")
     snapInput.Position = UIVector2.new(0, 10, 0, 10)
     snapInput.Size = UIVector2.new(0.1,0,0.05,0)
     snapInput.TextColor = Color.new(0,0,0,1)
@@ -211,6 +211,7 @@ end
 function editor:KeyPressed(key)
     if key == "escape" then
         self.Enabled = false
+        
         self.ReturnToMenu()
     end
     if key == "space" then
@@ -274,7 +275,7 @@ function editor:Draw()
 
     for _, l in ipairs(lines) do
         
-
+        
         if l.partial == false then
             love.graphics.setFont(mainBeatFont)
             love.graphics.setColor(1,1,1,1)
