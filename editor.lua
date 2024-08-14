@@ -28,7 +28,7 @@ local pixelsPerBeat = 300
 
 local snapIndex = 2
 local snaps = {1, 1/2, 1/3, 1/4, 1/6, 1/8, 1/16}
-local song = "/music/purplegoose.mp3"
+local song = "/charts/greengoose/song.mp3"
 local playing = false
 
 local minVisibleBeat = 0
@@ -209,6 +209,10 @@ function StopPlayback()
 end
 
 function editor:KeyPressed(key)
+    if key == "escape" then
+        self.Enabled = false
+        self.ReturnToMenu()
+    end
     if key == "space" then
         if playing == false then
             StartPlayback()

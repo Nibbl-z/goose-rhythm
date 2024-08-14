@@ -66,6 +66,23 @@ function StartSong(chartPath)
     started = true
 end
 
+function menu.playsong(chart)
+    menu.Enabled = false
+    hud.Enabled = true
+    StartSong(chart)
+end
+
+function ReturnToMenu()
+    menu.Enabled = true
+    editor.Enabled = false
+    hud.Enabled = false
+    Reset()
+end
+
+function editor.ReturnToMenu()
+    ReturnToMenu()
+end
+
 function love.load()
     menu:Init()
     for name, sprite in pairs(sprites) do
@@ -151,8 +168,8 @@ function conductor.Metronome()
     --metronome:play()
     
     goose.Size = Vector2.new(2.5, 1.5)
-    --yan:NewTween(goose, yan:TweenInfo(0.3, EasingStyle.QuadOut), {Size = Vector2.new(2,2)}):Pla
-    gooseBopTween:Play()
+    yan:NewTween(goose, yan:TweenInfo(0.3, EasingStyle.QuadOut), {Size = Vector2.new(2,2)}):Play()
+   -- gooseBopTween:Play()
 end
 
 local status = ""
@@ -166,11 +183,8 @@ function love.wheelmoved(x, y)
 end
 
 function love.keypressed(key, scancode, rep)
-    if key == "p" then
-        StartSong("/charts/greengoose")
-    end
-    if key == "o" then
-        StartSong("/charts/purplegoose")
+    if key == "escape" then
+        ReturnToMenu()
     end
     
     uimgr:KeyPressed(key, scancode, rep)
@@ -232,16 +246,20 @@ function love.textinput(t)
 end
 
 function love.draw()
-    if BGSprite ~= nil then
-        love.graphics.draw(BGSprite)
-    end
+    
    
-    goose:Draw()
+   
     if editor.Enabled == true then
         editor:Draw()
     elseif menu.Enabled == true then
         
     else
+        if BGSprite ~= nil then
+            love.graphics.draw(BGSprite)
+        end
+
+         goose:Draw()
+
         local circleXOffset = (love.graphics.getWidth() - 4 * 70) / 2 - 35
         love.graphics.setColor(0,0,0,0.5)
         love.graphics.rectangle("fill", circleXOffset + 35, 0, 70 * 4, love.graphics.getHeight())
