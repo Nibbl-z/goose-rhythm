@@ -4,6 +4,7 @@ menu.Enabled = true
 
 local editor = require("editor")
 local transitions = require("transitions")
+require("conductor")
 require("yan") -- i cant wait to use tweens
 -- i could wait to use tweens
 -- they dont work im sad
@@ -29,6 +30,9 @@ function menu:Reset()
     transitions:FadeOut(0.5)
     menuMusic:play()
 
+    conductor.BPM = 128
+        conductor:Init()
+
     mainPage.Position = UIVector2.new(0,0,0,0)
     levelsPage.Position = UIVector2.new(1,0,0,0)
     levelsContainer.Position = UIVector2.new(0,0,0,0)
@@ -41,6 +45,9 @@ function menu:Init()
     menuMusic:setLooping(true)
     menuMusic:setVolume(0.2)
     menuMusic:play()
+
+    conductor.BPM = 128
+    conductor:Init()
     
     bgImage = love.graphics.newImage("/img/menu_bg.png")
     bgImage:setWrap("repeat", "repeat")
@@ -59,8 +66,8 @@ function menu:Init()
     
     title = yan:Image(self.Screen, "/img/logo.png")
     title.Size = UIVector2.new(0,439*0.9,0,256*0.9)
-    title.Position = UIVector2.new(0.5,0,0,0)
-    title.AnchorPoint = Vector2.new(0.5,0)
+    title.Position = UIVector2.new(0.5,0,0.2,0)
+    title.AnchorPoint = Vector2.new(0.5,0.5)
     
     title.ZIndex = 3
 
@@ -99,7 +106,8 @@ function menu:Init()
         previewMusic = love.audio.newSource( charts[chartSelectionIndex].."/song.mp3", "stream")
         previewMusic:setVolume(0.1)
         previewMusic:play()
-        menuMusic:pause()
+
+        menuMusic:stop()
     end 
     
     openEditor = yan:TextButton(self.Screen, "open editor", 50, "center", "center", "/ComicNeue.ttf")
@@ -221,7 +229,13 @@ function menu:MouseMoved(_, _, x, y)
     scrollY = scrollY + y * 0.2
 end
 
+function menu:Metronome()
+    title.Size = UIVector2.new(0,439,0,256)
+    yan:NewTween(title, yan:TweenInfo(0.3, EasingStyle.Linear), {Size = UIVector2.new(0,439*0.9,0,256*0.9)}):Play()
+end
+
 function menu:Update(dt)
+    conductor:Update(dt)
     if fading ~= nil then
         if love.timer.getTime() > fadeDelay then
             if fading == "editor" then
@@ -296,6 +310,9 @@ function menu:KeyPressed(key)
             end
 
             menuMusic:play()
+
+            conductor.BPM = 128
+            conductor:Init()
         end
     end
 end

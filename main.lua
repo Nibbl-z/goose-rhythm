@@ -195,6 +195,10 @@ function conductor.Metronome()
     goose.Size = Vector2.new(2.5, 1.5)
     yan:NewTween(goose, yan:TweenInfo(0.3, EasingStyle.QuadOut), {Size = Vector2.new(2,2)}):Play()
    -- gooseBopTween:Play()
+
+   if menu.Enabled == true then
+    menu:Metronome()
+   end
 end
 
 local status = ""
