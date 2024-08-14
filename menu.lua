@@ -29,9 +29,9 @@ function menu:Reset()
     transitions:FadeIn(0)
     transitions:FadeOut(0.5)
     menuMusic:play()
-
+    
     conductor.BPM = 128
-        conductor:Init()
+    conductor:Init()
 
     mainPage.Position = UIVector2.new(0,0,0,0)
     levelsPage.Position = UIVector2.new(1,0,0,0)
@@ -75,6 +75,9 @@ function menu:Init()
     playLevels.Position = UIVector2.new(0.5,0,0.4,0)
     playLevels.Size = UIVector2.new(0.5, 0, 0.15, 0)
     playLevels.AnchorPoint = Vector2.new(0.5,0)
+
+    playLevels.Color = Color.new(0,1,33/255, 1)
+    playLevels.TextColor = Color.new(1,1,1,1)
     
     playHoverTween = yan:NewTween(playLevels, yan:TweenInfo(0.2, EasingStyle.QuadOut), {Size = UIVector2.new(0.6, 0, 0.15, 0)})
     playLeaveTween = yan:NewTween(playLevels, yan:TweenInfo(0.2, EasingStyle.QuadOut), {Size = UIVector2.new(0.5, 0, 0.15, 0)})
@@ -82,13 +85,13 @@ function menu:Init()
     playLevels.MouseEnter = function ()
         print("play enter")
         
-        yan:NewTween(playLevels, yan:TweenInfo(0.2, EasingStyle.QuadOut), {Size = UIVector2.new(0.6, 0, 0.15, 0)}):Play()
+        yan:NewTween(playLevels, yan:TweenInfo(0.2, EasingStyle.QuadOut), {Size = UIVector2.new(0.6, 0, 0.15, 0), Color = Color.new(0.3,1,100/255,1)}):Play()
     end
     
     playLevels.MouseLeave = function ()
         print("play leave")
         --playHoverTween:Stop() 
-        yan:NewTween(playLevels, yan:TweenInfo(0.2, EasingStyle.QuadOut), {Size = UIVector2.new(0.5, 0, 0.15, 0)}):Play()
+        yan:NewTween(playLevels, yan:TweenInfo(0.2, EasingStyle.QuadOut), {Size = UIVector2.new(0.5, 0, 0.15, 0), Color = Color.new(0,1,33/255,1)}):Play()
     end
     
     playLevels.MouseDown = function ()
@@ -106,7 +109,7 @@ function menu:Init()
         previewMusic = love.audio.newSource( charts[chartSelectionIndex].."/song.mp3", "stream")
         previewMusic:setVolume(0.1)
         previewMusic:play()
-
+        
         menuMusic:stop()
     end 
     
@@ -115,17 +118,20 @@ function menu:Init()
     openEditor.Size = UIVector2.new(0.5, 0, 0.15, 0)
     openEditor.AnchorPoint = Vector2.new(0.5,0)
     
+    openEditor.Color = Color.new(178/255,0,1, 1)
+    openEditor.TextColor = Color.new(1,1,1,1)
+
     editorHoverTween = yan:NewTween(openEditor, yan:TweenInfo(0.2, EasingStyle.QuadOut), {Size = UIVector2.new(0.5, 50, 0.15, 0)})
     editorLeaveTween = yan:NewTween(openEditor, yan:TweenInfo(0.2, EasingStyle.QuadOut), {Size = UIVector2.new(0.5, 0, 0.15, 0)})
     
     openEditor.MouseEnter = function ()
       --  editorLeaveTween:Stop()
-      yan:NewTween(openEditor, yan:TweenInfo(0.2, EasingStyle.QuadOut), {Size = UIVector2.new(0.5, 50, 0.15, 0)}):Play()
+      yan:NewTween(openEditor, yan:TweenInfo(0.2, EasingStyle.QuadOut), {Size = UIVector2.new(0.5, 50, 0.15, 0), Color = Color.new(230/255,0,1, 1)}):Play()
     end
     
     openEditor.MouseLeave = function ()
        -- editorHoverTween:Stop()
-       yan:NewTween(openEditor, yan:TweenInfo(0.2, EasingStyle.QuadOut), {Size = UIVector2.new(0.5, 0, 0.15, 0)}):Play()
+       yan:NewTween(openEditor, yan:TweenInfo(0.2, EasingStyle.QuadOut), {Size = UIVector2.new(0.5, 0, 0.15, 0), Color = Color.new(178/255,0,1, 1)}):Play()
     end
     
     openEditor.MouseDown = function ()
@@ -142,16 +148,17 @@ function menu:Init()
     
     settingsHoverTween = yan:NewTween(settingsBtn, yan:TweenInfo(0.2, EasingStyle.QuadOut), {Size = UIVector2.new(0.5, 50, 0.15, 0)})
     settingsLeaveTween = yan:NewTween(settingsBtn, yan:TweenInfo(0.2, EasingStyle.QuadOut), {Size = UIVector2.new(0.5, 0, 0.15, 0)})
-    
+    settingsBtn.Color = Color.new(0.5,0.5,0.5,1)
+    settingsBtn.TextColor = Color.new(1,1,1,1)
     settingsBtn.MouseEnter = function ()
        -- settingsLeaveTween:Stop()
-       yan:NewTween(settingsBtn, yan:TweenInfo(0.2, EasingStyle.QuadOut), {Size = UIVector2.new(0.5, 50, 0.15, 0)}):Play()
+       yan:NewTween(settingsBtn, yan:TweenInfo(0.2, EasingStyle.QuadOut), {Size = UIVector2.new(0.5, 50, 0.15, 0), Color = Color.new(0.7,0.7,0.7,1)}):Play()
        
     end
     
     settingsBtn.MouseLeave = function ()
         --settingsHoverTween:Stop()
-        yan:NewTween(settingsBtn, yan:TweenInfo(0.2, EasingStyle.QuadOut), {Size = UIVector2.new(0.5, 0, 0.15, 0)}):Play()
+        yan:NewTween(settingsBtn, yan:TweenInfo(0.2, EasingStyle.QuadOut), {Size = UIVector2.new(0.5, 0, 0.15, 0), Color =  Color.new(0.5,0.5,0.5,1)}):Play()
     end
 
     title:SetParent(mainPage)
