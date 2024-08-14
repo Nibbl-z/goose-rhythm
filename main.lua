@@ -245,6 +245,12 @@ function love.textinput(t)
     uimgr:TextInput(t)
 end
 
+function love.mousemoved(x, y, dx, dy)
+    if menu.Enabled == true then
+        menu:MouseMoved(x,y, dx, dy)
+    end
+end
+
 function love.draw()
     
    
@@ -252,7 +258,7 @@ function love.draw()
     if editor.Enabled == true then
         editor:Draw()
     elseif menu.Enabled == true then
-        
+        menu:Draw()
     else
         if BGSprite ~= nil then
             love.graphics.draw(BGSprite)
