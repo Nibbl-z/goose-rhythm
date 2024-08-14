@@ -176,6 +176,8 @@ function love.keypressed(key, scancode, rep)
     uimgr:KeyPressed(key, scancode, rep)
     if editor.Enabled == true then
         editor:KeyPressed(key)
+    elseif menu.Enabled == true then
+        menu:KeyPressed(key)
     else
         local result = conductor:GetHitAccuracy(key)
         if result == nil then return end
