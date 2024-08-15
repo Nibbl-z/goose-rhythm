@@ -32,7 +32,7 @@ function menu:Reset()
     
     conductor.BPM = 128
     conductor:Init()
-
+    
     mainPage.Position = UIVector2.new(0,0,0,0)
     levelsPage.Position = UIVector2.new(1,0,0,0)
     levelsContainer.Position = UIVector2.new(0,0,0,0)
@@ -59,6 +59,8 @@ function menu:Init()
     mainPage.Size = UIVector2.new(1,0,1,0)
     mainPage.Color = Color.new(0,0,0,0)
 
+    mainPage.Name = "MainPage"
+
     levelsPage = yan:Frame(self.Screen)
     levelsPage.Size = UIVector2.new(1,0,1,0)
     levelsPage.Position = UIVector2.new(1,0,0,0)
@@ -68,6 +70,8 @@ function menu:Init()
     title.Size = UIVector2.new(0,439*0.9,0,256*0.9)
     title.Position = UIVector2.new(0.5,0,0.2,0)
     title.AnchorPoint = Vector2.new(0.5,0.5)
+    
+    titleBop = yan:NewTween(title, yan:TweenInfo(0.3, EasingStyle.QuadOut), {Size = UIVector2.new(0,439*0.9,0,256*0.9)})
     
     title.ZIndex = 3
 
@@ -79,25 +83,25 @@ function menu:Init()
     playLevels.Color = Color.new(0,1,33/255, 1)
     playLevels.TextColor = Color.new(1,1,1,1)
     
-    playHoverTween = yan:NewTween(playLevels, yan:TweenInfo(0.2, EasingStyle.QuadOut), {Size = UIVector2.new(0.6, 0, 0.15, 0)})
-    playLeaveTween = yan:NewTween(playLevels, yan:TweenInfo(0.2, EasingStyle.QuadOut), {Size = UIVector2.new(0.5, 0, 0.15, 0)})
+    playHoverTween = yan:NewTween(playLevels, yan:TweenInfo(0.2, EasingStyle.QuadOut), {Size = UIVector2.new(0.5, 50, 0.15, 0), Color = Color.new(0.3,1,100/255,1)})
+    playLeaveTween = yan:NewTween(playLevels, yan:TweenInfo(0.2, EasingStyle.QuadOut), {Size = UIVector2.new(0.5, 0, 0.15, 0), Color = Color.new(0,1,33/255,1)})
     
     playLevels.MouseEnter = function ()
-        print("play enter")
-        
-        yan:NewTween(playLevels, yan:TweenInfo(0.2, EasingStyle.QuadOut), {Size = UIVector2.new(0.6, 0, 0.15, 0), Color = Color.new(0.3,1,100/255,1)}):Play()
+        playHoverTween:Play()
     end
     
     playLevels.MouseLeave = function ()
         print("play leave")
-        --playHoverTween:Stop() 
-        yan:NewTween(playLevels, yan:TweenInfo(0.2, EasingStyle.QuadOut), {Size = UIVector2.new(0.5, 0, 0.15, 0), Color = Color.new(0,1,33/255,1)}):Play()
+        playLeaveTween:Play()
     end
+    
+    moveMainTween = yan:NewTween(mainPage, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(-1,0,0,0)})
+    moveLevelsTween = yan:NewTween(levelsPage, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(0,0,0,0)})
     
     playLevels.MouseDown = function ()
         page = "levels"
-        yan:NewTween(mainPage, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(-1,0,0,0)}):Play()
-        yan:NewTween(levelsPage, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(0,0,0,0)}):Play()
+        moveMainTween:Play()
+        moveLevelsTween:Play()
         
 
         chartSelectionIndex = 1
@@ -121,17 +125,15 @@ function menu:Init()
     openEditor.Color = Color.new(178/255,0,1, 1)
     openEditor.TextColor = Color.new(1,1,1,1)
 
-    editorHoverTween = yan:NewTween(openEditor, yan:TweenInfo(0.2, EasingStyle.QuadOut), {Size = UIVector2.new(0.5, 50, 0.15, 0)})
-    editorLeaveTween = yan:NewTween(openEditor, yan:TweenInfo(0.2, EasingStyle.QuadOut), {Size = UIVector2.new(0.5, 0, 0.15, 0)})
+    editorHoverTween = yan:NewTween(openEditor, yan:TweenInfo(0.2, EasingStyle.QuadOut), {Size = UIVector2.new(0.5, 50, 0.15, 0), Color = Color.new(230/255,0,1, 1)})
+    editorLeaveTween = yan:NewTween(openEditor, yan:TweenInfo(0.2, EasingStyle.QuadOut), {Size = UIVector2.new(0.5, 0, 0.15, 0), Color = Color.new(178/255,0,1, 1)})
     
     openEditor.MouseEnter = function ()
-      --  editorLeaveTween:Stop()
-      yan:NewTween(openEditor, yan:TweenInfo(0.2, EasingStyle.QuadOut), {Size = UIVector2.new(0.5, 50, 0.15, 0), Color = Color.new(230/255,0,1, 1)}):Play()
+        editorHoverTween:Play()
     end
     
     openEditor.MouseLeave = function ()
-       -- editorHoverTween:Stop()
-       yan:NewTween(openEditor, yan:TweenInfo(0.2, EasingStyle.QuadOut), {Size = UIVector2.new(0.5, 0, 0.15, 0), Color = Color.new(178/255,0,1, 1)}):Play()
+        editorLeaveTween:Play()
     end
     
     openEditor.MouseDown = function ()
@@ -146,22 +148,21 @@ function menu:Init()
     settingsBtn.Size = UIVector2.new(0.5, 0, 0.15, 0)
     settingsBtn.AnchorPoint = Vector2.new(0.5,0)
     
-    settingsHoverTween = yan:NewTween(settingsBtn, yan:TweenInfo(0.2, EasingStyle.QuadOut), {Size = UIVector2.new(0.5, 50, 0.15, 0)})
-    settingsLeaveTween = yan:NewTween(settingsBtn, yan:TweenInfo(0.2, EasingStyle.QuadOut), {Size = UIVector2.new(0.5, 0, 0.15, 0)})
+    settingsHoverTween = yan:NewTween(settingsBtn, yan:TweenInfo(0.2, EasingStyle.QuadOut), {Size = UIVector2.new(0.5, 50, 0.15, 0), Color = Color.new(0.7,0.7,0.7,1)})
+    settingsLeaveTween = yan:NewTween(settingsBtn, yan:TweenInfo(0.2, EasingStyle.QuadOut), {Size = UIVector2.new(0.5, 0, 0.15, 0), Color =  Color.new(0.5,0.5,0.5,1)})
+
     settingsBtn.Color = Color.new(0.5,0.5,0.5,1)
     settingsBtn.TextColor = Color.new(1,1,1,1)
     settingsBtn.MouseEnter = function ()
-       -- settingsLeaveTween:Stop()
-       yan:NewTween(settingsBtn, yan:TweenInfo(0.2, EasingStyle.QuadOut), {Size = UIVector2.new(0.5, 50, 0.15, 0), Color = Color.new(0.7,0.7,0.7,1)}):Play()
-       
+       settingsHoverTween:Play()
     end
     
     settingsBtn.MouseLeave = function ()
-        --settingsHoverTween:Stop()
-        yan:NewTween(settingsBtn, yan:TweenInfo(0.2, EasingStyle.QuadOut), {Size = UIVector2.new(0.5, 0, 0.15, 0), Color =  Color.new(0.5,0.5,0.5,1)}):Play()
+        settingsLeaveTween:Play()
     end
 
     title:SetParent(mainPage)
+    title.Name = "Title"
     playLevels:SetParent(mainPage)
     openEditor:SetParent(mainPage)
     settingsBtn:SetParent(mainPage)
@@ -237,8 +238,9 @@ function menu:MouseMoved(_, _, x, y)
 end
 
 function menu:Metronome()
+    print("Boppin")
     title.Size = UIVector2.new(0,439,0,256)
-    yan:NewTween(title, yan:TweenInfo(0.3, EasingStyle.Linear), {Size = UIVector2.new(0,439*0.9,0,256*0.9)}):Play()
+    titleBop:Play()
 end
 
 function menu:Update(dt)

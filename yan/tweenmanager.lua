@@ -1,5 +1,5 @@
 local tweenmanager = {}
-local activeTweens = {}
+activeTweens = {}
 
 local EasingStyle = require("yan.datatypes.easingstyle")
 local utils = require("yan.utils")
@@ -20,6 +20,7 @@ function tweenmanager:NewTween(instance, tweeninfo, goal)
         
         Progress = 0.0,
         TimePosition = 0.0,
+        StartTime = 0.0,
         OriginalProperties = {},
         IsPlaying = false,
         Finished = false
@@ -32,22 +33,24 @@ function tweenmanager:NewTween(instance, tweeninfo, goal)
     
     
     function tween:Play()
-        for _, v in ipairs(activeTweens) do
+        --[[for _, v in ipairs(activeTweens) do
             if v.Instance == tween.Instance then
                 v:Pause()
             end
-        end
-
-        table.insert(activeTweens, tween)
-        tween.Index = #activeTweens
-        --[[for key, value in pairs(tween.Goal) do
-            tween.OriginalProperties[key] = instance[key]
         end]]
+        
+        table.insert(activeTweens, tween)
+        tween.Index = love.timer.getTime()
+
+        for key, value in pairs(tween.Goal) do
+            tween.OriginalProperties[key] = instance[key]
+        end
         
         tween.Progress = 0.0
         tween.TimePosition = 0.0
         tween.IsPlaying = true
         tween.Finished = false
+        tween.StartTime = love.timer.getTime()
     end
     
     function tween:Pause()
@@ -250,15 +253,23 @@ local EasingFuncs = {
 }
 
 local function UpdateTween(tween, dt)
-    tween.TimePosition = tween.TimePosition + dt
+    tween.TimePosition = love.timer.getTime() - tween.StartTime
     tween.Progress = utils:Clamp(tween.TimePosition / tween.TweenInfo.Duration, 0.0, 1.0)
     
     for key, value in pairs(tween.Goal) do
         tween.Instance[key] = tween.OriginalProperties[key] + (value - tween.OriginalProperties[key]) * EasingFuncs[tween.TweenInfo.EasingStyle](tween.Progress)
     end
-
+   
     if tween.Progress >= 1.0 then
-        local b = table.remove(activeTweens, tween.Index)
+        
+        --print(#activeTweens)
+        for i, v in ipairs(activeTweens) do
+            if v.Index == tween.Index then
+                table.remove(activeTweens, i)
+            end
+        end
+
+        --print(#activeTweens)
         tween.Finished = true
         tween.IsPlaying = false
     end
