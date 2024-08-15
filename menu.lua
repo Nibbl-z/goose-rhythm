@@ -1,7 +1,7 @@
 local menu = {}
 
 menu.Enabled = true
-
+local settings = require("settings")
 local editor = require("editor")
 local transitions = require("transitions")
 require("conductor")
@@ -24,6 +24,8 @@ local scrollY = 0
 
 local fadeDelay = 0
 local fading = nil
+
+local bgOffset = {Pos = 0}
 
 function menu:Reset()
     transitions:FadeIn(0)
@@ -48,6 +50,8 @@ function menu:Init()
 
     conductor.BPM = 128
     conductor:Init()
+
+    
     
     bgImage = love.graphics.newImage("/img/menu_bg.png")
     bgImage:setWrap("repeat", "repeat")
@@ -65,6 +69,11 @@ function menu:Init()
     levelsPage.Size = UIVector2.new(1,0,1,0)
     levelsPage.Position = UIVector2.new(1,0,0,0)
     levelsPage.Color = Color.new(0,0,0,0)
+
+    settingsFrame = yan:Frame(self.Screen)
+    settingsFrame.Position = UIVector2.new(0,0,1,0)
+    settingsFrame.Size = UIVector2.new(1,0,1,0)
+    settingsFrame.Color = Color.new(0,0,0,0)
     
     title = yan:Image(self.Screen, "/img/logo.png")
     title.Size = UIVector2.new(0,439*0.9,0,256*0.9)
@@ -160,6 +169,17 @@ function menu:Init()
     settingsBtn.MouseLeave = function ()
         settingsLeaveTween:Play()
     end
+    moveMainSettingsTween = yan:NewTween(mainPage, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(0,0,-1,0)})
+    moveSettingsTween = yan:NewTween(settingsFrame, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(0,0,0,0)})
+    settingsBtn.MouseDown = function ()
+        page = "settings"
+
+        moveMainSettingsTween:Play()
+        moveSettingsTween:Play()
+        yan:NewTween(bgOffset, yan:TweenInfo(1, EasingStyle.QuadInOut), {Pos = 400}):Play()
+    end
+    
+   
 
     title:SetParent(mainPage)
     title.Name = "Title"
@@ -223,10 +243,24 @@ function menu:Init()
         playButton:SetParent(frame)
         mapper:SetParent(frame)
     end
+    
+    
+
+    volumeSlider = yan:Slider(self.Screen, 0.0, 1.0, settings:GetMusicVolume())
+    volumeSlider.Style = "fill"
+    volumeSlider.Position = UIVector2.new(0.5, 0, 0.2,0)
+    volumeSlider.Size = UIVector2.new(0.6, 0, 0.1,0)
+    volumeSlider.AnchorPoint = Vector2.new(0.5,0)
+    
+    volumeSlider:SetParent(settingsFrame)
+
+    function volumeSlider.OnSlide(value)
+        settings.MusicVolume = value
+    end
 end
 
 function menu:Draw()
-    love.graphics.draw(bgImage, bgQuad, (800 * -20) + scrollX, (600 * -20) + scrollY)
+    love.graphics.draw(bgImage, bgQuad, (800 * -20) + scrollX, (600 * -20) + scrollY - bgOffset.Pos)
 
     --scrollX = scrollX + 0.1
     scrollY = scrollY + 0.1
@@ -244,6 +278,10 @@ function menu:Metronome()
 end
 
 function menu:Update(dt)
+    menuMusic:setVolume(settings:GetMusicVolume())
+    if previewMusic ~= nil then 
+        previewMusic:setVolume(settings:GetMusicVolume())
+    end
     conductor:Update(dt)
     if fading ~= nil then
         if love.timer.getTime() > fadeDelay then
@@ -317,12 +355,17 @@ function menu:KeyPressed(key)
             if previewMusic ~= nil then 
                 previewMusic:stop()
             end
-
+            
             menuMusic:play()
 
             conductor.BPM = 128
             conductor:Init()
         end
+    elseif page == "settings" then
+        page = "main"
+        yan:NewTween(settingsFrame, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(0, 0, 1, 0)}):Play()
+        yan:NewTween(mainPage, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(0,0,0,0)}):Play()
+        yan:NewTween(bgOffset, yan:TweenInfo(1, EasingStyle.QuadInOut), {Pos = 0}):Play()
     end
 end
 

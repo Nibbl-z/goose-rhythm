@@ -6,11 +6,11 @@ local utils = require("yan.utils")
 
 slider.__index = guibase
 
-function slider:New(screen, minValue, maxValue)
+function slider:New(screen, minValue, maxValue, defaultValue)
     local o = guibase:New(screen)
     o.Type = "Slider"
-    o.Progress = 0
-    o.Value = minValue
+    o.Progress = defaultValue / maxValue
+    o.Value = defaultValue
     o.CornerRoundness = 8 
     o.Direction = "horizontal"
     o.Style = "bar"
@@ -32,7 +32,9 @@ function slider:New(screen, minValue, maxValue)
             o.Value = minValue + (maxValue - minValue) * o.Progress
         end
         
-        print(o.Value)
+        if o.OnSlide ~= nil then
+            o.OnSlide(o.Value)
+        end
     end
     
     function o:Draw()

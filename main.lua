@@ -63,7 +63,7 @@ function StartSong(chartPath)
     goose:SetLoadedSprite(GooseSprite)
     
     metronome = love.audio.newSource("/select.wav", "static")
-    loadedSong:setVolume(0.2)
+    loadedSong:setVolume(settings:GetMusicVolume())
     
     startedSong = false
     startTime = love.timer.getTime() + conductor.SecondsPerBeat * 3
