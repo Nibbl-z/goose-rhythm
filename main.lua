@@ -34,11 +34,13 @@ local GooseMissSprite = nil
 local bread = 0
 local combo = 0
 local misses = 0
+local notesHit = 0
 
 function Reset()
     bread = 0
     combo = 0
     misses = 0
+    notesHit = 0
 
     if loadedSong ~= nil then
         loadedSong:stop()
@@ -204,7 +206,7 @@ end
 local status = ""
 
 function conductor.OnChartFinish()
-    results:Open(bread)
+    results:Open(bread, notesHit)
 end
 
 function results.ReturnToMenu()
@@ -231,18 +233,20 @@ function love.keypressed(key, scancode, rep)
         if key == "escape" then
             ReturnToMenu()
         end
-        local result= conductor:GetHitAccuracy(key)
+        local result = conductor:GetHitAccuracy(key)
         if result == nil then return end
         
         if result <= 0.05 then
             status = "Perfect"
             
             combo = combo + 1
+            notesHit = notesHit + 1
             goose:SetLoadedSprite(GooseSprite)
         elseif result <= 0.2 then
             status = "Okay"
 
             combo = combo + 1
+            notesHit = notesHit + 1
             goose:SetLoadedSprite(GooseSprite)
         elseif result > 0.3 then
             goose:SetLoadedSprite(GooseMissSprite)

@@ -1,6 +1,6 @@
 local results = {}
 require "yan"
-
+require "modules.conductor"
 function results:Init()
     self.Screen = yan:Screen()
     self.Screen.Enabled = false
@@ -46,10 +46,11 @@ function results:Init()
     end
 end
 
-function results:Open(breadamnt)
+function results:Open(breadamnt, totalNotes)
     self.Screen.Enabled = true
     yan:NewTween(mainFrame, yan:TweenInfo(1, EasingStyle.ElasticOut), {Position = UIVector2.new(0.5,0,0.5,0)}):Play()
     bread.Text = "Bread: "..breadamnt
+    notes.Text = "Notes Hit: "..tostring(totalNotes).."/"..tostring(conductor:GetNoteCount())
 end
 
 return results

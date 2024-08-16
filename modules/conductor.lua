@@ -48,10 +48,7 @@ function conductor:Update(dt)
         if not self.ChartFinished then
             if self.Chart[self.NoteIndex] == nil then
                 self.ChartFinished = true
-                if self.OnChartFinish and conductor.IsSong == true then
-                    conductor.IsSong = false
-                    self.OnChartFinish()
-                end
+
                 return
             end
 
@@ -59,6 +56,15 @@ function conductor:Update(dt)
             self.NextChartBeat = self.Chart[self.NoteIndex]
             
             self.NoteIndex = self.NoteIndex + 1
+        else
+            if self.IsSong then
+                if self.SongPositionInBeats > self:GetChartEndBeat() then
+                    if self.OnChartFinish ~= nil then
+                        self.IsSong = false
+                        self.OnChartFinish()
+                    end
+                end
+            end
         end
     end
     
@@ -115,6 +121,38 @@ function conductor:LoadChart(chart)
      
     self.NextChartBeat = self.Chart[1]
     conductor.NoteIndex = conductor.NoteIndex + 1
+end
+
+function conductor:GetChartEndBeat()
+    if #self.Chart == 0 then return end
+    local beat = self.Chart[#self.Chart]
+
+    local beatEndTime = beat.B 
+    
+    if beat.D ~= nil then
+        local largestDuration = 0
+        for _, d in ipairs(beat.D) do
+            if d > largestDuration then
+                largestDuration = d
+            end
+        end
+
+        beatEndTime = beatEndTime + largestDuration
+    end
+
+    beatEndTime = beatEndTime + 2 -- maybe later add a thing to metadata for chart end delay
+
+    return beatEndTime
+end
+
+function conductor:GetNoteCount()
+    local count = 0
+
+    for _, beat in ipairs(self.Chart) do
+        count = count + #beat.N
+    end
+    
+    return count
 end
 
 function conductor:GetHitAccuracy(key)

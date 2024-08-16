@@ -167,6 +167,7 @@ function screen:New()
     end
 
     function o:Update()
+        if o.Enabled == false then return end
         local mX, mY = love.mouse.getPosition()
         
         local interactableElements = {}
