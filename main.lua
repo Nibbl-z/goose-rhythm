@@ -92,6 +92,7 @@ function editor.ReturnToMenu()
 end
 
 function love.load()
+    settings:Load()
     menu:Init()
     for name, sprite in pairs(sprites) do
         sprites[name] = love.graphics.newImage("/img/"..sprite)

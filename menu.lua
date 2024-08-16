@@ -58,7 +58,7 @@ function menu:Init()
     
     bgImage = love.graphics.newImage("/img/menu_bg.png")
     bgImage:setWrap("repeat", "repeat")
-    bgQuad = love.graphics.newQuad(0, 0, 200000, 200000, 800, 600)
+    bgQuad = love.graphics.newQuad(0, 0, 20000000, 20000000, 800, 600)
     
     self.Screen = yan:Screen()
     
@@ -255,7 +255,7 @@ function menu:Init()
     volumeSlider.Size = UIVector2.new(0.5, -10, 0.1,0)
     volumeSlider.SliderColor = Color.new(0.5,0.5,0.5,1)
     volumeSlider:SetParent(settingsFrame)
-
+    
     volumeLabel = yan:Label(self.Screen, "Music Volume", 32, "right", "center", "/ComicNeue.ttf")
     volumeLabel.Size = UIVector2.new(0.5,0,1,0)
     volumeLabel.Position = UIVector2.new(0, -50, 0, 0)
@@ -405,7 +405,7 @@ function menu:KeyPressed(key)
             yan:NewTween(levelsContainer, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(0, 0, 0, 0)}):Play()
             yan:NewTween(mainPage, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(0,0,0,0)}):Play()
             yan:NewTween(levelsPage, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(1,0,0,0)}):Play()
-
+            
             if previewMusic ~= nil then 
                 previewMusic:stop()
             end
@@ -421,6 +421,8 @@ function menu:KeyPressed(key)
             yan:NewTween(settingsFrame, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(0, 0, 1, 0)}):Play()
             yan:NewTween(mainPage, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(0,0,0,0)}):Play()
             yan:NewTween(bgOffset, yan:TweenInfo(1, EasingStyle.QuadInOut), {Pos = 0}):Play()
+
+            settings:Save()
         end
     end
 end
