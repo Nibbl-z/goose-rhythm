@@ -196,6 +196,39 @@ function menu:Init()
     levelsContainer.Size = UIVector2.new(1,0,1,0)
     levelsContainer.Color = Color.new(0,0,0,0)
     levelsContainer:SetParent(levelsPage)
+
+    levelsBackBtn = yan:ImageButton(self.Screen, "/img/back_btn.png")
+    levelsBackBtn.Size = UIVector2.new(0,50,0,50)
+    levelsBackBtn.Position = UIVector2.new(0,10,0,10)
+    levelsBackBtn:SetParent(levelsPage)
+    levelsBackBtn.ZIndex = 10
+    levelsBackBtn.MouseEnter = function ()
+        levelsBackBtn.Color = Color.new(0.7,0.7,0.7,1)
+    end
+
+    levelsBackBtn.MouseLeave = function ()
+        levelsBackBtn.Color = Color.new(1,1,1,1)
+    end
+
+    levelsBackBtn.MouseDown = function ()
+        page = "main"
+        yan:NewTween(levelsContainer, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(0, 0, 0, 0)}):Play()
+        yan:NewTween(mainPage, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(0,0,0,0)}):Play()
+        yan:NewTween(levelsPage, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(1,0,0,0)}):Play()
+        
+        if previewMusic ~= nil then 
+            previewMusic:stop()
+        end
+        
+        menuMusic:play()
+
+        conductor.BPM = 128
+        conductor:Init()
+
+        levelsBackBtn.Color = Color.new(1,1,1,1)
+    end
+
+    
     
     for i, chart in ipairs(charts) do
         local metadata = love.filesystem.read(chart.."/metadata.lua")
@@ -262,6 +295,30 @@ function menu:Init()
     volumeLabel.AnchorPoint = Vector2.new(1,0)
     volumeLabel.TextColor = Color.new(1,1,1,1)
     volumeLabel:SetParent(volumeSlider)
+
+    settingsBackBtn = yan:ImageButton(self.Screen, "/img/back_btn_up.png")
+    settingsBackBtn.Size = UIVector2.new(0,50,0,50)
+    settingsBackBtn.Position = UIVector2.new(0,10,0,10)
+    settingsBackBtn:SetParent(settingsFrame)
+    settingsBackBtn.ZIndex = 10
+    settingsBackBtn.MouseEnter = function ()
+        settingsBackBtn.Color = Color.new(0.7,0.7,0.7,1)
+    end
+
+    settingsBackBtn.MouseLeave = function ()
+        settingsBackBtn.Color = Color.new(1,1,1,1)
+    end
+
+    settingsBackBtn.MouseDown = function ()
+        page = "main"
+        yan:NewTween(settingsFrame, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(0, 0, 1, 0)}):Play()
+        yan:NewTween(mainPage, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(0,0,0,0)}):Play()
+        yan:NewTween(bgOffset, yan:TweenInfo(1, EasingStyle.QuadInOut), {Pos = 0}):Play()
+
+        settings:Save()
+        
+        settingsBackBtn.Color = Color.new(1,1,1,1)
+    end
     
     
     for i = 1, 4 do

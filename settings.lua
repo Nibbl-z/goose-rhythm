@@ -30,12 +30,12 @@ end
 
 function settings:Save()
     love.filesystem.setIdentity(love.filesystem.getIdentity())
-
+    
     local settingsString = tostring(self.MusicVolume)
     for _, v in ipairs(self.Keybinds) do
         settingsString = settingsString.."\n"..v
     end
-
+    
     love.filesystem.write("settings", settingsString)
 end
 
