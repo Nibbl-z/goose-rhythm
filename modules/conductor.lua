@@ -72,6 +72,7 @@ function conductor:Update(dt)
 end
 
 function conductor:LoadChart(chart)
+    self.Chart = {}
     conductor.IsSong = true
     local combineIndex = 0
     local previousBeat = nil
@@ -99,7 +100,7 @@ function conductor:LoadChart(chart)
             end
         else
             combineIndex = combineIndex + 1
-            self.Chart[combineIndex] = {B = v.B, N = {v.N}}
+            self.Chart[combineIndex] = {B = v.B, N = {v.N}, H = {}}
             
             if v.D ~= nil then
                 self.Chart[combineIndex].D = {[tostring(v.N)] = v.D}
@@ -109,7 +110,7 @@ function conductor:LoadChart(chart)
        
         previousBeat = v.B
     end
-
+    
    
      
     self.NextChartBeat = self.Chart[1]
@@ -125,11 +126,18 @@ function conductor:GetHitAccuracy(key)
     if lastDiff > 1 and nextDiff > 1 then return end
     print(key)
     print(lastDiff, nextDiff)
+    local num = nil
+    for _, n in ipairs(self.NextChartBeat.N) do
+        if key == settings.Keybinds[n] then
+            num = n 
+        end
+    end
+    
     if lastDiff > nextDiff then
-        if self.NextChartBeat.H ~= true then
+        if self.NextChartBeat.H[tostring(num)] ~= true then
             for _, n in ipairs(self.NextChartBeat.N) do
                 if key == settings.Keybinds[n] then
-                    self.NextChartBeat.H = true
+                    self.NextChartBeat.H[tostring(n)] = true
                     
                     if self.NextChartBeat.D ~= nil then
                         if self.NextChartBeat.D[tostring(n)] ~= nil then
@@ -137,16 +145,16 @@ function conductor:GetHitAccuracy(key)
                         end
                     end
                     
-
+                    
                     return nextDiff
                 end
             end
         end
     else
-        if self.LastChartBeat.H ~= true then
+        if self.LastChartBeat.H[tostring(num)]  ~= true then
             for _, n in ipairs(self.LastChartBeat.N) do
                 if key == settings.Keybinds[n] then
-                    self.LastChartBeat.H = true
+                    self.LastChartBeat.H[tostring(n)] = true
                     if self.LastChartBeat.D ~= nil then
                         if self.LastChartBeat.D[tostring(n)] ~= nil then
                             self.HoldingBeats[n] = self.LastChartBeat

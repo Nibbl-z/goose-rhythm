@@ -231,7 +231,7 @@ function love.keypressed(key, scancode, rep)
         if key == "escape" then
             ReturnToMenu()
         end
-        local result = conductor:GetHitAccuracy(key)
+        local result= conductor:GetHitAccuracy(key)
         if result == nil then return end
         
         if result <= 0.05 then
@@ -324,8 +324,9 @@ function love.draw()
         
         for _, v in ipairs(conductor.Chart) do
             if (v.B - conductor.SongPositionInBeats) > -10 and (v.B - conductor.SongPositionInBeats) < 10 then
-                if v.H ~= true and v.M ~= true then
-                    for _, n in ipairs(v.N) do
+                for _, n in ipairs(v.N) do
+                    if v.H[tostring(n)] ~= true and v.M ~= true then
+                    
                         love.graphics.draw(sprites.Bread, n * 70 + circleXOffset - 30, (v.B - conductor.SongPositionInBeats) * -300 + 440)
                        --love.graphics.circle("fill", n * 70 + circleXOffset, (v.B - conductor.SongPositionInBeats) * -300 + 470, 30)
                         
