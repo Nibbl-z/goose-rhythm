@@ -1,11 +1,12 @@
-require("conductor")
+require("modules.conductor")
 require("yan")
-local editor = require("editor")
-local menu = require("menu")
+local editor = require("modules.editor")
+local menu = require("modules.menu")
 local uimgr = require("yan.uimanager")
 local song = "/music/greengoose.mp3"
-local settings = require("settings")
-local transitions = require("transitions")
+local settings = require("modules.settings")
+local transitions = require("modules.transitions")
+local results = require("modules.results")
 
 local testDraw = true
 
@@ -77,12 +78,9 @@ function menu.playsong(chart)
 end
 
 function ReturnToMenu()
-    print("h")
     transitions:FadeIn(0.3)
     fading = true
     fadingDelay = love.timer.getTime() + 0.5
-
-   
 end
 
 function editor.ReturnToMenu()
@@ -94,6 +92,7 @@ end
 function love.load()
     settings:Load()
     menu:Init()
+    results:Init()
     for name, sprite in pairs(sprites) do
         sprites[name] = love.graphics.newImage("/img/"..sprite)
     end
@@ -142,7 +141,7 @@ function love.update(dt)
         if love.timer.getTime() > fadingDelay then
             menu.Enabled = true
             editor.Enabled = false
-            
+            results.Screen.Enabled = false
             hud.Enabled = false
             Reset()
             menu:Reset()
@@ -203,6 +202,14 @@ function conductor.Metronome()
 end
 
 local status = ""
+
+function conductor.OnChartFinish()
+    results:Open(bread)
+end
+
+function results.ReturnToMenu()
+    ReturnToMenu()
+end
 
 function love.mousepressed(x, y, button)
     editor:MousePressed(x, y, button)

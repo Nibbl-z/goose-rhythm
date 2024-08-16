@@ -14,5 +14,6 @@
         "cast-local-type",
         "undefined-field",
         "inject-field"
-    ]
+    ],
+    "Lua.completion.autoRequire": false
 }

@@ -1,16 +1,16 @@
 local menu = {}
 
 menu.Enabled = true
-local settings = require("settings")
-local editor = require("editor")
-local transitions = require("transitions")
-require("conductor")
+local settings = require("modules.settings")
+local editor = require("modules.editor")
+local transitions = require("modules.transitions")
+require("modules.conductor")
 require("yan") -- i cant wait to use tweens
 -- i could wait to use tweens
 -- they dont work im sad
 
 local charts = {
-    "/charts/greengoose", "/charts/purplegoose"
+    "/charts/greengoose", "/charts/purplegoose", "/charts/purplegoose copy"
 }
 
 local chartSelectionIndex = 1
@@ -264,6 +264,14 @@ function menu:Init()
         playButton.Size = UIVector2.new(0.3,0,0.1,0)
         playButton.AnchorPoint = Vector2.new(0.5, 1)
         
+
+        playButton.MouseEnter = function ()
+            playButton.Color = Color.new(0.7,0.7,0.7,1)
+        end
+
+        playButton.MouseLeave = function ()
+            playButton.Color = Color.new(1,1,1,1)
+        end
         playButton.MouseDown = function ()
             transitions:FadeIn(0.2)
 
@@ -271,7 +279,7 @@ function menu:Init()
             fadeDelay = love.timer.getTime() + 0.5
             menuMusic:stop()
         end
-
+        
         frame:SetParent(levelsContainer)
         cover:SetParent(frame)
         title:SetParent(frame)
@@ -304,7 +312,7 @@ function menu:Init()
     settingsBackBtn.MouseEnter = function ()
         settingsBackBtn.Color = Color.new(0.7,0.7,0.7,1)
     end
-
+    
     settingsBackBtn.MouseLeave = function ()
         settingsBackBtn.Color = Color.new(1,1,1,1)
     end
@@ -316,7 +324,7 @@ function menu:Init()
         yan:NewTween(bgOffset, yan:TweenInfo(1, EasingStyle.QuadInOut), {Pos = 0}):Play()
 
         settings:Save()
-        
+
         settingsBackBtn.Color = Color.new(1,1,1,1)
     end
     

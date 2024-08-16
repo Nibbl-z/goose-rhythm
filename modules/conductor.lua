@@ -11,10 +11,11 @@ conductor.NextChartBeat = {B = 0.0, N = {}}
 conductor.NoteIndex = 1
 conductor.ChartFinished = false
 conductor.Chart = {}
+conductor.IsSong = false
 
 conductor.HoldingBeats = {nil, nil, nil, nil}
 
-local settings = require("settings")
+local settings = require("modules.settings")
 
 function conductor:Init()
     self.SongPosition = 0
@@ -41,17 +42,19 @@ function conductor:Update(dt)
         if self.Metronome ~= nil then
             self.Metronome()
         end
-    end
+    end 
     
     if self.SongPositionInBeats > self.NextChartBeat.B then
         if not self.ChartFinished then
             if self.Chart[self.NoteIndex] == nil then
                 self.ChartFinished = true
+                if self.OnChartFinish and conductor.IsSong == true then
+                    conductor.IsSong = false
+                    self.OnChartFinish()
+                end
                 return
             end
-            print("Picking next beat")
-            print("Its going to be at Beat "..self.Chart[self.NoteIndex].B)
-            print("and the one before was "..self.NextChartBeat.B)
+
             self.LastChartBeat = self.NextChartBeat
             self.NextChartBeat = self.Chart[self.NoteIndex]
             
@@ -69,6 +72,7 @@ function conductor:Update(dt)
 end
 
 function conductor:LoadChart(chart)
+    conductor.IsSong = true
     local combineIndex = 0
     local previousBeat = nil
     

@@ -1,5 +1,5 @@
 local editor = {}
-require("conductor")
+require("modules.conductor")
 
 local frame = require("yan.instance.ui.frame")
 local btn = require("yan.instance.ui.textbutton")
