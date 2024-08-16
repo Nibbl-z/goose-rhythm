@@ -65,8 +65,17 @@ function results:Init()
     exitButton.Size = UIVector2.new(0.5,0,0.1,0)
     exitButton.AnchorPoint = Vector2.new(0,1)
     exitButton:SetParent(container)
+
+    exitButton.MouseEnter = function ()
+        exitButton.Color = Color.new(0.7,0.7,0.7,1)
+    end
+
+    exitButton.MouseLeave = function ()
+        exitButton.Color = Color.new(1,1,1,1)
+    end
     
     exitButton.MouseDown = function ()
+        exitButton.Color = Color.new(1,1,1,1)
         results.ReturnToMenu()
     end
 end
