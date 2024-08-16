@@ -49,11 +49,16 @@ function results:Init()
     rank:SetParent(container)
     rank.Size = UIVector2.new(0,300*0.7,0,200*0.7)
     rank.Position = UIVector2.new(0.5,40,0.2,-20)
+    
+    goose2 = yan:Image(self.Screen, "/img/ranks/superb.png")
+    goose2:SetParent(container)
+    goose2.Position = UIVector2.new(0.7,10,0.4,60)
+    goose2.Size = UIVector2.new(0,100,0,100)
 
-    goose = yan:Image(self.Screen, "/img/ranks/superb.png")
-    goose:SetParent(container)
-    goose.Position = UIVector2.new(0,10,0.4,30)
-    goose.Size = UIVector2.new(0,100,0,100)
+    gooseDialogue = yan:Label(self.Screen, "Placeholder text.. honk honk..", 30, "center", "center", "/ComicNeue.ttf")
+    gooseDialogue.Position = UIVector2.new(0,43,0,235)
+    gooseDialogue.Size = UIVector2.new(0,300,0,80)
+    gooseDialogue:SetParent(container)
     
     exitButton = yan:TextButton(self.Screen, "Return to Menu", 40, "center", "center", "/ComicNeue.ttf")
     exitButton.Position = UIVector2.new(0,10,1,-10)
@@ -70,15 +75,12 @@ function results:Open(breadamnt, totalNotes, metadata, chartPath)
     self.Screen.Enabled = true
     mainFrame.Position = UIVector2.new(0,0,1,0)
     yan:NewTween(mainFrame, yan:TweenInfo(1, EasingStyle.ElasticOut), {Position = UIVector2.new(0,0,0,0)}):Play()
-
+    
     bread.Text = "Bread: "..breadamnt
     notes.Text = "Notes Hit: "..tostring(totalNotes).."/"..tostring(conductor:GetNoteCount())
     
-    print(chartPath)
-    local img =  love.graphics.newImage("/img/ranks/try_again.png")
-    print(img)
-    goose.Image = img
-    print(goose.Image)
+    goose2.Image = love.graphics.newImage(chartPath.."/assets/goose.png")
+
     
     local accuracypercent = (breadamnt / (conductor:GetBreadCount()) * 100)
     accuracypercent = accuracypercent * 100
@@ -88,12 +90,16 @@ function results:Open(breadamnt, totalNotes, metadata, chartPath)
     
     if accuracypercent <= 40 then
         rank.Image = love.graphics.newImage("/img/ranks/try_again.png")
+        gooseDialogue.Text = metadata.DialogueTryAgain
     elseif accuracypercent <= 70 then
         rank.Image = love.graphics.newImage("/img/ranks/ok.png")
+        gooseDialogue.Text = metadata.DialogueOK
     elseif accuracypercent < 100 then
         rank.Image = love.graphics.newImage("/img/ranks/superb.png")
+        gooseDialogue.Text = metadata.DialogueSuperb
     elseif accuracypercent >= 100 then
         rank.Image = love.graphics.newImage("/img/ranks/perfect.png")
+        gooseDialogue.Text = metadata.DialoguePerfect
     end
 
     accuracy.Text = "Accuracy: "..accuracypercent.."%"
