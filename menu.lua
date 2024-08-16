@@ -27,6 +27,9 @@ local fading = nil
 
 local bgOffset = {Pos = 0}
 
+local choosingKeybind = -1
+local choosingButton = nil
+
 function menu:Reset()
     transitions:FadeIn(0)
     transitions:FadeOut(0.5)
@@ -248,12 +251,54 @@ function menu:Init()
 
     volumeSlider = yan:Slider(self.Screen, 0.0, 1.0, settings:GetMusicVolume())
     volumeSlider.Style = "fill"
-    volumeSlider.Position = UIVector2.new(0.5, 0, 0.2,0)
-    volumeSlider.Size = UIVector2.new(0.6, 0, 0.1,0)
-    volumeSlider.AnchorPoint = Vector2.new(0.5,0)
-    
+    volumeSlider.Position = UIVector2.new(0.4, 0, 0.2,0)
+    volumeSlider.Size = UIVector2.new(0.5, -10, 0.1,0)
+    volumeSlider.SliderColor = Color.new(0.5,0.5,0.5,1)
     volumeSlider:SetParent(settingsFrame)
 
+    volumeLabel = yan:Label(self.Screen, "Music Volume", 32, "right", "center", "/ComicNeue.ttf")
+    volumeLabel.Size = UIVector2.new(0.5,0,1,0)
+    volumeLabel.Position = UIVector2.new(0, -50, 0, 0)
+    volumeLabel.AnchorPoint = Vector2.new(1,0)
+    volumeLabel.TextColor = Color.new(1,1,1,1)
+    volumeLabel:SetParent(volumeSlider)
+    
+    
+    for i = 1, 4 do
+        local keybutton = yan:TextButton(self.Screen, settings:GetKeybinds()[i], 40, "center", "center", "/ComicNeue.ttf")
+        keybutton.Position = UIVector2.new(0.4, 0, 0.2 + (i * 0.1), i * 10)
+        keybutton.Size = UIVector2.new(0.5, -10, 0.1,0)
+        keybutton:SetParent(settingsFrame)
+
+        keylabel = yan:Label(self.Screen, "Note "..i.." Keybind", 32, "right", "center", "/ComicNeue.ttf")
+        keylabel.Size = UIVector2.new(0.7,0,1,0)
+        keylabel.Position = UIVector2.new(0, -50, 0, 0)
+        keylabel.AnchorPoint = Vector2.new(1,0)
+        keylabel.TextColor = Color.new(1,1,1,1)
+        keylabel:SetParent(keybutton)
+
+        keybutton.MouseEnter = function ()
+            if choosingKeybind ~= i then
+                keybutton.Color = Color.new(0.7,0.7,0.7,1)
+            end
+        end
+
+        keybutton.MouseLeave = function ()
+            if choosingKeybind ~= i then
+                keybutton.Color = Color.new(1,1,1,1)
+            end
+        end
+        
+        keybutton.MouseDown = function ()
+            if choosingKeybind ~= -1 then return end
+            keybutton.Color = Color.new(0.5,0.5,0.5,1)
+            choosingKeybind = i
+            choosingButton = keybutton
+            keybutton.Text = "Choose a key"
+        end
+    end
+   
+    
     function volumeSlider.OnSlide(value)
         settings.MusicVolume = value
     end
@@ -314,19 +359,28 @@ function menu:Update(dt)
 end
 
 function menu:KeyPressed(key)
+    if choosingKeybind ~= -1 then
+        settings.Keybinds[choosingKeybind] = tostring(key)
+        choosingButton.Text = tostring(key)
+        choosingButton.Color = Color.new(1,1,1,1)
+        choosingKeybind = -1
+        choosingButton = nil
+
+    end
+
     if page == "levels" then
         if key == "left" or key == "a" then
             if chartSelectionIndex > 1 then
                 chartSelectionIndex = chartSelectionIndex - 1
                 selectionPos = selectionPos + 1
                 yan:NewTween(levelsContainer, yan:TweenInfo(1, EasingStyle.BackOut), {Position = UIVector2.new(selectionPos, 0, 0, 0)}):Play()
-
+                
                 if previewMusic ~= nil then 
                     previewMusic:stop()
                 end
                 
                 previewMusic = love.audio.newSource( charts[chartSelectionIndex].."/song.mp3", "stream")
-                previewMusic:setVolume(0.1)
+                previewMusic:setVolume(settings:GetMusicVolume())
                 previewMusic:play()
                
             end
@@ -341,7 +395,7 @@ function menu:KeyPressed(key)
                 end
                 
                 previewMusic = love.audio.newSource( charts[chartSelectionIndex].."/song.mp3", "stream")
-                previewMusic:setVolume(0.1)
+                previewMusic:setVolume(settings:GetMusicVolume())
                 previewMusic:play()
             end
         end
@@ -362,10 +416,12 @@ function menu:KeyPressed(key)
             conductor:Init()
         end
     elseif page == "settings" then
-        page = "main"
-        yan:NewTween(settingsFrame, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(0, 0, 1, 0)}):Play()
-        yan:NewTween(mainPage, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(0,0,0,0)}):Play()
-        yan:NewTween(bgOffset, yan:TweenInfo(1, EasingStyle.QuadInOut), {Pos = 0}):Play()
+        if key == "escape" then
+            page = "main"
+            yan:NewTween(settingsFrame, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(0, 0, 1, 0)}):Play()
+            yan:NewTween(mainPage, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(0,0,0,0)}):Play()
+            yan:NewTween(bgOffset, yan:TweenInfo(1, EasingStyle.QuadInOut), {Pos = 0}):Play()
+        end
     end
 end
 

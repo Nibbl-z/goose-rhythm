@@ -7,4 +7,8 @@ function settings:GetMusicVolume()
     return self.MusicVolume -- this is because you have to like rerequire when you uhmmm change it so yea 
 end
 
+function settings:GetKeybinds()
+    return self.Keybinds
+end
+
 return settings

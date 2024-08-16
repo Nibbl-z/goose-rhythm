@@ -12,6 +12,7 @@
         "assign-type-mismatch",
         "duplicate-set-field",
         "cast-local-type",
-        "undefined-field"
+        "undefined-field",
+        "inject-field"
     ]
 }
