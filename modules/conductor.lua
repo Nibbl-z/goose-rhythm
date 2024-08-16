@@ -147,9 +147,25 @@ end
 
 function conductor:GetNoteCount()
     local count = 0
-
+    
     for _, beat in ipairs(self.Chart) do
         count = count + #beat.N
+    end
+    
+    return count
+end
+
+function conductor:GetBreadCount()
+    local count = 0
+    
+    for _, beat in ipairs(self.Chart) do
+        count = count + #beat.N * 10
+        print(count)
+        if beat.D ~= nil then
+            for _, v in pairs(beat.D) do -- #beat.D doesnt work bc its a dictonary wahhh
+                count = count + 10
+            end
+        end
     end
     
     return count
