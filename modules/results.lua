@@ -49,6 +49,11 @@ function results:Init()
     rank:SetParent(container)
     rank.Size = UIVector2.new(0,300*0.7,0,200*0.7)
     rank.Position = UIVector2.new(0.5,40,0.2,-20)
+
+    goose = yan:Image(self.Screen, "/img/ranks/superb.png")
+    goose:SetParent(container)
+    goose.Position = UIVector2.new(0,10,0.4,30)
+    goose.Size = UIVector2.new(0,100,0,100)
     
     exitButton = yan:TextButton(self.Screen, "Return to Menu", 40, "center", "center", "/ComicNeue.ttf")
     exitButton.Position = UIVector2.new(0,10,1,-10)
@@ -61,12 +66,20 @@ function results:Init()
     end
 end
 
-function results:Open(breadamnt, totalNotes)
+function results:Open(breadamnt, totalNotes, metadata, chartPath)
     self.Screen.Enabled = true
     mainFrame.Position = UIVector2.new(0,0,1,0)
     yan:NewTween(mainFrame, yan:TweenInfo(1, EasingStyle.ElasticOut), {Position = UIVector2.new(0,0,0,0)}):Play()
+
     bread.Text = "Bread: "..breadamnt
     notes.Text = "Notes Hit: "..tostring(totalNotes).."/"..tostring(conductor:GetNoteCount())
+    
+    print(chartPath)
+    local img =  love.graphics.newImage("/img/ranks/try_again.png")
+    print(img)
+    goose.Image = img
+    print(goose.Image)
+    
     local accuracypercent = (breadamnt / (conductor:GetBreadCount()) * 100)
     accuracypercent = accuracypercent * 100
     accuracypercent = math.ceil(accuracypercent)

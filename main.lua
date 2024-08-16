@@ -36,6 +36,9 @@ local combo = 0
 local misses = 0
 local notesHit = 0
 
+local loadedMetadata
+local chartPath
+
 function Reset()
     bread = 0
     combo = 0
@@ -47,22 +50,23 @@ function Reset()
     end
 end
 
-function StartSong(chartPath)
+function StartSong(chart)
     Reset()
-    local chartData = love.filesystem.read(chartPath.."/chart.lua")
+    chartPath = chart
+    local chartData = love.filesystem.read(chart.."/chart.lua")
     local loadedChart = loadstring(chartData)()
 
-    local metadata = love.filesystem.read(chartPath.."/metadata.lua")
-    local loadedMetadata = loadstring(metadata)()
+    local metadata = love.filesystem.read(chart.."/metadata.lua")
+    loadedMetadata = loadstring(metadata)()
     
-    loadedSong = love.audio.newSource(chartPath.."/song.mp3", "static")
+    loadedSong = love.audio.newSource(chart.."/song.mp3", "static")
     conductor.BPM = loadedMetadata.BPM
     conductor:Init()
     conductor:LoadChart(loadedChart)
     
-    BGSprite = love.graphics.newImage(chartPath.."/assets/bg.png")
-    GooseSprite = love.graphics.newImage(chartPath.."/assets/goose.png")
-    GooseMissSprite = love.graphics.newImage(chartPath.."/assets/goose_miss.png")
+    BGSprite = love.graphics.newImage(chart.."/assets/bg.png")
+    GooseSprite = love.graphics.newImage(chart.."/assets/goose.png")
+    GooseMissSprite = love.graphics.newImage(chart.."/assets/goose_miss.png")
     goose:SetLoadedSprite(GooseSprite)
     
     metronome = love.audio.newSource("/select.wav", "static")
@@ -206,7 +210,7 @@ end
 local status = ""
 
 function conductor.OnChartFinish()
-    results:Open(bread, notesHit)
+    results:Open(bread, notesHit, loadedMetadata, chartPath)
 end
 
 function results.ReturnToMenu()

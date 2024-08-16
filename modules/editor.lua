@@ -111,7 +111,7 @@ function editor:Init()
     snapInput.MouseDown = function () 
     
     end 
-
+    
     snapInput.OnEnter = function ()
         if tonumber(snapInput.Text) ~= nil then
             if tonumber(snapInput.Text) > 0 then
