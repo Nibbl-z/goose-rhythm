@@ -2,6 +2,19 @@ local results = {}
 require "yan"
 require "modules.conductor"
 
+local rankDisplayDelay = -1
+local dialogueDelay = -1
+local displayOthersDelay = -1
+local doingDelays = false
+local accuracyPercent = 0
+local sfx = {
+    Reveal = love.audio.newSource("/sfx/reveal.mp3", "static"),
+    TryAgain = love.audio.newSource("/sfx/try_again.mp3", "static"),
+    OK = love.audio.newSource("/sfx/ok.mp3", "static"),
+    Superb = love.audio.newSource("/sfx/superb.mp3", "static"),
+    Perfect = love.audio.newSource("/sfx/perfect.mp3", "static"),
+}
+
 function results:Init()
     self.Screen = yan:Screen()
     self.Screen.Enabled = false
@@ -19,7 +32,7 @@ function results:Init()
     
     container.Color = Color.new(0,0,0,0)
     container.CornerRoundness = 8
-
+    
     bread = yan:Label(self.Screen, "Bread: 0", 40, "left", "center", "/ComicNeue.ttf")
     bread:SetParent(container)
     bread.Size = UIVector2.new(0.6,0,0.1,0)
@@ -80,38 +93,81 @@ function results:Init()
     end
 end
 
+function results:Update()
+    if not doingDelays then return end
+    
+    if love.timer.getTime() > rankDisplayDelay and rankDisplayDelay ~= -1 then
+        rank.Visible = true
+
+        if accuracyPercent <= 40 then
+            sfx.TryAgain:play()
+        elseif accuracyPercent <= 70 then
+            sfx.OK:play()
+        elseif accuracyPercent < 100 then
+            sfx.Superb:play()
+        elseif accuracyPercent >= 100 then
+            sfx.Perfect:play()
+        end
+        rankDisplayDelay = -1
+    end
+
+    if love.timer.getTime() > dialogueDelay and dialogueDelay ~= -1  then
+        gooseDialogue.Visible = true
+    end
+    
+    if love.timer.getTime() > displayOthersDelay and displayOthersDelay ~= -1  then
+        bread.Visible = true
+        notes.Visible = true
+        accuracy.Visible = true
+        doingDelays = false
+        exitButton.Visible = true
+    end
+end
+
 function results:Open(breadamnt, totalNotes, metadata, chartPath)
+    sfx.Reveal:play()
+
     self.Screen.Enabled = true
     mainFrame.Position = UIVector2.new(0,0,1,0)
+
+    rank.Visible = false
+    bread.Visible = false
+    notes.Visible = false
+    accuracy.Visible = false
+    gooseDialogue.Visible = false
+    exitButton.Visible = false
     yan:NewTween(mainFrame, yan:TweenInfo(1, EasingStyle.ElasticOut), {Position = UIVector2.new(0,0,0,0)}):Play()
     
     bread.Text = "Bread: "..breadamnt
     notes.Text = "Notes Hit: "..tostring(totalNotes).."/"..tostring(conductor:GetNoteCount())
     
     goose2.Image = love.graphics.newImage(chartPath.."/assets/goose.png")
-
     
-    local accuracypercent = (breadamnt / (conductor:GetBreadCount()) * 100)
-    accuracypercent = accuracypercent * 100
-    accuracypercent = math.ceil(accuracypercent)
+    accuracyPercent = (breadamnt / (conductor:GetBreadCount()) * 100)
+    accuracyPercent = accuracyPercent * 100
+    accuracyPercent = math.ceil(accuracyPercent)
     
-    accuracypercent = accuracypercent / 100
+    accuracyPercent = accuracyPercent / 100
     
-    if accuracypercent <= 40 then
+    if accuracyPercent <= 40 then
         rank.Image = love.graphics.newImage("/img/ranks/try_again.png")
         gooseDialogue.Text = metadata.DialogueTryAgain
-    elseif accuracypercent <= 70 then
+    elseif accuracyPercent <= 70 then
         rank.Image = love.graphics.newImage("/img/ranks/ok.png")
         gooseDialogue.Text = metadata.DialogueOK
-    elseif accuracypercent < 100 then
+    elseif accuracyPercent < 100 then
         rank.Image = love.graphics.newImage("/img/ranks/superb.png")
         gooseDialogue.Text = metadata.DialogueSuperb
-    elseif accuracypercent >= 100 then
+    elseif accuracyPercent >= 100 then
         rank.Image = love.graphics.newImage("/img/ranks/perfect.png")
         gooseDialogue.Text = metadata.DialoguePerfect
     end
 
-    accuracy.Text = "Accuracy: "..accuracypercent.."%"
+    rankDisplayDelay = love.timer.getTime() + 2
+    dialogueDelay = love.timer.getTime() + 4
+    displayOthersDelay = love.timer.getTime() + 6
+    doingDelays = true
+    accuracy.Text = "Accuracy: "..accuracyPercent.."%"
 end
 
 return results

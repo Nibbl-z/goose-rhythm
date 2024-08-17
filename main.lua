@@ -141,7 +141,7 @@ end
 
 function love.update(dt)
     yan:Update(dt)
-
+    results:Update()
     
     if fading then
         if love.timer.getTime() > fadingDelay then

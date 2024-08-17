@@ -181,13 +181,15 @@ function conductor:GetHitAccuracy(key)
     print(key)
     print(lastDiff, nextDiff)
     local num = nil
-    for _, n in ipairs(self.NextChartBeat.N) do
-        if key == settings.Keybinds[n] then
-            num = n 
-        end
-    end
+    
     
     if lastDiff > nextDiff then
+        for _, n in ipairs(self.NextChartBeat.N) do
+            if key == settings.Keybinds[n] then
+                num = n 
+            end
+        end
+        if num == nil then return end
         if self.NextChartBeat.H[tostring(num)] ~= true then
             for _, n in ipairs(self.NextChartBeat.N) do
                 if key == settings.Keybinds[n] then
@@ -205,6 +207,12 @@ function conductor:GetHitAccuracy(key)
             end
         end
     else
+        for _, n in ipairs(self.LastChartBeat.N) do
+            if key == settings.Keybinds[n] then
+                num = n 
+            end
+        end
+        if num == nil then return end
         if self.LastChartBeat.H[tostring(num)]  ~= true then
             for _, n in ipairs(self.LastChartBeat.N) do
                 if key == settings.Keybinds[n] then
