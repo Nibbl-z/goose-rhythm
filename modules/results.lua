@@ -72,6 +72,13 @@ function results:Init()
     gooseDialogue.Position = UIVector2.new(0,43,0,235)
     gooseDialogue.Size = UIVector2.new(0,300,0,80)
     gooseDialogue:SetParent(container)
+    gooseDialogue.ZIndex = 3
+    
+    resultsSpeechBubble = yan:Image(self.Screen, "/img/results_speech.png")
+    resultsSpeechBubble.Size = UIVector2.new(1,0,1,0)
+    resultsSpeechBubble.Position = UIVector2.new(0,0,0,0)
+    resultsSpeechBubble:SetParent(mainFrame)
+    resultsSpeechBubble.ZIndex = 2
     
     exitButton = yan:TextButton(self.Screen, "Return to Menu", 40, "center", "center", "/ComicNeue.ttf")
     exitButton.Position = UIVector2.new(0,10,1,-10)
@@ -113,6 +120,7 @@ function results:Update()
 
     if love.timer.getTime() > dialogueDelay and dialogueDelay ~= -1  then
         gooseDialogue.Visible = true
+        resultsSpeechBubble.Visible = true
     end
     
     if love.timer.getTime() > displayOthersDelay and displayOthersDelay ~= -1  then
@@ -136,6 +144,7 @@ function results:Open(breadamnt, totalNotes, metadata, chartPath)
     accuracy.Visible = false
     gooseDialogue.Visible = false
     exitButton.Visible = false
+    resultsSpeechBubble.Visible = false
     yan:NewTween(mainFrame, yan:TweenInfo(1, EasingStyle.ElasticOut), {Position = UIVector2.new(0,0,0,0)}):Play()
     
     bread.Text = "Bread: "..breadamnt
