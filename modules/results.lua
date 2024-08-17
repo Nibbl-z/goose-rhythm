@@ -13,6 +13,7 @@ local sfx = {
     OK = love.audio.newSource("/sfx/ok.mp3", "static"),
     Superb = love.audio.newSource("/sfx/superb.mp3", "static"),
     Perfect = love.audio.newSource("/sfx/perfect.mp3", "static"),
+    Select = love.audio.newSource("/sfx/select.wav", "static")
 }
 
 function results:Init()
@@ -95,6 +96,7 @@ function results:Init()
     end
     
     exitButton.MouseDown = function ()
+        sfx.Select:play()
         exitButton.Color = Color.new(1,1,1,1)
         results.ReturnToMenu()
     end

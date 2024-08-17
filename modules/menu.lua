@@ -13,6 +13,10 @@ local charts = {
     "/charts/greengoose", "/charts/purplegoose", "/charts/purplegoose copy"
 }
 
+local sfx = {
+    Select = love.audio.newSource("/sfx/select.wav", "static"),
+}
+
 local chartSelectionIndex = 1
 local selectionPos = 0
 local page = "main"
@@ -25,7 +29,7 @@ local scrollY = 0
 local fadeDelay = 0
 local fading = nil
 
-local bgOffset = {Pos = 0}
+local bgOffset = {Pos = 0, MusicVolume = 1, SettingsVolume = 0 }
 
 local choosingKeybind = -1
 local choosingButton = nil
@@ -46,9 +50,16 @@ end
 function menu:Init()
     transitions:Init()
     
-    menuMusic = love.audio.newSource("/music/menu.mp3", "stream")
+    menuMusic = love.audio.newSource("/music/menu.mp3", "static")
     menuMusic:setLooping(true)
     menuMusic:setVolume(0.2)
+    
+    
+    menuMusicSettings = love.audio.newSource("/music/menu_settings.mp3", "static")
+    menuMusicSettings:setLooping(true)
+    menuMusicSettings:setVolume(0.2)
+
+    menuMusicSettings:play()
     menuMusic:play()
 
     conductor.BPM = 128
@@ -111,6 +122,7 @@ function menu:Init()
     moveLevelsTween = yan:NewTween(levelsPage, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(0,0,0,0)})
     
     playLevels.MouseDown = function ()
+        sfx.Select:play()
         page = "levels"
         moveMainTween:Play()
         moveLevelsTween:Play()
@@ -127,6 +139,7 @@ function menu:Init()
         previewMusic:play()
         
         menuMusic:stop()
+        menuMusicSettings:stop()
     end 
     
     openEditor = yan:TextButton(self.Screen, "open editor", 50, "center", "center", "/ComicNeue.ttf")
@@ -149,6 +162,7 @@ function menu:Init()
     end
     
     openEditor.MouseDown = function ()
+        sfx.Select:play()
         transitions:FadeIn(0.2)
         
         fading = "editor"
@@ -175,11 +189,12 @@ function menu:Init()
     moveMainSettingsTween = yan:NewTween(mainPage, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(0,0,-1,0)})
     moveSettingsTween = yan:NewTween(settingsFrame, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(0,0,0,0)})
     settingsBtn.MouseDown = function ()
+        sfx.Select:play()
         page = "settings"
 
         moveMainSettingsTween:Play()
         moveSettingsTween:Play()
-        yan:NewTween(bgOffset, yan:TweenInfo(1, EasingStyle.QuadInOut), {Pos = 400}):Play()
+        yan:NewTween(bgOffset, yan:TweenInfo(1, EasingStyle.QuadInOut), {Pos = 400, MusicVolume = 0, SettingsVolume = 1}):Play()
     end
     
    
@@ -211,6 +226,7 @@ function menu:Init()
     end
 
     levelsBackBtn.MouseDown = function ()
+        sfx.Select:play()
         page = "main"
         yan:NewTween(levelsContainer, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(0, 0, 0, 0)}):Play()
         yan:NewTween(mainPage, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(0,0,0,0)}):Play()
@@ -221,6 +237,7 @@ function menu:Init()
         end
         
         menuMusic:play()
+        menuMusicSettings:play()
 
         conductor.BPM = 128
         conductor:Init()
@@ -273,11 +290,13 @@ function menu:Init()
             playButton.Color = Color.new(1,1,1,1)
         end
         playButton.MouseDown = function ()
+            sfx.Select:play()
             transitions:FadeIn(0.2)
 
             fading = "play"
             fadeDelay = love.timer.getTime() + 0.5
             menuMusic:stop()
+            menuMusicSettings:stop()
         end
         
         frame:SetParent(levelsContainer)
@@ -318,10 +337,11 @@ function menu:Init()
     end
 
     settingsBackBtn.MouseDown = function ()
+        sfx.Select:play()
         page = "main"
         yan:NewTween(settingsFrame, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(0, 0, 1, 0)}):Play()
         yan:NewTween(mainPage, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(0,0,0,0)}):Play()
-        yan:NewTween(bgOffset, yan:TweenInfo(1, EasingStyle.QuadInOut), {Pos = 0}):Play()
+        yan:NewTween(bgOffset, yan:TweenInfo(1, EasingStyle.QuadInOut), {Pos = 0, MusicVolume = 1, SettingsVolume = 0}):Play()
 
         settings:Save()
 
@@ -355,6 +375,7 @@ function menu:Init()
         end
         
         keybutton.MouseDown = function ()
+            sfx.Select:play()
             if choosingKeybind ~= -1 then return end
             keybutton.Color = Color.new(0.5,0.5,0.5,1)
             choosingKeybind = i
@@ -388,7 +409,8 @@ function menu:Metronome()
 end
 
 function menu:Update(dt)
-    menuMusic:setVolume(settings:GetMusicVolume())
+    menuMusic:setVolume(settings:GetMusicVolume() * bgOffset.MusicVolume)
+    menuMusicSettings:setVolume(settings:GetMusicVolume() * bgOffset.SettingsVolume)
     if previewMusic ~= nil then 
         previewMusic:setVolume(settings:GetMusicVolume())
     end
@@ -403,6 +425,7 @@ function menu:Update(dt)
                 self.Enabled = false
                 self.Screen.Enabled = false
                 menuMusic:stop()
+                menuMusicSettings:stop()
                 fading = nil
             end
 
@@ -417,6 +440,7 @@ function menu:Update(dt)
 
                 self.Enabled = false
                 menuMusic:stop()
+                menuMusicSettings:stop()
                 fading = nil
             end
         end
