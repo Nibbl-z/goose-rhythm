@@ -105,6 +105,7 @@ function results:Update()
     
     if love.timer.getTime() > rankDisplayDelay and rankDisplayDelay ~= -1 then
         rank.Visible = true
+        yan:NewTween(rank, yan:TweenInfo(1, EasingStyle.ElasticOut), {Size = UIVector2.new(0,300*0.7,0,200*0.7)}):Play()
 
         if accuracyPercent <= 40 then
             sfx.TryAgain:play()
@@ -124,26 +125,33 @@ function results:Update()
     end
     
     if love.timer.getTime() > displayOthersDelay and displayOthersDelay ~= -1  then
-        bread.Visible = true
-        notes.Visible = true
-        accuracy.Visible = true
-        doingDelays = false
         exitButton.Visible = true
+        yan:NewTween(bread, yan:TweenInfo(1, EasingStyle.BackOut), {Position = UIVector2.new(0,10,0.1,0)}):Play()
+        yan:NewTween(notes, yan:TweenInfo(1.2, EasingStyle.BackOut), {Position = UIVector2.new(0,10,0.2,10)}):Play()
+        yan:NewTween(accuracy, yan:TweenInfo(1.4, EasingStyle.BackOut), {Position = UIVector2.new(0,10,0.3,20)}):Play()
+        yan:NewTween(exitButton, yan:TweenInfo(1, EasingStyle.BackOut), {Position = UIVector2.new(0,10,1,-10)}):Play()
+        
+        doingDelays = false
     end
 end
 
 function results:Open(breadamnt, totalNotes, metadata, chartPath)
     sfx.Reveal:play()
-
+    
     self.Screen.Enabled = true
     mainFrame.Position = UIVector2.new(0,0,1,0)
-
+    rank.Size = UIVector2.new(0,0,0,0)
     rank.Visible = false
-    bread.Visible = false
-    notes.Visible = false
-    accuracy.Visible = false
+    rankTitle.Position = UIVector2.new(1,0,-1,10)
+    yan:NewTween(rankTitle, yan:TweenInfo(2, EasingStyle.QuadInOut), {Position = UIVector2.new(1,0,0.1,10)}):Play()
     gooseDialogue.Visible = false
+    
+    bread.Position = UIVector2.new(0,10,-1,0)
+    notes.Position = UIVector2.new(0,10,-1,0)
+    accuracy.Position = UIVector2.new(0,10,-1,0)
     exitButton.Visible = false
+    exitButton.Position = UIVector2.new(0,10,1.5,0)
+
     resultsSpeechBubble.Visible = false
     yan:NewTween(mainFrame, yan:TweenInfo(1, EasingStyle.ElasticOut), {Position = UIVector2.new(0,0,0,0)}):Play()
     
@@ -151,6 +159,8 @@ function results:Open(breadamnt, totalNotes, metadata, chartPath)
     notes.Text = "Notes Hit: "..tostring(totalNotes).."/"..tostring(conductor:GetNoteCount())
     
     goose2.Image = love.graphics.newImage(chartPath.."/assets/goose.png")
+    goose2.Position = UIVector2.new(0.7,10,-1,60)
+    yan:NewTween(goose2, yan:TweenInfo(3, EasingStyle.BounceOut), {Position = UIVector2.new(0.7,10,0.4,60)}):Play()
     
     accuracyPercent = (breadamnt / (conductor:GetBreadCount()) * 100)
     accuracyPercent = accuracyPercent * 100
@@ -171,7 +181,7 @@ function results:Open(breadamnt, totalNotes, metadata, chartPath)
         rank.Image = love.graphics.newImage("/img/ranks/perfect.png")
         gooseDialogue.Text = metadata.DialoguePerfect
     end
-
+    
     rankDisplayDelay = love.timer.getTime() + 2
     dialogueDelay = love.timer.getTime() + 4
     displayOthersDelay = love.timer.getTime() + 6
