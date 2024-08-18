@@ -59,10 +59,9 @@ function StartSong(chart)
     local metadata = love.filesystem.read(chart.."/metadata.lua")
     loadedMetadata = loadstring(metadata)()
     
-    loadedSong = love.audio.newSource(chart.."/song.mp3", "static")
+    loadedSong = love.audio.newSource(chart.."/song.mp3", "stream")
     conductor.BPM = loadedMetadata.BPM
-    conductor:Init()
-    conductor:LoadChart(loadedChart)
+   
     
     BGSprite = love.graphics.newImage(chart.."/assets/bg.png")
     GooseSprite = love.graphics.newImage(chart.."/assets/goose.png")
@@ -73,8 +72,11 @@ function StartSong(chart)
     loadedSong:setVolume(settings:GetMusicVolume())
     
     startedSong = false
-    startTime = love.timer.getTime() + conductor.SecondsPerBeat * 3
+    conductor:Init()
+    conductor:LoadChart(loadedChart)
+    startTime = love.timer.getTime() + conductor.SecondsPerBeat * 4
     started = true
+    
 end
 
 function menu.playsong(chart)
@@ -374,11 +376,11 @@ function love.draw()
            
         end
         
-        love.graphics.print(status)
+        --[[love.graphics.print(status)
         
         if testDraw then
             love.graphics.rectangle("fill", 10, 10, 20, 20)
-        end
+        end]]
     end
 
     yan:Draw()

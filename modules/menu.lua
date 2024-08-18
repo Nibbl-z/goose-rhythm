@@ -10,7 +10,7 @@ require("yan") -- i cant wait to use tweens
 -- they dont work im sad
 
 local charts = {
-    "/charts/greengoose", "/charts/purplegoose", "/charts/purplegoose copy"
+    "/charts/greengoose", "/charts/purplegoose"
 }
 
 local sfx = {
@@ -38,6 +38,7 @@ function menu:Reset()
     transitions:FadeIn(0)
     transitions:FadeOut(0.5)
     menuMusic:play()
+    menuMusicSettings:play()
     
     conductor.BPM = 128
     conductor:Init()
@@ -58,7 +59,7 @@ function menu:Init()
     menuMusicSettings = love.audio.newSource("/music/menu_settings.mp3", "static")
     menuMusicSettings:setLooping(true)
     menuMusicSettings:setVolume(0.2)
-
+    
     menuMusicSettings:play()
     menuMusic:play()
 
@@ -191,7 +192,7 @@ function menu:Init()
     settingsBtn.MouseDown = function ()
         sfx.Select:play()
         page = "settings"
-
+        
         moveMainSettingsTween:Play()
         moveSettingsTween:Play()
         yan:NewTween(bgOffset, yan:TweenInfo(1, EasingStyle.QuadInOut), {Pos = 400, MusicVolume = 0, SettingsVolume = 1}):Play()
@@ -500,6 +501,7 @@ function menu:KeyPressed(key)
             end
             
             menuMusic:play()
+            menuMusicSettings:play()
 
             conductor.BPM = 128
             conductor:Init()
@@ -509,7 +511,7 @@ function menu:KeyPressed(key)
             page = "main"
             yan:NewTween(settingsFrame, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(0, 0, 1, 0)}):Play()
             yan:NewTween(mainPage, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(0,0,0,0)}):Play()
-            yan:NewTween(bgOffset, yan:TweenInfo(1, EasingStyle.QuadInOut), {Pos = 0}):Play()
+            yan:NewTween(bgOffset, yan:TweenInfo(1, EasingStyle.QuadInOut), {Pos = 0, MusicVolume = 1, SettingsVolume = 0}):Play()
 
             settings:Save()
         end
