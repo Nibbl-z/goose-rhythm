@@ -348,11 +348,11 @@ function love.draw()
                 for _, n in ipairs(v.N) do
                     if v.H[tostring(n)] ~= true and v.M ~= true then
                     
-                        love.graphics.draw(sprites.Bread, n * 70 + circleXOffset - 30, (v.B - conductor.SongPositionInBeats) * -300 + 440)
+                        love.graphics.draw(sprites.Bread, n * 70 + circleXOffset - 30, (v.B - conductor.SongPositionInBeats) * -settings.NoteSpeed + 440)
                        --love.graphics.circle("fill", n * 70 + circleXOffset, (v.B - conductor.SongPositionInBeats) * -300 + 470, 30)
                         
                        
-                        if (v.B - conductor.SongPositionInBeats) * -300 + 440 > 600 then
+                        if (v.B - conductor.SongPositionInBeats) * -settings.NoteSpeed + 440 > 600 then
                             v.M = true
                             
                             goose:SetLoadedSprite(GooseMissSprite)
@@ -374,9 +374,9 @@ function love.draw()
                             love.graphics.setColor(1, 183/255, 135/255)
                             love.graphics.rectangle("fill",
                             n * 70 + circleXOffset - 10, 
-                            (v.B - conductor.SongPositionInBeats) * -300 + 440 - v.D[tostring(n)] * 300,
+                            (v.B - conductor.SongPositionInBeats) * -settings.NoteSpeed + 440 - v.D[tostring(n)] * settings.NoteSpeed,
                             20,
-                            v.D[tostring(n)] * 300, 10, 10)
+                            v.D[tostring(n)] * settings.NoteSpeed, 10, 10)
                             love.graphics.setColor(1,1,1,1)
                         end
                        
@@ -393,6 +393,10 @@ function love.draw()
             love.graphics.rectangle("fill", 10, 10, 20, 20)
         end]]
     end
-
+    
     yan:Draw()
+end
+
+function love.textinput(t)
+    yan:TextInput(t)
 end

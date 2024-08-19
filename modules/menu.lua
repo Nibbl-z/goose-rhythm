@@ -408,7 +408,53 @@ function menu:Init()
             keybutton.Text = "Choose a key"
         end
     end
-   
+
+    noteSpeedInput = yan:TextInputter(self.Screen, "300", 40, "center", "center", "/ComicNeue.ttf")
+    noteSpeedInput.Position = UIVector2.new(0.4, 0, 0.7, 50)
+    noteSpeedInput.Size = UIVector2.new(0.5, -10, 0.1, 0)
+    noteSpeedInput.TextColor = Color.new(0,0,0,1)
+    noteSpeedInput:SetParent(settingsFrame)
+
+    noteSpeedLabel = yan:Label(self.Screen, "Note Speed", 32, "right", "center", "/ComicNeue.ttf")
+    noteSpeedLabel.Size = UIVector2.new(0.7,0,1,0)
+    noteSpeedLabel.Position = UIVector2.new(0, -50, 0, 0)
+    noteSpeedLabel.AnchorPoint = Vector2.new(1,0)
+    noteSpeedLabel.TextColor = Color.new(1,1,1,1)
+    noteSpeedLabel:SetParent(noteSpeedInput)
+
+    noteSpeedInput.MouseEnter = function ()
+        noteSpeedInput.Color = Color.new(0.7,0.7,0.7,1)
+    end
+    
+    noteSpeedInput.MouseLeave = function ()
+        noteSpeedInput.Color = Color.new(1,1,1,1)
+    end
+    
+    noteSpeedInput.MouseDown = function ()
+        sfx.Select:play()
+        noteSpeedInput.Color = Color.new(0.5,0.5,0.5,1)
+
+        noteSpeedInput.Text = ""
+    end
+    
+    noteSpeedInput.OnEnter = function ()
+        local input = tonumber(noteSpeedInput.Text)
+        noteSpeedInput.Color = Color.new(0.5,0.5,0.5,1)
+        sfx.Select:play()
+        if input == nil then 
+            noteSpeedInput.Text = "Invalid Input"
+            return 
+        end
+        
+        if input < 50 then 
+            noteSpeedInput.Text = "Must be above 50"
+            return 
+        end
+        
+        settings.NoteSpeed = tonumber(noteSpeedInput.Text)
+        
+    end
+    
     
     function volumeSlider.OnSlide(value)
         settings.MusicVolume = value
@@ -417,7 +463,7 @@ end
 
 function menu:Draw()
     love.graphics.draw(bgImage, bgQuad, (800 * -20) + scrollX, (600 * -20) + scrollY - bgOffset.Pos)
-
+    
     --scrollX = scrollX + 0.1
     scrollY = scrollY + 0.1
 end

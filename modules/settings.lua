@@ -2,6 +2,7 @@ local settings = {}
 
 settings.Keybinds = {"a", "s", "k", "l"}
 settings.MusicVolume = 1.0
+settings.NoteSpeed = 300
 
 function settings:GetMusicVolume()
     return self.MusicVolume -- this is because you have to like rerequire when you uhmmm change it so yea 
@@ -24,6 +25,10 @@ function settings:Load()
         if index >= 2 and index <= 5 then
             self.Keybinds[index - 1] = value
         end
+
+        if index == 6 then
+            self.NoteSpeed = value
+        end
         index = index + 1
     end
 end
@@ -35,6 +40,7 @@ function settings:Save()
     for _, v in ipairs(self.Keybinds) do
         settingsString = settingsString.."\n"..v
     end
+    settingsString = settingsString.."\n"..self.NoteSpeed
     
     love.filesystem.write("settings", settingsString)
 end
