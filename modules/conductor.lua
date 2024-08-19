@@ -126,20 +126,21 @@ end
 function conductor:GetChartEndBeat()
     if #self.Chart == 0 then return end
     local beat = self.Chart[#self.Chart]
-
+    print(beat.B)
     local beatEndTime = beat.B 
     
     if beat.D ~= nil then
         local largestDuration = 0
-        for _, d in ipairs(beat.D) do
-            if d > largestDuration then
+        for k, d in pairs(beat.D) do
+            print(d)
+            if d >= largestDuration then
                 largestDuration = d
             end
         end
-
+        
         beatEndTime = beatEndTime + largestDuration
     end
-
+    
     beatEndTime = beatEndTime + 2 -- maybe later add a thing to metadata for chart end delay
 
     return beatEndTime
@@ -197,6 +198,7 @@ function conductor:GetHitAccuracy(key)
                     
                     if self.NextChartBeat.D ~= nil then
                         if self.NextChartBeat.D[tostring(n)] ~= nil then
+                            print("hi")
                             self.HoldingBeats[n] = self.NextChartBeat
                         end
                     end
@@ -219,6 +221,7 @@ function conductor:GetHitAccuracy(key)
                     self.LastChartBeat.H[tostring(n)] = true
                     if self.LastChartBeat.D ~= nil then
                         if self.LastChartBeat.D[tostring(n)] ~= nil then
+                            print("hi")
                             self.HoldingBeats[n] = self.LastChartBeat
                         end
                     end
@@ -243,13 +246,12 @@ function conductor:ReleaseHeldNote(key)
     
     local heldNote = self.HoldingBeats[index]
     if heldNote == nil then return end
-
+    
     if heldNote.D[tostring(index)] == nil then return end
-
+    
     local time = self.SongPositionInBeats
     local diff = math.abs((heldNote.B + heldNote.D[tostring(index)]) - time)
-    
-    table.remove(self.HoldingBeats, index)
+    self.HoldingBeats[index] = nil
     
     return diff
 end
