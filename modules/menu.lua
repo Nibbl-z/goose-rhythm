@@ -414,6 +414,7 @@ function menu:Init()
     noteSpeedInput.Size = UIVector2.new(0.5, -10, 0.1, 0)
     noteSpeedInput.TextColor = Color.new(0,0,0,1)
     noteSpeedInput:SetParent(settingsFrame)
+    noteSpeedInput.Text = settings.NoteSpeed
 
     noteSpeedLabel = yan:Label(self.Screen, "Note Speed", 32, "right", "center", "/ComicNeue.ttf")
     noteSpeedLabel.Size = UIVector2.new(0.7,0,1,0)

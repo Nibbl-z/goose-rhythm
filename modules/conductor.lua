@@ -14,9 +14,10 @@ conductor.Chart = {}
 conductor.IsSong = false
 
 conductor.HoldingBeats = {nil, nil, nil, nil}
+conductor.TotalNotes = 0
 
 local settings = require("modules.settings")
-
+local utils = require("yan.utils")
 function conductor:Init()
     self.SongPosition = 0
     self.SongPositionInBeats = 0
@@ -77,7 +78,32 @@ function conductor:Update(dt)
     
 end
 
-function conductor:LoadChart(chart)
+function RemoveDuplicateNotes(chart)
+    local seenNotes = {}
+    
+    function IsDuplicate(note)
+        for _, v in ipairs(seenNotes) do
+            if v.B == note.B and v.D == note.D and v.N == note.N then
+                return true
+            end
+        end
+
+        return false
+    end
+
+    for i, v in ipairs(chart) do
+        if IsDuplicate(v) == false then
+            table.insert(seenNotes, v)
+        end
+    end
+
+    return seenNotes
+end
+
+function conductor:LoadChart(c)
+    local chart = RemoveDuplicateNotes(c)
+    self.TotalNotes = #chart
+    print(#chart)
     self.Chart = {}
     conductor.IsSong = true
     local combineIndex = 0
@@ -117,7 +143,7 @@ function conductor:LoadChart(chart)
         previousBeat = v.B
     end
     
-   
+    print(self:GetNoteCount())
      
     self.NextChartBeat = self.Chart[1]
     conductor.NoteIndex = conductor.NoteIndex + 1

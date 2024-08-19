@@ -158,7 +158,7 @@ function results:Open(breadamnt, totalNotes, metadata, chartPath)
     yan:NewTween(mainFrame, yan:TweenInfo(1, EasingStyle.ElasticOut), {Position = UIVector2.new(0,0,0,0)}):Play()
     
     bread.Text = "Bread: "..breadamnt
-    notes.Text = "Notes Hit: "..tostring(totalNotes).."/"..tostring(conductor:GetNoteCount())
+    notes.Text = "Notes Hit: "..tostring(totalNotes).."/"..tostring(conductor.TotalNotes)
     
     goose2.Image = love.graphics.newImage(chartPath.."/assets/goose.png")
     goose2.Position = UIVector2.new(0.7,10,-1,60)
