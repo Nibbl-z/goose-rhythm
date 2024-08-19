@@ -104,6 +104,9 @@ function editor.ReturnToMenu()
 end
 
 function love.load()
+    love.window.setTitle("Goose Rhythm")
+    love.window.setIcon(love.image.newImageData("/img/icon.png"))
+    
     settings:Load()
     menu:Init()
     results:Init()
