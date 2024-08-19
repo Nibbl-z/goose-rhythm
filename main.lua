@@ -67,6 +67,12 @@ function StartSong(chart)
     GooseSprite = love.graphics.newImage(chart.."/assets/goose.png")
     GooseMissSprite = love.graphics.newImage(chart.."/assets/goose_miss.png")
     goose:SetLoadedSprite(GooseSprite)
+
+    if loadedMetadata.GooseSize ~= nil then
+        goose.Size = Vector2.new(loadedMetadata.GooseSize, loadedMetadata.GooseSize)
+    else
+        goose.Size = Vector2.new(2,2)
+    end
     
     metronome = love.audio.newSource("/select.wav", "static")
     loadedSong:setVolume(settings:GetMusicVolume())
@@ -110,9 +116,11 @@ function love.load()
     startTime = love.timer.getTime()
     
     
+    
     goose = yan:Instance("Goose")
     goose.Position = Vector2.new(650,500)
     goose.Offset = Vector2.new(25, 50)
+
     goose.Size = Vector2.new(2,2)
     
     gooseBopTween = yan:NewTween(goose, yan:TweenInfo(0.2, EasingStyle.Linear), {Size = Vector2.new(2,2)})
@@ -200,8 +208,11 @@ function conductor.Metronome()
     testDraw = not testDraw
     --metronome:play()
     
-    goose.Size = Vector2.new(2.5, 1.5)
-    yan:NewTween(goose, yan:TweenInfo(0.3, EasingStyle.QuadOut), {Size = Vector2.new(2,2)}):Play()
+    if loadedMetadata ~= nil then
+        goose.Size = Vector2.new(loadedMetadata.GooseSize * 1.25, loadedMetadata.GooseSize * 0.75)
+        yan:NewTween(goose, yan:TweenInfo(0.3, EasingStyle.QuadOut), {Size = Vector2.new(loadedMetadata.GooseSize, loadedMetadata.GooseSize)}):Play()
+    end
+   
    -- gooseBopTween:Play()
     
     if menu.Enabled == true then
