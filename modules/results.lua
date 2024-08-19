@@ -7,11 +7,13 @@ local dialogueDelay = -1
 local displayOthersDelay = -1
 local doingDelays = false
 local accuracyPercent = 0
+local isPerfect = false
 local sfx = {
     Reveal = love.audio.newSource("/sfx/reveal.mp3", "static"),
     TryAgain = love.audio.newSource("/sfx/try_again.mp3", "static"),
     OK = love.audio.newSource("/sfx/ok.mp3", "static"),
     Superb = love.audio.newSource("/sfx/superb.mp3", "static"),
+    SuperPerfect = love.audio.newSource("/sfx/superperfect.mp3", "static"),
     Perfect = love.audio.newSource("/sfx/perfect.mp3", "static"),
     Select = love.audio.newSource("/sfx/select.wav", "static")
 }
@@ -34,19 +36,19 @@ function results:Init()
     container.Color = Color.new(0,0,0,0)
     container.CornerRoundness = 8
     
-    bread = yan:Label(self.Screen, "Bread: 0", 40, "left", "center", "/ComicNeue.ttf")
+    bread = yan:Label(self.Screen, "Bread: 0", 30, "left", "center", "/ComicNeue.ttf")
     bread:SetParent(container)
     bread.Size = UIVector2.new(0.6,0,0.1,0)
     bread.Position = UIVector2.new(0,10,0.1,0)
     bread.TextColor = Color.new(1,1,1,1)
     
-    notes = yan:Label(self.Screen, "Notes Hit: 0/0", 40, "left", "center", "/ComicNeue.ttf")
+    notes = yan:Label(self.Screen, "Notes Hit: 0/0", 30, "left", "center", "/ComicNeue.ttf")
     notes:SetParent(container)
     notes.Size = UIVector2.new(0.6,0,0.1,0)
     notes.Position = UIVector2.new(0,10,0.2,10)
     notes.TextColor = Color.new(1,1,1,1)
 
-    accuracy = yan:Label(self.Screen, "Accuracy: 100%", 40, "left", "center", "/ComicNeue.ttf")
+    accuracy = yan:Label(self.Screen, "Accuracy: 100%", 30, "left", "center", "/ComicNeue.ttf")
     accuracy:SetParent(container)
     accuracy.Size = UIVector2.new(1,0,0.1,0)
     accuracy.Position = UIVector2.new(0,10,0.3,20)
@@ -116,7 +118,7 @@ function results:Update()
         elseif accuracyPercent < 100 then
             sfx.Superb:play()
         elseif accuracyPercent >= 100 then
-            sfx.Perfect:play()
+            sfx.SuperPerfect:play()
         end
         rankDisplayDelay = -1
     end
@@ -133,6 +135,10 @@ function results:Update()
         yan:NewTween(accuracy, yan:TweenInfo(1.4, EasingStyle.BackOut), {Position = UIVector2.new(0,10,0.3,20)}):Play()
         yan:NewTween(exitButton, yan:TweenInfo(1, EasingStyle.BackOut), {Position = UIVector2.new(0,10,1,-10)}):Play()
         
+        if isPerfect then
+            sfx.Perfect:play()
+        end
+
         doingDelays = false
     end
 end
@@ -153,6 +159,12 @@ function results:Open(breadamnt, totalNotes, metadata, chartPath)
     accuracy.Position = UIVector2.new(0,10,-1,0)
     exitButton.Visible = false
     exitButton.Position = UIVector2.new(0,10,1.5,0)
+    
+    if totalNotes == conductor.TotalNotes then
+        isPerfect = true
+    else
+        isPerfect = false
+    end
 
     resultsSpeechBubble.Visible = false
     yan:NewTween(mainFrame, yan:TweenInfo(1, EasingStyle.ElasticOut), {Position = UIVector2.new(0,0,0,0)}):Play()
@@ -160,8 +172,13 @@ function results:Open(breadamnt, totalNotes, metadata, chartPath)
     bread.Text = "Bread: "..breadamnt
     notes.Text = "Notes Hit: "..tostring(totalNotes).."/"..tostring(conductor.TotalNotes)
     
+    if isPerfect then
+        notes.Text = notes.Text.." (PERFECT!)"
+    end
+    
     goose2.Image = love.graphics.newImage(chartPath.."/assets/goose.png")
     goose2.Position = UIVector2.new(0.7,10,-1,60)
+    goose2.Size = UIVector2.new(0, metadata.GooseSize * 50, 0, metadata.GooseSize * 50)
     yan:NewTween(goose2, yan:TweenInfo(3, EasingStyle.BounceOut), {Position = UIVector2.new(0.7,10,0.4,60)}):Play()
     
     accuracyPercent = (breadamnt / (conductor:GetBreadCount()) * 100)
