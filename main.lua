@@ -300,9 +300,6 @@ function love.mousemoved(x, y, dx, dy)
 end
 
 function love.draw()
-    
-   
-   
     if editor.Enabled == true then
         editor:Draw()
     elseif menu.Enabled == true then

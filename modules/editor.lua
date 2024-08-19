@@ -29,7 +29,7 @@ local pixelsPerBeat = 300
 
 local snapIndex = 2
 local snaps = {1, 1/2, 1/3, 1/4, 1/6, 1/8, 1/16}
-local song = "/charts/greengoose/song.mp3"
+local song = "/charts/orangegoose/song.mp3"
 local playing = false
 
 local minVisibleBeat = 0
@@ -194,6 +194,8 @@ function editor:Update(dt)
 end
 
 function StartPlayback()
+    conductor.BPM = 90
+    conductor:Init()
     playing = true
     conductor.SongPositionInBeats = scrollOffset / pixelsPerBeat
     conductor.SongPosition = scrollOffset / pixelsPerBeat * conductor.SecondsPerBeat

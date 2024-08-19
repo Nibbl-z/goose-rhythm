@@ -1,6 +1,6 @@
 conductor = {}
 
-conductor.BPM = 150
+conductor.BPM = 90
 conductor.SongPositionInBeats = 0
 conductor.SongPosition = 0.0
 conductor.LastBeat = 0.0
