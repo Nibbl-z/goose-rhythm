@@ -6,8 +6,8 @@ return {
 
     GooseSize = 3,
     
-    DialogueTryAgain = "Grrrr...",
-    DialogueOK = "Good enough.",
-    DialogueSuperb = "Wow, good job.",
-    DialoguePerfect = "That's pretty good, but I think you could get 110% accuracy next time."
+    DialogueTryAgain = "You Died!",
+    DialogueOK = "Monster Hunter",
+    DialogueSuperb = "Monsters Hunted!",
+    DialoguePerfect = "How Did We Get Here?"
 }

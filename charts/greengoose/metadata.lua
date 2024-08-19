@@ -3,7 +3,7 @@ return {
     SongArtist = "Nibbles",
     Charter = "Nibbles",
     BPM = 150,
-    
+    GooseSize = 2,
     DialogueTryAgain = "Grrrr...",
     DialogueOK = "Good enough.",
     DialogueSuperb = "Wow, good job.",

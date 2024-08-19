@@ -34,7 +34,11 @@ local bgOffset = {Pos = 0, MusicVolume = 1, SettingsVolume = 0 }
 local choosingKeybind = -1
 local choosingButton = nil
 
+local menuMoving = false
+local menuStopMovingDelay = -1
+
 function menu:Reset()
+    page = "main"
     transitions:FadeIn(0)
     transitions:FadeOut(0.5)
     menuMusic:play()
@@ -65,8 +69,6 @@ function menu:Init()
 
     conductor.BPM = 128
     conductor:Init()
-
-    
     
     bgImage = love.graphics.newImage("/img/menu_bg.png")
     bgImage:setWrap("repeat", "repeat")
@@ -123,11 +125,14 @@ function menu:Init()
     moveLevelsTween = yan:NewTween(levelsPage, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(0,0,0,0)})
     
     playLevels.MouseDown = function ()
+        if menuMoving then return end
+        menuMoving = true
+        menuStopMovingDelay = love.timer.getTime() + 1
+
         sfx.Select:play()
         page = "levels"
         moveMainTween:Play()
         moveLevelsTween:Play()
-        
 
         chartSelectionIndex = 1
         selectionPos = 0
@@ -190,6 +195,10 @@ function menu:Init()
     moveMainSettingsTween = yan:NewTween(mainPage, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(0,0,-1,0)})
     moveSettingsTween = yan:NewTween(settingsFrame, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(0,0,0,0)})
     settingsBtn.MouseDown = function ()
+        if menuMoving then return end
+        menuMoving = true
+        menuStopMovingDelay = love.timer.getTime() + 1
+        
         sfx.Select:play()
         page = "settings"
         
@@ -227,6 +236,10 @@ function menu:Init()
     end
 
     levelsBackBtn.MouseDown = function ()
+        if menuMoving then return end
+        menuMoving = true
+        menuStopMovingDelay = love.timer.getTime() + 1
+
         sfx.Select:play()
         page = "main"
         yan:NewTween(levelsContainer, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(0, 0, 0, 0)}):Play()
@@ -338,6 +351,17 @@ function menu:Init()
     end
 
     settingsBackBtn.MouseDown = function ()
+        if menuMoving then return end
+        menuMoving = true
+        menuStopMovingDelay = love.timer.getTime() + 1
+
+        if choosingKeybind ~= -1 then
+            choosingButton.Text = settings.Keybinds[choosingKeybind]
+            choosingButton.Color = Color.new(1,1,1,1)
+            choosingKeybind = -1
+            choosingButton = nil
+        end
+        
         sfx.Select:play()
         page = "main"
         yan:NewTween(settingsFrame, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(0, 0, 1, 0)}):Play()
@@ -404,7 +428,6 @@ function menu:MouseMoved(_, _, x, y)
 end
 
 function menu:Metronome()
-    print("Boppin")
     title.Size = UIVector2.new(0,439,0,256)
     titleBop:Play()
 end
@@ -415,6 +438,12 @@ function menu:Update(dt)
     if previewMusic ~= nil then 
         previewMusic:setVolume(settings:GetMusicVolume())
     end
+    
+    if menuStopMovingDelay ~= -1 and love.timer.getTime() > menuStopMovingDelay then
+        menuStopMovingDelay = -1
+        menuMoving = false
+    end
+    
     conductor:Update(dt)
     if fading ~= nil then
         if love.timer.getTime() > fadeDelay then
@@ -450,12 +479,18 @@ end
 
 function menu:KeyPressed(key)
     if choosingKeybind ~= -1 then
+        if key == "escape" then
+            choosingButton.Text = settings.Keybinds[choosingKeybind]
+            choosingButton.Color = Color.new(1,1,1,1)
+            choosingKeybind = -1
+            choosingButton = nil
+            return
+        end
         settings.Keybinds[choosingKeybind] = tostring(key)
         choosingButton.Text = tostring(key)
         choosingButton.Color = Color.new(1,1,1,1)
         choosingKeybind = -1
         choosingButton = nil
-
     end
 
     if page == "levels" then
@@ -490,7 +525,10 @@ function menu:KeyPressed(key)
             end
         end
         
-        if key == "escape" then
+        if key == "escape" and not menuMoving then
+            menuMoving = true
+            menuStopMovingDelay = love.timer.getTime() + 1
+
             page = "main"
             yan:NewTween(levelsContainer, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(0, 0, 0, 0)}):Play()
             yan:NewTween(mainPage, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(0,0,0,0)}):Play()
@@ -507,12 +545,15 @@ function menu:KeyPressed(key)
             conductor:Init()
         end
     elseif page == "settings" then
-        if key == "escape" then
+        if key == "escape" and not menuMoving then
+            menuMoving = true
+            menuStopMovingDelay = love.timer.getTime() + 1
+
             page = "main"
             yan:NewTween(settingsFrame, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(0, 0, 1, 0)}):Play()
             yan:NewTween(mainPage, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(0,0,0,0)}):Play()
             yan:NewTween(bgOffset, yan:TweenInfo(1, EasingStyle.QuadInOut), {Pos = 0, MusicVolume = 1, SettingsVolume = 0}):Play()
-
+            
             settings:Save()
         end
     end
