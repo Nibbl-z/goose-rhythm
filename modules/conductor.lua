@@ -6,9 +6,9 @@ conductor.SongPosition = 0.0
 conductor.LastBeat = 0.0
 conductor.SecondsPerBeat = 0.0
 
-conductor.LastChartBeat = {B = 0.0, N = {}}
-conductor.NextChartBeat = {B = 0.0, N = {}}
-conductor.NoteIndex = 1
+conductor.LastChartBeats = {{B = 0.0, N = {}}, {B = 0.0, N = {}}, {B = 0.0, N = {}}, {B = 0.0, N = {}}}
+conductor.NextChartBeats = {{B = 0.0, N = {}}, {B = 0.0, N = {}}, {B = 0.0, N = {}}, {B = 0.0, N = {}}}
+conductor.NoteIndex = {nil, nil, nil, nil}
 conductor.ChartFinished = false
 conductor.Chart = {}
 conductor.IsSong = false
@@ -22,8 +22,8 @@ function conductor:Init()
     self.SongPosition = 0
     self.SongPositionInBeats = 0
     self.LastBeat = 0
-    self.LastChartBeat = {B = 0.0, N = {}}
-    self.NextChartBeat = {B = 0.0, N = {}}
+    self.LastChartBeats = {{B = 0.0, N = {}}, {B = 0.0, N = {}}, {B = 0.0, N = {}}, {B = 0.0, N = {}}}
+    self.NextChartBeats = {{B = 0.0, N = {}}, {B = 0.0, N = {}}, {B = 0.0, N = {}}, {B = 0.0, N = {}}}
     self.ChartFinished = false
     self.NoteIndex = 1
     self.HoldingBeats = {nil, nil, nil, nil}
@@ -45,29 +45,56 @@ function conductor:Update(dt)
         end
     end 
     
-    if self.SongPositionInBeats > self.NextChartBeat.B then
-        if not self.ChartFinished then
-            if self.Chart[self.NoteIndex] == nil then
-                self.ChartFinished = true
-
-                return
+    for i, v in ipairs(self.NextChartBeats) do
+        if self.SongPositionInBeats > v.B then
+            if not self.ChartFinished then
+                if self.Chart[self.NoteIndex] == nil then
+                    self.ChartFinished = true
+    
+                    return
+                end
             end
 
-            self.LastChartBeat = self.NextChartBeat
-            self.NextChartBeat = self.Chart[self.NoteIndex]
-            
-            self.NoteIndex = self.NoteIndex + 1
-        else
-            if self.IsSong then
-                if self.SongPositionInBeats > self:GetChartEndBeat() then
-                    if self.OnChartFinish ~= nil then
-                        self.IsSong = false
-                        self.OnChartFinish()
+            self.LastChartBeats[i] = v
+            self.NextChartBeats[i] = self.Chart[self.NoteIndex]
+        end
+    end
+
+    --[[for i, v in ipairs(self.NextChartBeats) do
+        if self.SongPositionInBeats > v.B then
+            if not self.ChartFinished then
+                if self.Chart[self.NoteIndex] == nil then
+                    self.ChartFinished = true
+    
+                    return
+                end
+                print(v.B)
+                self.LastChartBeats[i] = self.NextChartBeats[i]
+                
+                for _, chartNote in ipairs(self.Chart) do
+                    for nindex, chartNoteN in ipairs(chartNote.N) do
+                        print(v.N[nindex])
+                        if chartNoteN == v.N[nindex] and chartNote.B == v.B then
+                            self.NextChartBeats[i] = chartNote
+                            break
+                        end
+                    end
+                end
+                --self.NextChartBeats[i] = self.Chart[self.NoteIndex]
+                
+                --self.NoteIndex = self.NoteIndex + 1
+            else
+                if self.IsSong then
+                    if self.SongPositionInBeats > self:GetChartEndBeat() then
+                        if self.OnChartFinish ~= nil then
+                            self.IsSong = false
+                            self.OnChartFinish()
+                        end
                     end
                 end
             end
         end
-    end
+    end]]
     
     --[[if self.BeatToMiss ~= nil then
         if self.SongPositionInBeats > self.BeatToMiss.B + 1 then
@@ -200,32 +227,39 @@ end
 
 function conductor:GetHitAccuracy(key)
     local time = self.SongPositionInBeats
+    local index = nil
     
-    local lastDiff = math.abs(self.LastChartBeat.B - time)
-    local nextDiff = math.abs(self.NextChartBeat.B - time)
+    for i, n in ipairs(settings.Keybinds) do
+        if key == n then
+            index = i 
+        end
+    end
+
+    local lastDiff = math.abs(self.LastChartBeats[index].B - time)
+    local nextDiff = math.abs(self.NextChartBeats[index].B - time)
     
     if lastDiff > 1 and nextDiff > 1 then return end
     print(key)
     print(lastDiff, nextDiff)
-    local num = nil
+    
     
     
     if lastDiff > nextDiff then
-        for _, n in ipairs(self.NextChartBeat.N) do
+        for _, n in ipairs(self.NextChartBeats[index].N) do
             if key == settings.Keybinds[n] then
                 num = n 
             end
         end
         if num == nil then return end
-        if self.NextChartBeat.H[tostring(num)] ~= true then
-            for _, n in ipairs(self.NextChartBeat.N) do
+        if self.NextChartBeats[index].H[tostring(num)] ~= true then
+            for _, n in ipairs(self.NextChartBeats[index].N) do
                 if key == settings.Keybinds[n] then
-                    self.NextChartBeat.H[tostring(n)] = true
+                    self.NextChartBeats[index].H[tostring(n)] = true
                     
-                    if self.NextChartBeat.D ~= nil then
-                        if self.NextChartBeat.D[tostring(n)] ~= nil then
+                    if self.NextChartBeats[index].D ~= nil then
+                        if self.NextChartBeats[index].D[tostring(n)] ~= nil then
                             print("hi")
-                            self.HoldingBeats[n] = self.NextChartBeat
+                            self.HoldingBeats[n] = self.NextChartBeats[index]
                         end
                     end
                     
@@ -235,20 +269,20 @@ function conductor:GetHitAccuracy(key)
             end
         end
     else
-        for _, n in ipairs(self.LastChartBeat.N) do
+        for _, n in ipairs(self.LastChartBeats[index].N) do
             if key == settings.Keybinds[n] then
                 num = n 
             end
         end
         if num == nil then return end
-        if self.LastChartBeat.H[tostring(num)]  ~= true then
-            for _, n in ipairs(self.LastChartBeat.N) do
+        if self.LastChartBeats[index].H[tostring(num)]  ~= true then
+            for _, n in ipairs(self.LastChartBeats[index].N) do
                 if key == settings.Keybinds[n] then
-                    self.LastChartBeat.H[tostring(n)] = true
-                    if self.LastChartBeat.D ~= nil then
-                        if self.LastChartBeat.D[tostring(n)] ~= nil then
+                    self.LastChartBeats[index].H[tostring(n)] = true
+                    if self.LastChartBeats[index].D ~= nil then
+                        if self.LastChartBeats[index].D[tostring(n)] ~= nil then
                             print("hi")
-                            self.HoldingBeats[n] = self.LastChartBeat
+                            self.HoldingBeats[n] = self.LastChartBeats[index]
                         end
                     end
                     

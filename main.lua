@@ -213,7 +213,7 @@ function conductor.Metronome()
     
     if loadedMetadata ~= nil then
         goose.Size = Vector2.new(loadedMetadata.GooseSize * 1.25, loadedMetadata.GooseSize * 0.75)
-        yan:NewTween(goose, yan:TweenInfo(0.3, EasingStyle.QuadOut), {Size = Vector2.new(loadedMetadata.GooseSize, loadedMetadata.GooseSize)}):Play()
+        yan:NewTween(goose, yan:TweenInfo(0.2, EasingStyle.QuadOut), {Size = Vector2.new(loadedMetadata.GooseSize, loadedMetadata.GooseSize)}):Play()
     end
    
    -- gooseBopTween:Play()
