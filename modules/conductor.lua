@@ -18,6 +18,7 @@ conductor.TotalNotes = 0
 
 local settings = require("modules.settings")
 local utils = require("yan.utils")
+
 function conductor:Init()
     self.SongPosition = 0
     self.SongPositionInBeats = 0
@@ -46,17 +47,62 @@ function conductor:Update(dt)
     end 
     
     for i, v in ipairs(self.NextChartBeats) do
+        if self.IsSong then
+            if self.SongPositionInBeats > self:GetChartEndBeat() then
+                if self.OnChartFinish ~= nil then
+                    self.IsSong = false
+                    self.OnChartFinish()
+                end
+
+                return
+            end
+        end
+
         if self.SongPositionInBeats > v.B then
             if not self.ChartFinished then
                 if self.Chart[self.NoteIndex] == nil then
                     self.ChartFinished = true
-    
+
                     return
                 end
             end
-
+            
             self.LastChartBeats[i] = v
-            self.NextChartBeats[i] = self.Chart[self.NoteIndex]
+            
+            --[[for _, chartBeat in ipairs(self.Chart) do
+                for _, chartBeatNotes in ipairs(chartBeat.N) do
+                    for _, n in ipairs(v.N) do
+                        if n == chartBeatNotes then
+                            self.NextChartBeats[i] = chartBeat
+                        end
+                    end
+                end
+            end]]
+            local foundBeat = false
+            for _, chartBeat in ipairs(self.Chart) do
+                for _, n in ipairs(chartBeat.N) do
+                    if n == i and chartBeat.C[tostring(n)] == nil then
+                        --if #v.N == 1 then
+                        print("HAI", #chartBeat.N, chartBeat.B)
+                        self.NextChartBeats[n] = chartBeat
+                        chartBeat.C[tostring(n)] = true
+                        foundBeat = true
+
+                        --[[else
+                            for nindex, n2 in ipairs(v.N) do
+                                self.NextChartBeats[n2] = {B = chartBeat.B, N = {n2}, H = {}}
+                                
+                                if nindex == #v.N then
+                                    chartBeat.C = true
+                                    foundBeat = true
+                                end
+                            end
+                        end]]
+                    end
+                end
+                
+                if foundBeat then break end
+            end
         end
     end
 
@@ -159,7 +205,7 @@ function conductor:LoadChart(c)
             end
         else
             combineIndex = combineIndex + 1
-            self.Chart[combineIndex] = {B = v.B, N = {v.N}, H = {}}
+            self.Chart[combineIndex] = {B = v.B, N = {v.N}, H = {}, C = {}}
             
             if v.D ~= nil then
                 self.Chart[combineIndex].D = {[tostring(v.N)] = v.D}
@@ -174,6 +220,19 @@ function conductor:LoadChart(c)
      
     self.NextChartBeat = self.Chart[1]
     conductor.NoteIndex = conductor.NoteIndex + 1
+    
+    local foundFirstBeats = {false, false, false, false}
+    
+    for i, v in ipairs(self.Chart) do
+        for _, n in ipairs(v.N) do
+            if foundFirstBeats[n] == false then
+                self.NextChartBeats[n] = v
+                v.C = {[tostring(n)] = true}
+                foundFirstBeats[n] = true
+                print(n)
+            end
+        end
+    end
 end
 
 function conductor:GetChartEndBeat()
@@ -195,7 +254,6 @@ function conductor:GetChartEndBeat()
     end
     
     beatEndTime = beatEndTime + 2 -- maybe later add a thing to metadata for chart end delay
-
     return beatEndTime
 end
 
@@ -234,7 +292,9 @@ function conductor:GetHitAccuracy(key)
             index = i 
         end
     end
-
+    
+    if index == nil then return end
+    
     local lastDiff = math.abs(self.LastChartBeats[index].B - time)
     local nextDiff = math.abs(self.NextChartBeats[index].B - time)
     

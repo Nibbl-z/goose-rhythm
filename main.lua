@@ -384,7 +384,6 @@ function love.draw()
                     end
                 end
             end
-           
         end
         
         --[[love.graphics.print(status)
