@@ -7,6 +7,7 @@ local song = "/music/greengoose.mp3"
 local settings = require("modules.settings")
 local transitions = require("modules.transitions")
 local results = require("modules.results")
+local pause = require("modules.pause")
 
 local started = false
 local startedSong = false
@@ -104,6 +105,7 @@ function love.load()
     love.window.setIcon(love.image.newImageData("/img/icon.png"))
     
     settings:Load()
+    pause:Init()
     menu:Init()
     results:Init()
     for name, sprite in pairs(sprites) do
@@ -236,18 +238,19 @@ function love.keypressed(key, scancode, rep)
     
     
     uimgr:KeyPressed(key, scancode, rep)
+
     if editor.Enabled == true then
         editor:KeyPressed(key)
     elseif menu.Enabled == true then
         menu:KeyPressed(key)
     else
         if key == "escape" then
-            ReturnToMenu()
+            pause.Paused = not pause.Paused
+            pause.Screen.Enabled = not pause.Screen.Enabled
         end
         local result = conductor:GetHitAccuracy(key)
         
         if result == nil then 
-            print("sigma skibidi")
             return 
         end
         
