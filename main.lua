@@ -80,9 +80,8 @@ function StartSong(chart)
     startedSong = false
     conductor:Init()
     conductor:LoadChart(loadedChart)
-    startTime = love.timer.getTime() + conductor.SecondsPerBeat * 4
+    startTime = love.timer.getTime() + conductor.SecondsPerBeat * 3.5
     started = true
-    
 end
 
 function menu.playsong(chart)
