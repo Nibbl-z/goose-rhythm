@@ -2,7 +2,9 @@ local pause = {}
 
 pause.Paused = false
 require("yan")
-
+local sfx = {
+    Select = love.audio.newSource("/sfx/select.wav", "static"),
+}
 function pause:Init()
     self.Screen = yan:Screen()
     self.Screen.Enabled = false
@@ -40,6 +42,13 @@ function pause:Init()
     resumeButton.MouseLeave = function ()
         resumeLeaveTween:Play()
     end
+    
+    resumeButton.MouseDown = function ()
+        sfx.Select:play()
+        self.Screen.Enabled = false
+        self.Paused = false
+        self.Unpause()
+    end
 
     quitEnterTween = yan:NewTween(quitButton, yan:TweenInfo(0.2, EasingStyle.QuadOut), {Size = UIVector2.new(0.5, 50, 0.15, 0), Color = Color.new(1, 86/255, 86/255, 1)})
     quitLeaveTween = yan:NewTween(quitButton, yan:TweenInfo(0.2, EasingStyle.QuadOut), {Size = UIVector2.new(0.5, 0, 0.15, 0), Color = Color.new(1, 76/255, 76/255, 1)})
@@ -50,6 +59,11 @@ function pause:Init()
     
     quitButton.MouseLeave = function ()
         quitLeaveTween:Play()
+    end
+
+    quitButton.MouseDown = function ()
+        sfx.Select:play()
+        self.ReturnToMenu()
     end
 
     backgroundFrame = yan:Frame(self.Screen)

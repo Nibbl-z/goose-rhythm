@@ -100,6 +100,16 @@ function editor.ReturnToMenu()
     fadingDelay = love.timer.getTime() + 0.5
 end
 
+function pause.ReturnToMenu()
+    transitions:FadeIn(0.3)
+    fading = true
+    fadingDelay = love.timer.getTime() + 0.5
+end
+
+function pause.Unpause()
+    loadedSong:play()
+end
+
 function love.load()
     love.window.setTitle("Goose Rhythm")
     love.window.setIcon(love.image.newImageData("/img/icon.png"))
@@ -164,6 +174,10 @@ function love.update(dt)
             menu:Reset()
             fading = false
             editor.Screen.Enabled = false
+
+            
+            pause.Paused = false
+            pause.Screen.Enabled = false
             transitions:FadeOut(0.3)
         end
     end
@@ -247,7 +261,14 @@ function love.keypressed(key, scancode, rep)
         if key == "escape" then
             pause.Paused = not pause.Paused
             pause.Screen.Enabled = not pause.Screen.Enabled
+
+            if pause.Paused then
+                loadedSong:pause()
+            else
+                loadedSong:play()
+            end
         end
+        if pause.Paused then return end
         local result = conductor:GetHitAccuracy(key)
         
         if result == nil then 
@@ -322,7 +343,7 @@ function love.draw()
             --love.graphics.setColor(1,1,1,1)
             
             
-            if love.keyboard.isDown(settings.Keybinds[i]) then
+            if love.keyboard.isDown(settings.Keybinds[i]) and pause.Paused == false then
                 love.graphics.draw(sprites.CrustPressed, i * 70 + circleXOffset - 30, 440)
             else
                 love.graphics.draw(sprites.Crust, i * 70 + circleXOffset - 30, 440)
