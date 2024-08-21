@@ -83,7 +83,6 @@ function conductor:Update(dt)
                 for _, n in ipairs(chartBeat.N) do
                     if n == i and chartBeat.C[tostring(n)] == nil then
                         --if #v.N == 1 then
-                        print("HAI", #chartBeat.N, chartBeat.B)
                         self.NextChartBeats[n] = chartBeat
                         chartBeat.C[tostring(n)] = true
                         foundBeat = true
@@ -157,15 +156,17 @@ function RemoveDuplicateNotes(chart)
     function IsDuplicate(note)
         for _, v in ipairs(seenNotes) do
             if v.B == note.B and v.D == note.D and v.N == note.N then
+                print("eekkers")
                 return true
             end
         end
-
+        
         return false
     end
 
     for i, v in ipairs(chart) do
         if IsDuplicate(v) == false then
+            print(i, #seenNotes)
             table.insert(seenNotes, v)
         end
     end
@@ -229,7 +230,6 @@ function conductor:LoadChart(c)
                 self.NextChartBeats[n] = v
                 v.C = {[tostring(n)] = true}
                 foundFirstBeats[n] = true
-                print(n)
             end
         end
     end
@@ -238,13 +238,12 @@ end
 function conductor:GetChartEndBeat()
     if #self.Chart == 0 then return end
     local beat = self.Chart[#self.Chart]
-    print(beat.B)
+
     local beatEndTime = beat.B 
     
     if beat.D ~= nil then
         local largestDuration = 0
         for k, d in pairs(beat.D) do
-            print(d)
             if d >= largestDuration then
                 largestDuration = d
             end
@@ -272,7 +271,6 @@ function conductor:GetBreadCount()
     
     for _, beat in ipairs(self.Chart) do
         count = count + #beat.N * 10
-        print(count)
         if beat.D ~= nil then
             for _, v in pairs(beat.D) do -- #beat.D doesnt work bc its a dictonary wahhh
                 count = count + 10
@@ -299,8 +297,6 @@ function conductor:GetHitAccuracy(key)
     local nextDiff = math.abs(self.NextChartBeats[index].B - time)
     
     if lastDiff > 1 and nextDiff > 1 then return end
-    print(key)
-    print(lastDiff, nextDiff)
     
     
     
@@ -318,7 +314,6 @@ function conductor:GetHitAccuracy(key)
                     
                     if self.NextChartBeats[index].D ~= nil then
                         if self.NextChartBeats[index].D[tostring(n)] ~= nil then
-                            print("hi")
                             self.HoldingBeats[n] = self.NextChartBeats[index]
                         end
                     end
@@ -341,7 +336,6 @@ function conductor:GetHitAccuracy(key)
                     self.LastChartBeats[index].H[tostring(n)] = true
                     if self.LastChartBeats[index].D ~= nil then
                         if self.LastChartBeats[index].D[tostring(n)] ~= nil then
-                            print("hi")
                             self.HoldingBeats[n] = self.LastChartBeats[index]
                         end
                     end

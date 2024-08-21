@@ -185,7 +185,7 @@ function editor:Update(dt)
         end
         beat = beat + snap
     end
-
+    
     if playing then
         conductor:Update(dt)
 

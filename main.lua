@@ -80,7 +80,7 @@ function StartSong(chart)
     startedSong = false
     conductor:Init()
     conductor:LoadChart(loadedChart)
-    startTime = love.timer.getTime() + conductor.SecondsPerBeat * 3.5
+    startTime = love.timer.getTime() + conductor.SecondsPerBeat * 3
     started = true
 end
 
@@ -165,7 +165,6 @@ function love.update(dt)
             menu:Reset()
             fading = false
             editor.Screen.Enabled = false
-            print(editor.Screen.Enabled)
             transitions:FadeOut(0.3)
         end
     end
@@ -356,7 +355,7 @@ function love.draw()
                             
                             goose:SetLoadedSprite(GooseMissSprite)
         
-                            misses = misses + 1
+                            misses = misses + #v.N
                             combo = 0
                             status = "Miss"
                         end
