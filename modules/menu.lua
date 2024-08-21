@@ -10,7 +10,7 @@ require("yan") -- i cant wait to use tweens
 -- they dont work im sad
 
 local charts = {
-    "/charts/greengoose", "/charts/purplegoose", "/charts/orangegoose", "/charts/whitegoose", "/charts/purplegoose copy"
+    "/charts/greengoose", "/charts/purplegoose", "/charts/orangegoose", "/charts/whitegoose", "/charts/bluegoose"
 }
 
 local sfx = {
