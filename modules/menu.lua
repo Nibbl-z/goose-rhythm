@@ -58,8 +58,7 @@ function menu:Init()
     menuMusic = love.audio.newSource("/music/menu.mp3", "static")
     menuMusic:setLooping(true)
     menuMusic:setVolume(0.2)
-    
-    
+
     menuMusicSettings = love.audio.newSource("/music/menu_settings.mp3", "static")
     menuMusicSettings:setLooping(true)
     menuMusicSettings:setVolume(0.2)
@@ -140,7 +139,7 @@ function menu:Init()
             previewMusic:stop()
         end
         
-        previewMusic = love.audio.newSource( charts[chartSelectionIndex].."/song.mp3", "stream")
+        previewMusic = love.audio.newSource( charts[chartSelectionIndex].."/song.ogg", "stream")
         previewMusic:setVolume(0.1)
         previewMusic:play()
         
@@ -491,6 +490,7 @@ function menu:Update(dt)
         menuMoving = false
     end
     
+    --conductor.SongPosition = menuMusic:tell("seconds")
     conductor:Update(dt)
     if fading ~= nil then
         if love.timer.getTime() > fadeDelay then
@@ -551,7 +551,7 @@ function menu:KeyPressed(key)
                     previewMusic:stop()
                 end
                 
-                previewMusic = love.audio.newSource( charts[chartSelectionIndex].."/song.mp3", "stream")
+                previewMusic = love.audio.newSource( charts[chartSelectionIndex].."/song.ogg", "stream")
                 previewMusic:setVolume(settings:GetMusicVolume())
                 previewMusic:play()
                
@@ -566,7 +566,7 @@ function menu:KeyPressed(key)
                     previewMusic:stop()
                 end
                 
-                previewMusic = love.audio.newSource( charts[chartSelectionIndex].."/song.mp3", "stream")
+                previewMusic = love.audio.newSource( charts[chartSelectionIndex].."/song.ogg", "stream")
                 previewMusic:setVolume(settings:GetMusicVolume())
                 previewMusic:play()
             end

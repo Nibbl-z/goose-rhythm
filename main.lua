@@ -10,7 +10,6 @@ local results = require("modules.results")
 
 local testDraw = true
 
-
 local started = false
 local startedSong = false
 local startDelay = 0
@@ -59,7 +58,7 @@ function StartSong(chart)
     local metadata = love.filesystem.read(chart.."/metadata.lua")
     loadedMetadata = loadstring(metadata)()
     
-    loadedSong = love.audio.newSource(chart.."/song.mp3", "stream")
+    loadedSong = love.audio.newSource(chart.."/song.ogg", "stream")
     conductor.BPM = loadedMetadata.BPM
    
     
@@ -67,7 +66,7 @@ function StartSong(chart)
     GooseSprite = love.graphics.newImage(chart.."/assets/goose.png")
     GooseMissSprite = love.graphics.newImage(chart.."/assets/goose_miss.png")
     goose:SetLoadedSprite(GooseSprite)
-
+    
     if loadedMetadata.GooseSize ~= nil then
         goose.Size = Vector2.new(loadedMetadata.GooseSize, loadedMetadata.GooseSize)
     else
@@ -80,7 +79,7 @@ function StartSong(chart)
     startedSong = false
     conductor:Init()
     conductor:LoadChart(loadedChart)
-    startTime = love.timer.getTime() + conductor.SecondsPerBeat * 3
+    startTime = love.timer.getTime()
     started = true
 end
 
@@ -178,6 +177,7 @@ function love.update(dt)
         editor.Screen.Enabled = false
         menu:Update(dt)
     else
+        conductor.SongPosition = loadedSong:tell("seconds")
         editor.Screen.Enabled = false
         menu.Screen.Enabled = false
         if started then
@@ -207,7 +207,6 @@ end
 
 function conductor.Metronome()
     testDraw = not testDraw
-    --metronome:play()
     
     if loadedMetadata ~= nil then
         goose.Size = Vector2.new(loadedMetadata.GooseSize * 1.25, loadedMetadata.GooseSize * 0.75)
@@ -252,6 +251,7 @@ function love.keypressed(key, scancode, rep)
             ReturnToMenu()
         end
         local result = conductor:GetHitAccuracy(key)
+
         if result == nil then return end
         
         if result <= 0.05 then
@@ -282,15 +282,15 @@ function love.keyreleased(key)
     local result = conductor:ReleaseHeldNote(key)
         if result == nil then return end
         
-        if result <= 0.05 then
+        if result <= 0.1 then
             status = "Perfect"
             
             goose:SetLoadedSprite(GooseSprite)
-        elseif result <= 0.2 then
+        elseif result <= 0.4 then
             status = "Okay"
             
             goose:SetLoadedSprite(GooseSprite)
-        elseif result > 0.3 then
+        elseif result > 0.4 then
             goose:SetLoadedSprite(GooseMissSprite)
             
             misses = misses + 1
@@ -335,9 +335,9 @@ function love.draw()
             
             
             if love.keyboard.isDown(settings.Keybinds[i]) then
-                love.graphics.draw(sprites.CrustPressed, i * 70 + circleXOffset - 30, 470)
+                love.graphics.draw(sprites.CrustPressed, i * 70 + circleXOffset - 30, 440)
             else
-                love.graphics.draw(sprites.Crust, i * 70 + circleXOffset - 30, 470)
+                love.graphics.draw(sprites.Crust, i * 70 + circleXOffset - 30, 440)
             end
         end
         

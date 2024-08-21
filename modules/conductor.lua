@@ -35,7 +35,7 @@ end
 function conductor:Update(dt)
     self.SecondsPerBeat = 60 / self.BPM
     
-    self.SongPosition = self.SongPosition + dt
+    self.SongPosition = self.SongPosition + love.timer.getDelta()
     self.SongPositionInBeats = self.SongPosition / self.SecondsPerBeat
 
     if self.SongPosition > self.LastBeat + self.SecondsPerBeat then
@@ -186,7 +186,7 @@ function conductor:LoadChart(c)
     for _, v in ipairs(chart) do
         v.B = v.B + 4
     end
-
+    
     table.sort(chart, function (a, b)
         return a.B < b.B
     end)
