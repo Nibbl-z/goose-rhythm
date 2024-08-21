@@ -4,6 +4,7 @@ return {
     Charter = "Nibbles",
     BPM = 120,
     GooseSize = 2,
+    PreviewSongTime = 2,
     DialogueTryAgain = "Why would you let this happen!! :(",
     DialogueOK = "Eh... good enough",
     DialogueSuperb = "Wait, you did good?",

@@ -4,6 +4,7 @@ return {
     Charter = "Nibbles",
     BPM = 200,
     GooseSize = 2,
+    PreviewSongTime = 1.2,
     DialogueTryAgain = "I am very upset with your performance... GRR!",
     DialogueOK = "Good enough.",
     DialogueSuperb = "WOWZERS!!! you really know how to uhh.... rhythm..",

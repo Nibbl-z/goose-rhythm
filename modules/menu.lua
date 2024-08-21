@@ -127,7 +127,7 @@ function menu:Init()
         if menuMoving then return end
         menuMoving = true
         menuStopMovingDelay = love.timer.getTime() + 1
-
+        
         sfx.Select:play()
         page = "levels"
         moveMainTween:Play()
@@ -139,9 +139,13 @@ function menu:Init()
             previewMusic:stop()
         end
         
+        local metadata = love.filesystem.read(charts[chartSelectionIndex].."/metadata.lua")
+        local loadedMetadata = loadstring(metadata)()
+
         previewMusic = love.audio.newSource( charts[chartSelectionIndex].."/song.ogg", "stream")
         previewMusic:setVolume(0.1)
         previewMusic:play()
+        previewMusic:seek(loadedMetadata.PreviewSongTime, "seconds")
         
         menuMusic:stop()
         menuMusicSettings:stop()
@@ -554,7 +558,10 @@ function menu:KeyPressed(key)
                 previewMusic = love.audio.newSource( charts[chartSelectionIndex].."/song.ogg", "stream")
                 previewMusic:setVolume(settings:GetMusicVolume())
                 previewMusic:play()
-               
+
+                local metadata = love.filesystem.read(charts[chartSelectionIndex].."/metadata.lua")
+                local loadedMetadata = loadstring(metadata)()
+                previewMusic:seek(loadedMetadata.PreviewSongTime, "seconds")
             end
         elseif key == "right" or key == "d" then
             if chartSelectionIndex < #charts then
@@ -569,6 +576,10 @@ function menu:KeyPressed(key)
                 previewMusic = love.audio.newSource( charts[chartSelectionIndex].."/song.ogg", "stream")
                 previewMusic:setVolume(settings:GetMusicVolume())
                 previewMusic:play()
+
+                local metadata = love.filesystem.read(charts[chartSelectionIndex].."/metadata.lua")
+                local loadedMetadata = loadstring(metadata)()
+                previewMusic:seek(loadedMetadata.PreviewSongTime, "seconds")
             end
         end
         

@@ -3,7 +3,7 @@ return {
     SongArtist = "Nibbles",
     Charter = "Nibbles",
     BPM = 90,
-
+    PreviewSongTime = 2.66,
     GooseSize = 3,
     
     DialogueTryAgain = "You Died!",

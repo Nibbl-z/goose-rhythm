@@ -170,7 +170,7 @@ function RemoveDuplicateNotes(chart)
             table.insert(seenNotes, v)
         end
     end
-
+    
     return seenNotes
 end
 
