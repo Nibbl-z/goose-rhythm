@@ -211,7 +211,7 @@ function menu:Init()
     end
     
    
-
+    
     title:SetParent(mainPage)
     title.Name = "Title"
     playLevels:SetParent(mainPage)
@@ -332,6 +332,7 @@ function menu:Init()
     volumeSlider.Size = UIVector2.new(0.5, -10, 0.1,0)
     volumeSlider.SliderColor = Color.new(0.5,0.5,0.5,1)
     volumeSlider:SetParent(settingsFrame)
+    volumeSlider.CornerRoundness = 8
     
     volumeLabel = yan:Label(self.Screen, "Music Volume", 32, "right", "center", "/ComicNeue.ttf")
     volumeLabel.Size = UIVector2.new(0.5,0,1,0)
@@ -382,6 +383,7 @@ function menu:Init()
         keybutton.Position = UIVector2.new(0.4, 0, 0.2 + (i * 0.1), i * 10)
         keybutton.Size = UIVector2.new(0.5, -10, 0.1,0)
         keybutton:SetParent(settingsFrame)
+        keybutton.CornerRoundness = 8
 
         keylabel = yan:Label(self.Screen, "Note "..i.." Keybind", 32, "right", "center", "/ComicNeue.ttf")
         keylabel.Size = UIVector2.new(0.7,0,1,0)
@@ -411,13 +413,14 @@ function menu:Init()
             keybutton.Text = "Choose a key"
         end
     end
-
+    
     noteSpeedInput = yan:TextInputter(self.Screen, "300", 40, "center", "center", "/ComicNeue.ttf")
     noteSpeedInput.Position = UIVector2.new(0.4, 0, 0.7, 50)
     noteSpeedInput.Size = UIVector2.new(0.5, -10, 0.1, 0)
     noteSpeedInput.TextColor = Color.new(0,0,0,1)
     noteSpeedInput:SetParent(settingsFrame)
     noteSpeedInput.Text = settings.NoteSpeed
+    noteSpeedInput.CornerRoundness = 8
 
     noteSpeedLabel = yan:Label(self.Screen, "Note Speed", 32, "right", "center", "/ComicNeue.ttf")
     noteSpeedLabel.Size = UIVector2.new(0.7,0,1,0)

@@ -6,8 +6,8 @@ conductor.SongPosition = 0.0
 conductor.LastBeat = 0.0
 conductor.SecondsPerBeat = 0.0
 
-conductor.LastChartBeats = {{B = 0.0, N = {}}, {B = 0.0, N = {}}, {B = 0.0, N = {}}, {B = 0.0, N = {}}}
-conductor.NextChartBeats = {{B = 0.0, N = {}}, {B = 0.0, N = {}}, {B = 0.0, N = {}}, {B = 0.0, N = {}}}
+conductor.LastChartBeats = {{B = 0.0, N = {}, H = {}}, {B = 0.0, N = {}, H = {}}, {B = 0.0, N = {}, H = {}}, {B = 0.0, N = {}, H = {}}}
+conductor.NextChartBeats = {{B = 0.0, N = {}, H = {}}, {B = 0.0, N = {}, H = {}}, {B = 0.0, N = {}, H = {}}, {B = 0.0, N = {}, H = {}}}
 conductor.NoteIndex = {nil, nil, nil, nil}
 conductor.ChartFinished = false
 conductor.Chart = {}
@@ -23,8 +23,8 @@ function conductor:Init()
     self.SongPosition = 0
     self.SongPositionInBeats = 0
     self.LastBeat = 0
-    self.LastChartBeats = {{B = 0.0, N = {}}, {B = 0.0, N = {}}, {B = 0.0, N = {}}, {B = 0.0, N = {}}}
-    self.NextChartBeats = {{B = 0.0, N = {}}, {B = 0.0, N = {}}, {B = 0.0, N = {}}, {B = 0.0, N = {}}}
+    self.LastChartBeats = {{B = 0.0, N = {}, H = {}}, {B = 0.0, N = {}, H = {}}, {B = 0.0, N = {}, H = {}}, {B = 0.0, N = {}, H = {}}}
+    self.NextChartBeats = {{B = 0.0, N = {}, H = {}}, {B = 0.0, N = {}, H = {}}, {B = 0.0, N = {}, H = {}}, {B = 0.0, N = {}, H = {}}}
     self.ChartFinished = false
     self.NoteIndex = 1
     self.HoldingBeats = {nil, nil, nil, nil}
@@ -156,7 +156,6 @@ function RemoveDuplicateNotes(chart)
     function IsDuplicate(note)
         for _, v in ipairs(seenNotes) do
             if v.B == note.B and v.D == note.D and v.N == note.N then
-                print("eekkers")
                 return true
             end
         end
@@ -296,7 +295,7 @@ function conductor:GetHitAccuracy(key)
     local lastDiff = math.abs(self.LastChartBeats[index].B - time)
     local nextDiff = math.abs(self.NextChartBeats[index].B - time)
     
-    if lastDiff > 1 and nextDiff > 1 then return end
+    if lastDiff > 0.6 and nextDiff > 0.6 then return end
     
     
     

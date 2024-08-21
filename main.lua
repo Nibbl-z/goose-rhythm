@@ -8,8 +8,6 @@ local settings = require("modules.settings")
 local transitions = require("modules.transitions")
 local results = require("modules.results")
 
-local testDraw = true
-
 local started = false
 local startedSong = false
 local startDelay = 0
@@ -206,8 +204,6 @@ function love.update(dt)
 end
 
 function conductor.Metronome()
-    testDraw = not testDraw
-    
     if loadedMetadata ~= nil then
         goose.Size = Vector2.new(loadedMetadata.GooseSize * 1.25, loadedMetadata.GooseSize * 0.75)
         yan:NewTween(goose, yan:TweenInfo(0.2, EasingStyle.QuadOut), {Size = Vector2.new(loadedMetadata.GooseSize, loadedMetadata.GooseSize)}):Play()
@@ -219,8 +215,6 @@ function conductor.Metronome()
         menu:Metronome()
     end
 end
-
-local status = ""
 
 function conductor.OnChartFinish()
     results:Open(bread, notesHit, loadedMetadata, chartPath)
@@ -251,18 +245,17 @@ function love.keypressed(key, scancode, rep)
             ReturnToMenu()
         end
         local result = conductor:GetHitAccuracy(key)
-
-        if result == nil then return end
+        
+        if result == nil then 
+            print("sigma skibidi")
+            return 
+        end
         
         if result <= 0.05 then
-            status = "Perfect"
-            
             combo = combo + 1
             notesHit = notesHit + 1
             goose:SetLoadedSprite(GooseSprite)
-        elseif result <= 0.2 then
-            status = "Okay"
-
+        elseif result <= 0.3 then
             combo = combo + 1
             notesHit = notesHit + 1
             goose:SetLoadedSprite(GooseSprite)
@@ -271,10 +264,10 @@ function love.keypressed(key, scancode, rep)
             
             misses = misses + 1
             combo = 0
-            status = "Miss"
         end
-        
-        bread = bread + (10 - math.floor(result * 10))
+        local addedBread = (10 - math.floor(result * 10))
+        if addedBread <= 0 then addedBread = 0 end
+        bread = bread + addedBread
     end
 end
 
@@ -282,21 +275,13 @@ function love.keyreleased(key)
     local result = conductor:ReleaseHeldNote(key)
         if result == nil then return end
         
-        if result <= 0.1 then
-            status = "Perfect"
-            
+        --[[if result <= 0.1 then
             goose:SetLoadedSprite(GooseSprite)
         elseif result <= 0.4 then
-            status = "Okay"
-            
             goose:SetLoadedSprite(GooseSprite)
         elseif result > 0.4 then
             goose:SetLoadedSprite(GooseMissSprite)
-            
-            misses = misses + 1
-            combo = 0
-            status = "Miss"
-        end
+        end]]
         
         bread = bread + (10 - math.floor(result * 10))
 end
@@ -321,7 +306,7 @@ function love.draw()
             love.graphics.draw(BGSprite)
         end
 
-         goose:Draw()
+        goose:Draw()
 
         local circleXOffset = (love.graphics.getWidth() - 4 * 70) / 2 - 35
         love.graphics.setColor(0,0,0,0.5)
@@ -383,12 +368,6 @@ function love.draw()
                 end
             end
         end
-        
-        --[[love.graphics.print(status)
-        
-        if testDraw then
-            love.graphics.rectangle("fill", 10, 10, 20, 20)
-        end]]
     end
     
     yan:Draw()
