@@ -1,12 +1,8 @@
 local editor = {}
 require("modules.conductor")
 
-local frame = require("yan.instance.ui.frame")
-local btn = require("yan.instance.ui.textbutton")
-local screen = require("yan.instance.ui.screen")
-local Color = require("yan.datatypes.color")
-local UIVector2 = require("yan.datatypes.uivector2")
-local Vector2 = require("yan.datatypes.vector2")
+require("yan")
+
 local utils = require("yan.utils")
 
 local textinput = require("yan.instance.ui.textinput")
@@ -21,8 +17,8 @@ local snap = 0.5
 local beats = 8
 local beatQuadrant = {}
 
-local chart = require("charts.purplegoose.chart")
-
+local chart = {}
+local chartPath = ""
 local notePlaceLines = {}
 local lines = {}
 local pixelsPerBeat = 300
@@ -34,6 +30,18 @@ local playing = false
 
 local minVisibleBeat = 0
 local maxVisibleBeat = 6
+
+function editor:LoadChart(c)
+    chartPath = c
+    local chartData = love.filesystem.read(c.."/chart.lua")
+    chart = loadstring(chartData)()
+
+    local metadata = love.filesystem.read(c.."/metadata.lua")
+    loadedMetadata = loadstring(metadata)()
+    
+    loadedSong = love.audio.newSource(c.."/song.ogg", "static")
+    conductor.BPM = loadedMetadata.BPM
+end
 
 function PlaceNote()
     if beatQuadrant.b == nil then return end
@@ -53,7 +61,7 @@ function DeleteNote()
 end
 
 function Export()
-    local result = "{"
+    local result = "return {"
     
     for i, note in ipairs(chart) do
         result = result.."{B = "..note.B..", N = "..note.N
@@ -67,29 +75,27 @@ function Export()
         end
     end
     
+    love.filesystem.write(chartPath.."/chart.lua", result)
     love.system.setClipboardText(result)
 end
 
 function editor:Init()
-    loadedSong = love.audio.newSource(song, "static")
-    loadedSong:setVolume(0.7)
-
     mainBeatFont = love.graphics.newFont(25)
     smallBeatFont = love.graphics.newFont(15)
     
-    self.Screen = screen:New()
+    self.Screen = yan:Screen()
     self.Screen.Enabled = true
     
     noteColumns = {}
     
-    placerContainer = frame:New(self.Screen)
+    placerContainer = yan:Frame(self.Screen)
     placerContainer.Size = UIVector2.new(0,70 * 4,1,0)
     placerContainer.Position = UIVector2.new(0.5,0,0,0)
     placerContainer.AnchorPoint = Vector2.new(0.5,0)
     placerContainer.Color = Color.new(1,1,1,0)
     
     for i = 1, 4 do
-        local noteDetector = btn:New(self.Screen, "", 20, "center", "center")
+        local noteDetector = yan:TextButton(self.Screen, "", 20, "center", "center")
         noteDetector.Position = UIVector2.new(0.25 * (i - 1), 0, 0, 0)
         noteDetector.Size = UIVector2.new(0.25,0,1,0)
         noteDetector:SetParent(placerContainer)
@@ -104,13 +110,12 @@ function editor:Init()
         end
     end
     
-    snapInput = textinput:New(self.Screen, "0.5", 16, "left", "center")
-    snapInput.Position = UIVector2.new(0, 10, 0, 10)
+    snapInput = yan:TextInputter(self.Screen, "0.5", 16, "left", "center")
+    snapInput.Position = UIVector2.new(1, -10, 0, 10)
     snapInput.Size = UIVector2.new(0.1,0,0.05,0)
+    snapInput.AnchorPoint = Vector2.new(1,0)
     snapInput.TextColor = Color.new(0,0,0,1)
-    snapInput.MouseDown = function () 
-    
-    end 
+    snapInput.MouseDown = function () end 
     
     snapInput.OnEnter = function ()
         if tonumber(snapInput.Text) ~= nil then
@@ -119,32 +124,16 @@ function editor:Init()
             end
         end
     end
-    --[[beatDetector = screen:New()
-    beatDetector.Enabled = true
+
+    saveBtn = yan:ImageButton(self.Screen, "/img/save.png")
+    saveBtn.Size = UIVector2.new(0,40,0,40)
+    saveBtn.Position = UIVector2.new(0,5,0,5)
     
-    beatRows = {}
-    
-    beatDetectorContainer = frame:New(noteDetector)
-    beatDetectorContainer.Size = UIVector2.new(0,70 * 4,0,530)
-    beatDetectorContainer.Position = UIVector2.new(0.5,0,0,0)
-    beatDetectorContainer.AnchorPoint = Vector2.new(0.5,0)
-    beatDetectorContainer.Color = Color.new(1,1,1,0.5)
-    
-    for i = 1, beats do
-        local beatDetector = btn:New(beatDetector, "", 1, "center", "center")
-        beatDetector.Position = UIVector2.new(0, 0, 0.125 * (i - 1), 0)
-        beatDetector.Size = UIVector2.new(1,0,0.125,0)
-        beatDetector:SetParent(beatDetectorContainer)
-        beatDetector.Color = Color.new(i * 0.25, 1, 1, 0.5)
-        
-        beatDetector.MouseEnter = function ()
-            beatQuadrant = i
-        end
-        
-        beatDetector.MouseLeave = function ()
-            beatQuadrant = -1
-        end
-    end]]
+    saveBtn.MouseEnter = function () saveBtn.Color = Color.new(0.7,0.7,0.7,1) end
+    saveBtn.MouseLeave = function () saveBtn.Color = Color.new(1,1,1,1) end
+    saveBtn.MouseDown = function ()
+        Export()
+    end
 end
 
 function editor:MousePressed(x, y, button)
@@ -194,7 +183,6 @@ function editor:Update(dt)
 end
 
 function StartPlayback()
-    conductor.BPM = 128
     conductor:Init()
     playing = true
     conductor.SongPositionInBeats = scrollOffset / pixelsPerBeat

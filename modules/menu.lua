@@ -1184,17 +1184,18 @@ function menu:Update(dt)
             if fading == "editor" then
                 transitions:FadeOut(0.5)
                 editor.Enabled = true
-                editor:Init()
+                editor:LoadChart(customCharts[customChartSelectionIndex])
                 if previewMusic ~= nil then 
                     previewMusic:stop()
                 end
+                editor.Screen.Enabled = true
                 self.Enabled = false
                 self.Screen.Enabled = false
                 menuMusic:stop()
                 menuMusicSettings:stop()
                 fading = nil
             end
-
+            
             if fading == "play" then
                 transitions:FadeOut(0.3)
                 
