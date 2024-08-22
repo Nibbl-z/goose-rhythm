@@ -44,6 +44,9 @@ local menuMoving = false
 local menuStopMovingDelay = -1
 
 local customChartFrames = {}
+local canDelete = true
+local deleteBtnDelay = -1
+
 
 local creatingLevel = {
     SongName = "",
@@ -264,7 +267,46 @@ function RefreshCustomLevels()
             superbInput.Text = loadedMetadata.DialogueSuperb
             perfectInput.Text = loadedMetadata.DialoguePerfect 
         end
-
+        
+        local deleteBtn = yan:TextButton(menu.Screen, "Delete Level", 30, "center", "center", "/ComicNeue.ttf")
+        deleteBtn.Position = UIVector2.new(1, -20,0.9,-30)
+        deleteBtn.Size = UIVector2.new(0.3,0,0.1,0)
+        deleteBtn.AnchorPoint = Vector2.new(1, 1)
+        deleteBtn.Color = Color.new(1,0.1,0.1,1)
+        
+        deleteBtn.MouseEnter = function () 
+            deleteBtn.Color = Color.new(0.7,0.1,0.1,1) 
+        end
+        deleteBtn.MouseLeave = function () deleteBtn.Color = Color.new(1,0.1,0.1,1) end
+        local deleteConfirmation = false
+        deleteBtn.MouseDown = function ()
+            if not canDelete then return end
+            if deleteConfirmation == false then
+                deleteBtn.Text = "Are you sure?"
+                deleteConfirmation = true
+            else
+                local function recursivelyDelete(item)
+                    if love.filesystem.getInfo(item).type == "directory" then
+                        for _, child in ipairs(love.filesystem.getDirectoryItems(item)) do
+                            recursivelyDelete(item..'/'..child)
+                            love.filesystem.remove(item..'/'..child)
+                        end
+                    elseif love.filesystem.getInfo(item).type == "file" then
+                        love.filesystem.remove(item)
+                    end
+                    love.filesystem.remove(item)
+                end
+                
+                recursivelyDelete(chart)
+                love.filesystem.remove(chart)
+                deleteConfirmation = false
+                RefreshCustomLevels()
+                deleteBtn.Text = "Delete Level"
+                
+                canDelete = false
+                deleteBtnDelay = love.timer.getTime() + 0.1
+            end
+        end
         
         frame:SetParent(customLevelsContainer)
         cover:SetParent(frame)
@@ -274,6 +316,7 @@ function RefreshCustomLevels()
         mapper:SetParent(frame)
         editButton:SetParent(frame)
         editMetadataBtn:SetParent(frame)
+        deleteBtn:SetParent(frame)
 
         table.insert(customChartFrames, frame)
     end
@@ -1287,7 +1330,7 @@ function menu:Init()
                 end
                 love.filesystem.remove(item)
             end
-
+            
             recursivelyDelete("/customLevels/"..previousLevelName)
             love.filesystem.remove("/customLevels/"..previousLevelName)
         end
@@ -1325,6 +1368,11 @@ function menu:Update(dt)
     if menuStopMovingDelay ~= -1 and love.timer.getTime() > menuStopMovingDelay then
         menuStopMovingDelay = -1
         menuMoving = false
+    end
+
+    if deleteBtnDelay ~= -1 and love.timer.getTime() > deleteBtnDelay then
+        canDelete = true
+        deleteBtnDelay = -1
     end
     
     --conductor.SongPosition = menuMusic:tell("seconds")
