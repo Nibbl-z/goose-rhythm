@@ -3,7 +3,6 @@ require("yan")
 local editor = require("modules.editor")
 local menu = require("modules.menu")
 local uimgr = require("yan.uimanager")
-local song = "/music/greengoose.mp3"
 local settings = require("modules.settings")
 local transitions = require("modules.transitions")
 local results = require("modules.results")

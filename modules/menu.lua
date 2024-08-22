@@ -90,6 +90,11 @@ function menu:Init()
     settingsFrame.Position = UIVector2.new(0,0,1,0)
     settingsFrame.Size = UIVector2.new(1,0,1,0)
     settingsFrame.Color = Color.new(0,0,0,0)
+
+    customLevelsPage = yan:Frame(self.Screen)
+    customLevelsPage.Size = UIVector2.new(1,0,1,0)
+    customLevelsPage.Position = UIVector2.new(1,0,0,0)
+    customLevelsPage.Color = Color.new(0,0,0,0)
     
     title = yan:Image(self.Screen, "/img/logo.png")
     title.Size = UIVector2.new(0,439*0.9,0,256*0.9)
@@ -151,7 +156,7 @@ function menu:Init()
         menuMusicSettings:stop()
     end 
     
-    openEditor = yan:TextButton(self.Screen, "open editor", 50, "center", "center", "/ComicNeue.ttf")
+    openEditor = yan:TextButton(self.Screen, "custom levels", 50, "center", "center", "/ComicNeue.ttf")
     openEditor.Position = UIVector2.new(0.5,0,0.55,10)
     openEditor.Size = UIVector2.new(0.5, 0, 0.15, 0)
     openEditor.AnchorPoint = Vector2.new(0.5,0)
@@ -169,13 +174,16 @@ function menu:Init()
     openEditor.MouseLeave = function ()
         editorLeaveTween:Play()
     end
-    
+    moveCustomLevelsTween = yan:NewTween(customLevelsPage, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(0,0,0,0)})
     openEditor.MouseDown = function ()
-        sfx.Select:play()
-        transitions:FadeIn(0.2)
+        if menuMoving then return end
+        menuMoving = true
+        menuStopMovingDelay = love.timer.getTime() + 1
         
-        fading = "editor"
-        fadeDelay = love.timer.getTime() + 0.5
+        sfx.Select:play()
+        page = "customlevels"
+        moveMainTween:Play()
+        moveCustomLevelsTween:Play()
     end
     
     settingsBtn = yan:TextButton(self.Screen, "settings", 50, "center", "center", "/ComicNeue.ttf")
@@ -302,7 +310,7 @@ function menu:Init()
         playButton.MouseEnter = function ()
             playButton.Color = Color.new(0.7,0.7,0.7,1)
         end
-
+        
         playButton.MouseLeave = function ()
             playButton.Color = Color.new(1,1,1,1)
         end
@@ -616,6 +624,22 @@ function menu:KeyPressed(key)
             yan:NewTween(bgOffset, yan:TweenInfo(1, EasingStyle.QuadInOut), {Pos = 0, MusicVolume = 1, SettingsVolume = 0}):Play()
             
             settings:Save()
+        end
+    elseif page == "customlevels" then
+        if key == "escape" and not menuMoving then
+            menuMoving = true
+            menuStopMovingDelay = love.timer.getTime() + 1
+
+            page = "main"
+            --yan:NewTween(levelsContainer, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(0, 0, 0, 0)}):Play()
+            yan:NewTween(mainPage, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(0,0,0,0)}):Play()
+            yan:NewTween(customLevelsPage, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(1,0,0,0)}):Play()
+            
+            menuMusic:play()
+            menuMusicSettings:play()
+            
+            conductor.BPM = 128
+            conductor:Init()
         end
     end
 end
