@@ -294,6 +294,7 @@ function love.keypressed(key, scancode, rep)
         menu:KeyPressed(key)
     else
         if key == "escape" then
+            pause.Type = "game"
             pause.Paused = not pause.Paused
             pause.Screen.Enabled = not pause.Screen.Enabled
 

@@ -5,6 +5,7 @@ require("yan")
 
 local utils = require("yan.utils")
 local settings = require("modules.settings")
+local pause = require("modules.pause")
 
 editor.Enabled = false
 
@@ -29,6 +30,8 @@ local playing = false
 
 local minVisibleBeat = 0
 local maxVisibleBeat = 6
+
+local unsavedChanges = false
 
 local sprites = {
     Bread = love.graphics.newImage("/img/bread.png"),
@@ -67,19 +70,19 @@ end
 
 function PlaceNote()
     if beatQuadrant.b == nil then return end
+    unsavedChanges = true
     table.insert(chart, {B = beatQuadrant.b, N = quadrant, Y = beatQuadrant.y1})
-    
-    Export()
 end
 
 function DeleteNote()
     for i, v in ipairs(chart) do
         if v.B == beatQuadrant.b and v.N == quadrant then
             table.remove(chart,i)
+            unsavedChanges = true
         end
     end
+
     
-    Export()
 end
 
 function Export()
@@ -98,7 +101,8 @@ function Export()
     end
     
     love.filesystem.write(chartPath.."/chart.lua", result)
-    love.system.setClipboardText(result)
+
+    unsavedChanges = false
 end
 
 function editor:Init()
@@ -235,7 +239,9 @@ end
 
 function editor:KeyPressed(key)
     if key == "escape" then
-        self.ReturnToMenu()
+        pause.Type = "editor"
+        pause.Paused = not pause.Paused
+        pause.Screen.Enabled = not pause.Screen.Enabled
     end
     if key == "space" then
         if playing == false then
@@ -244,6 +250,10 @@ function editor:KeyPressed(key)
             StopPlayback()
         end
     end
+end
+
+function pause.HasSaved()
+    return unsavedChanges
 end
 
 function editor:WheelMoved(x, y)
@@ -288,8 +298,6 @@ function editor:Draw()
     love.graphics.setColor(1,1,1,1)
     
     for _, l in ipairs(lines) do
-
-        
         if l.partial == false then
             love.graphics.setFont(mainBeatFont)
             love.graphics.setColor(1,1,1,1)
@@ -305,6 +313,12 @@ function editor:Draw()
     end
 
     if quadrant ~= -1 and beatQuadrant.y1 ~= nil then
+        for i, v in ipairs(chart) do
+            if v.B == beatQuadrant.b and v.N == quadrant then
+                love.graphics.draw(sprites.Crust, (quadrant) * 70 + xOffset, beatQuadrant.y1 + scrollOffset - 30, 0, 1.2, 1.2, 5, 5)
+            end
+        end
+        
         love.graphics.draw(sprites.Crust, (quadrant) * 70 + xOffset, beatQuadrant.y1 + scrollOffset - 30)
     end
     

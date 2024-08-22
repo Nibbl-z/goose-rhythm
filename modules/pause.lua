@@ -1,10 +1,12 @@
 local pause = {}
 
 pause.Paused = false
+pause.Type = "game"
 require("yan")
 local sfx = {
     Select = love.audio.newSource("/sfx/select.wav", "static"),
 }
+
 function pause:Init()
     self.Screen = yan:Screen()
     self.Screen.Enabled = false
@@ -47,7 +49,10 @@ function pause:Init()
         sfx.Select:play()
         self.Screen.Enabled = false
         self.Paused = false
-        self.Unpause()
+
+        if self.Type == "game" then
+            self.Unpause()
+        end
     end
     
     quitEnterTween = yan:NewTween(quitButton, yan:TweenInfo(0.2, EasingStyle.QuadOut), {Size = UIVector2.new(0.5, 50, 0.15, 0), Color = Color.new(1, 86/255, 86/255, 1)})
@@ -63,6 +68,15 @@ function pause:Init()
 
     quitButton.MouseDown = function ()
         sfx.Select:play()
+
+        if self.Type == "editor" then
+            local hasSaved = self.HasSaved()
+            if hasSaved == true then
+                local result = love.window.showMessageBox("Warning", "You have unsaved changes! Are you sure you want to exit?", {"Yes", "Cancel"}, "warning", false)
+                if result == 2 then return end
+            end
+        end
+
         self.ReturnToMenu()
     end
 
