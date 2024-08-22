@@ -867,7 +867,20 @@ function menu:Init()
     
     createSongBtn.MouseEnter = function () createSongBtn.Color = Color.new(0.7,0.7,0.7,1) end
     createSongBtn.MouseLeave = function () createSongBtn.Color = Color.new(1,1,1,1) end
-    createSongBtn.MouseDown = function() end
+    createSongBtn.MouseDown = function() 
+        if love.filesystem.getInfo("/customLevels/"..nameInputter.Text) ~= nil then
+            createSongBtn.Text = "Level with same name already exists!"
+            return
+        end
+        
+        local metadataString = string.format("return {SongName = \"%s\", SongArtist = \"%s\", Charter = \"%s\",", nameInputter.Text, artistInputter.Text, mapperInputter.Text)
+        metadataString = metadataString..("BPM = 150, GooseSize = 2, PreviewStartTime = 0.0,")--todo make these modifiable
+        metadataString = metadataString..string.format("DialogueTryAgain = \"%s\", DialogueOK = \"%s\", DialogueSuperb = \"%s\", DialoguePerfect = \"%s\"}", tryagainInput.Text, okayInput.Text, superbInput.Text, perfectInput.Text)
+        print(metadataString)
+        love.filesystem.createDirectory("/customLevels/"..nameInputter.Text)
+        love.filesystem.write("/customLevels/"..nameInputter.Text.."/metadata.lua", metadataString)
+        
+    end
 end
 
 function menu:Draw()

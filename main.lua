@@ -113,6 +113,12 @@ function love.load()
     love.window.setTitle("Goose Rhythm")
     love.window.setIcon(love.image.newImageData("/img/icon.png"))
     
+    love.filesystem.setIdentity(love.filesystem.getIdentity())
+    
+    if love.filesystem.getInfo("/customLevels") == nil then
+        love.filesystem.createDirectory("customLevels")
+    end
+
     settings:Load()
     pause:Init()
     menu:Init()
@@ -248,8 +254,6 @@ function love.wheelmoved(x, y)
 end
 
 function love.keypressed(key, scancode, rep)
-    
-    
     uimgr:KeyPressed(key, scancode, rep)
 
     if editor.Enabled == true then
