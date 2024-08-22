@@ -55,6 +55,9 @@ local creatingLevel = {
     GooseMiss = nil,
     Cover = nil
 }
+
+local createLevelMode = "create"
+
 local droppingFile = nil
 
 function menu:Reset()
@@ -115,6 +118,28 @@ function RefreshCustomLevels()
         elseif love.filesystem.getInfo(chart.."/cover.bmp") ~= nil then
             coverfileExt = ".bmp"
         end
+
+        local goosefileExt = ".png"
+        if love.filesystem.getInfo(chart.."/assets/goose.png") ~= nil then
+            goosefileExt = ".png"
+        elseif love.filesystem.getInfo(chart.."/assets/goose.jpg") ~= nil then
+            goosefileExt = ".jpg"
+        elseif love.filesystem.getInfo(chart.."/assets/goose.jpeg") ~= nil then
+            goosefileExt = ".jpeg"
+        elseif love.filesystem.getInfo(chart.."/assets/goose.bmp") ~= nil then
+            goosefileExt = ".bmp"
+        end
+
+        local goosemissFileExt = ".png"
+        if love.filesystem.getInfo(chart.."/assets/goose_miss.png") ~= nil then
+            goosemissFileExt = ".png"
+        elseif love.filesystem.getInfo(chart.."/assets/goose_miss.jpg") ~= nil then
+            goosemissFileExt = ".jpg"
+        elseif love.filesystem.getInfo(chart.."/assets/goose_miss.jpeg") ~= nil then
+            goosemissFileExt = ".jpeg"
+        elseif love.filesystem.getInfo(chart.."/assets/goose_miss.bmp") ~= nil then
+            goosemissFileExt = ".bmp"
+        end
         
         local frame = yan:Image(menu.Screen, chart.."/assets/bg"..bgfileExt)
         frame.Size = UIVector2.new(1,0,1,0)
@@ -141,10 +166,10 @@ function RefreshCustomLevels()
         mapper.Position = UIVector2.new(0,0,0.17,0)
         mapper.TextColor = Color.new(0.8,0.8,0.8,1)
         
-        local playButton = yan:TextButton(menu.Screen, "Play", 50, "center", "center", "/ComicNeue.ttf")
-        playButton.Position = UIVector2.new(0.35,0,1,-20)
+        local playButton = yan:TextButton(menu.Screen, "Play", 30, "center", "center", "/ComicNeue.ttf")
+        playButton.Position = UIVector2.new(0,20,1,-20)
         playButton.Size = UIVector2.new(0.3,0,0.1,0)
-        playButton.AnchorPoint = Vector2.new(0.5, 1)
+        playButton.AnchorPoint = Vector2.new(0, 1)
         
 
         playButton.MouseEnter = function ()
@@ -164,12 +189,12 @@ function RefreshCustomLevels()
             menuMusicSettings:stop()
         end
 
-        local editButton = yan:TextButton(menu.Screen, "Edit", 50, "center", "center", "/ComicNeue.ttf")
-        editButton.Position = UIVector2.new(0.65,10,1,-20)
+        local editButton = yan:TextButton(menu.Screen, "Edit Chart", 30, "center", "center", "/ComicNeue.ttf")
+        editButton.Position = UIVector2.new(0.5,0,1,-20)
         editButton.Size = UIVector2.new(0.3,0,0.1,0)
         editButton.AnchorPoint = Vector2.new(0.5, 1)
         
-
+        
         editButton.MouseEnter = function ()
             editButton.Color = Color.new(0.7,0.7,0.7,1)
         end
@@ -180,13 +205,51 @@ function RefreshCustomLevels()
         editButton.MouseDown = function ()
             sfx.Select:play()
             transitions:FadeIn(0.2)
-
+            
             fading = "editor"
             fadeDelay = love.timer.getTime() + 0.5
            
             menuMusic:stop()
             menuMusicSettings:stop()
         end
+
+        local editMetadataBtn = yan:TextButton(menu.Screen, "Edit Level Info", 30, "center", "center", "/ComicNeue.ttf")
+        editMetadataBtn.Position = UIVector2.new(1, -20,1,-20)
+        editMetadataBtn.Size = UIVector2.new(0.3,0,0.1,0)
+        editMetadataBtn.AnchorPoint = Vector2.new(1, 1)
+        
+        editMetadataBtn.MouseEnter = function ()
+            editMetadataBtn.Color = Color.new(0.7,0.7,0.7,1)
+        end
+        
+        editMetadataBtn.MouseLeave = function ()
+            editMetadataBtn.Color = Color.new(1,1,1,1)
+        end
+        editMetadataBtn.MouseDown = function ()
+            sfx.Select:play()
+
+            createLevelMode = "edit"
+            yan:NewTween(newLevelPopup, yan:TweenInfo(1, EasingStyle.BackOut), {Position = UIVector2.new(0.5,0,0.5,0)}):Play()
+            newLevelTitle.Text = "Editing "..loadedMetadata.SongName
+
+            nameInputter.Text = loadedMetadata.SongName
+            artistInputter.Text = loadedMetadata.SongArtist
+            mapperInputter.Text = loadedMetadata.Charter 
+            bpmInputter.Text = tostring(loadedMetadata.BPM)
+            songPreviewTimeInputter.Text = tostring(loadedMetadata.PreviewSongTime)
+            
+            creatingLevel.SongOgg = love.filesystem.newFile(chart.."/song.ogg")
+            creatingLevel.Cover = love.filesystem.newFile(chart.."/cover"..coverfileExt)
+            creatingLevel.BG = love.filesystem.newFile(chart.."/assets/bg"..bgfileExt)
+            creatingLevel.Goose = love.filesystem.newFile(chart.."/assets/goose"..goosefileExt)
+            creatingLevel.GooseMiss = love.filesystem.newFile(chart.."/asset/goose_miss"..goosemissFileExt)
+            
+            tryagainInput.Text = loadedMetadata.DialogueTryAgain
+            okayInput.Text = loadedMetadata.DialogueOK
+            superbInput.Text = loadedMetadata.DialogueSuperb
+            perfectInput.Text = loadedMetadata.DialoguePerfect 
+        end
+
         table.insert(customChartFrames, frame)
         frame:SetParent(customLevelsContainer)
         cover:SetParent(frame)
@@ -195,8 +258,9 @@ function RefreshCustomLevels()
         playButton:SetParent(frame)
         mapper:SetParent(frame)
         editButton:SetParent(frame)
+        editMetadataBtn:SetParent(frame)
     end
-
+    
     if #customCharts ~= 0 then
         noLevelsLabel.Visible = false
     end
@@ -1107,7 +1171,7 @@ function menu:Init()
             return
         end
 
-        if love.filesystem.getInfo("/customLevels/"..nameInputter.Text) ~= nil then
+        if love.filesystem.getInfo("/customLevels/"..nameInputter.Text) ~= nil and createLevelMode == "create" then
             sfx.Error:play()
             createSongBtn.Text = "Level with same name already exists!"
             return
