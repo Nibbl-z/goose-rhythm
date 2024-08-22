@@ -142,7 +142,7 @@ function RefreshCustomLevels()
         mapper.TextColor = Color.new(0.8,0.8,0.8,1)
         
         local playButton = yan:TextButton(menu.Screen, "Play", 50, "center", "center", "/ComicNeue.ttf")
-        playButton.Position = UIVector2.new(0.5,0,1,-20)
+        playButton.Position = UIVector2.new(0.35,0,1,-20)
         playButton.Size = UIVector2.new(0.3,0,0.1,0)
         playButton.AnchorPoint = Vector2.new(0.5, 1)
         
@@ -163,6 +163,30 @@ function RefreshCustomLevels()
             menuMusic:stop()
             menuMusicSettings:stop()
         end
+
+        local editButton = yan:TextButton(menu.Screen, "Edit", 50, "center", "center", "/ComicNeue.ttf")
+        editButton.Position = UIVector2.new(0.65,10,1,-20)
+        editButton.Size = UIVector2.new(0.3,0,0.1,0)
+        editButton.AnchorPoint = Vector2.new(0.5, 1)
+        
+
+        editButton.MouseEnter = function ()
+            editButton.Color = Color.new(0.7,0.7,0.7,1)
+        end
+        
+        editButton.MouseLeave = function ()
+            editButton.Color = Color.new(1,1,1,1)
+        end
+        editButton.MouseDown = function ()
+            sfx.Select:play()
+            transitions:FadeIn(0.2)
+
+            fading = "editor"
+            fadeDelay = love.timer.getTime() + 0.5
+           
+            menuMusic:stop()
+            menuMusicSettings:stop()
+        end
         table.insert(customChartFrames, frame)
         frame:SetParent(customLevelsContainer)
         cover:SetParent(frame)
@@ -170,6 +194,7 @@ function RefreshCustomLevels()
         artist:SetParent(frame)
         playButton:SetParent(frame)
         mapper:SetParent(frame)
+        editButton:SetParent(frame)
     end
 
     if #customCharts ~= 0 then
@@ -1160,7 +1185,9 @@ function menu:Update(dt)
                 transitions:FadeOut(0.5)
                 editor.Enabled = true
                 editor:Init()
-                
+                if previewMusic ~= nil then 
+                    previewMusic:stop()
+                end
                 self.Enabled = false
                 self.Screen.Enabled = false
                 menuMusic:stop()
