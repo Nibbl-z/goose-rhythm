@@ -49,7 +49,7 @@ function pause:Init()
         self.Paused = false
         self.Unpause()
     end
-
+    
     quitEnterTween = yan:NewTween(quitButton, yan:TweenInfo(0.2, EasingStyle.QuadOut), {Size = UIVector2.new(0.5, 50, 0.15, 0), Color = Color.new(1, 86/255, 86/255, 1)})
     quitLeaveTween = yan:NewTween(quitButton, yan:TweenInfo(0.2, EasingStyle.QuadOut), {Size = UIVector2.new(0.5, 0, 0.15, 0), Color = Color.new(1, 76/255, 76/255, 1)})
     

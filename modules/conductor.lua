@@ -182,10 +182,6 @@ function conductor:LoadChart(c)
     local combineIndex = 0
     local previousBeat = nil
     
-    for _, v in ipairs(chart) do
-        v.B = v.B + 4
-    end
-    
     table.sort(chart, function (a, b)
         return a.B < b.B
     end)
