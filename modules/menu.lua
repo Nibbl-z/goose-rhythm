@@ -851,8 +851,8 @@ function menu:Init()
     --
 
     nameInputter = yan:TextInputter(self.Screen, "Enter Song Name", 30, "center", "center", "/ComicNeue.ttf")
-    nameInputter.Position = UIVector2.new(0.5,0,0.2,0)
-    nameInputter.Size = UIVector2.new(0.8,0,0.15,0)
+    nameInputter.Position = UIVector2.new(0.5,0,0.15,0)
+    nameInputter.Size = UIVector2.new(0.8,0,0.1,0)
     nameInputter.AnchorPoint = Vector2.new(0.5,0)
     nameInputter.Color = Color.new(1,1,1,1)
     nameInputter.TextColor = Color.new(0,0,0,1)
@@ -865,8 +865,8 @@ function menu:Init()
     nameInputter.MouseDown = function() sfx.Select:play() end
     
     artistInputter = yan:TextInputter(self.Screen, "Enter Artist Name", 30, "center", "center", "/ComicNeue.ttf")
-    artistInputter.Position = UIVector2.new(0.5,0,0.35,10)
-    artistInputter.Size = UIVector2.new(0.8,0,0.15,0)
+    artistInputter.Position = UIVector2.new(0.5,0,0.25,10)
+    artistInputter.Size = UIVector2.new(0.8,0,0.1,0)
     artistInputter.AnchorPoint = Vector2.new(0.5,0)
     artistInputter.Color = Color.new(1,1,1,1)
     artistInputter.TextColor = Color.new(0,0,0,1)
@@ -879,8 +879,8 @@ function menu:Init()
     artistInputter.MouseDown = function() sfx.Select:play() end
 
     mapperInputter = yan:TextInputter(self.Screen, "Enter Mapper Name (that's you!)", 30, "center", "center", "/ComicNeue.ttf")
-    mapperInputter.Position = UIVector2.new(0.5,0,0.5,20)
-    mapperInputter.Size = UIVector2.new(0.8,0,0.15,0)
+    mapperInputter.Position = UIVector2.new(0.5,0,0.35,20)
+    mapperInputter.Size = UIVector2.new(0.8,0,0.1,0)
     mapperInputter.AnchorPoint = Vector2.new(0.5,0)
     mapperInputter.Color = Color.new(1,1,1,1)
     mapperInputter.TextColor = Color.new(0,0,0,1)
@@ -892,9 +892,33 @@ function menu:Init()
     mapperInputter.MouseLeave = function () mapperInputter.Color = Color.new(1,1,1,1) end
     mapperInputter.MouseDown = function() sfx.Select:play() end
     
+    bpmInputter = yan:TextInputter(self.Screen, "Enter Song BPM", 30, "center", "center", "/ComicNeue.ttf")
+    bpmInputter.Position = UIVector2.new(0.5,0,0.45,30)
+    bpmInputter.Size = UIVector2.new(0.8,0,0.1,0)
+    bpmInputter.AnchorPoint = Vector2.new(0.5,0)
+    bpmInputter.Color = Color.new(1,1,1,1)
+    bpmInputter.TextColor = Color.new(0,0,0,1)
+    bpmInputter.ZIndex = 11
+    bpmInputter.CornerRoundness = 8
+    bpmInputter:SetParent(metadataFrame)
+    
+    bpmInputter.MouseEnter = function () bpmInputter.Color = Color.new(0.7,0.7,0.7,1) end
+    bpmInputter.MouseLeave = function () bpmInputter.Color = Color.new(1,1,1,1) end
+    bpmInputter.MouseDown = function() sfx.Select:play() end
 
-
-
+    songPreviewTimeInputter = yan:TextInputter(self.Screen, "Enter Song Preview Time", 30, "center", "center", "/ComicNeue.ttf")
+    songPreviewTimeInputter.Position = UIVector2.new(0.5,0,0.55,40)
+    songPreviewTimeInputter.Size = UIVector2.new(0.8,0,0.1,0)
+    songPreviewTimeInputter.AnchorPoint = Vector2.new(0.5,0)
+    songPreviewTimeInputter.Color = Color.new(1,1,1,1)
+    songPreviewTimeInputter.TextColor = Color.new(0,0,0,1)
+    songPreviewTimeInputter.ZIndex = 11
+    songPreviewTimeInputter.CornerRoundness = 8
+    songPreviewTimeInputter:SetParent(metadataFrame)
+    
+    songPreviewTimeInputter.MouseEnter = function () songPreviewTimeInputter.Color = Color.new(0.7,0.7,0.7,1) end
+    songPreviewTimeInputter.MouseLeave = function () songPreviewTimeInputter.Color = Color.new(1,1,1,1) end
+    songPreviewTimeInputter.MouseDown = function() sfx.Select:play() end
 
     -- ASSETS TAB
     
@@ -1067,7 +1091,19 @@ function menu:Init()
     createSongBtn.MouseDown = function() 
         if nameInputter.Text == "" then
             sfx.Error:play()
-            createSongBtn.Text = "You have to name the song, silly!"
+            createSongBtn.Text = "You have to name the song, silly goose!"
+            return
+        end
+
+        if tonumber(bpmInputter.Text) == nil then
+            sfx.Error:play()
+            createSongBtn.Text = "The BPM has to be a number, silly goose!"
+            return
+        end
+        
+        if tonumber(songPreviewTimeInputter.Text) == nil then
+            sfx.Error:play()
+            createSongBtn.Text = "The song preview time has to be a number, silly goose!"
             return
         end
 
@@ -1115,9 +1151,9 @@ function menu:Init()
         love.filesystem.createDirectory("/customLevels/"..nameInputter.Text)
         -- create metadata
         local metadataString = string.format("return {SongName = \"%s\", SongArtist = \"%s\", Charter = \"%s\",", nameInputter.Text, artistInputter.Text, mapperInputter.Text)
-        metadataString = metadataString..("BPM = 150, GooseSize = 2, PreviewSongTime = 0.0,")--todo make these modifiable
+        metadataString = metadataString..string.format("BPM = %s, GooseSize = 2, PreviewSongTime = %s,", bpmInputter.Text, songPreviewTimeInputter.Text)--todo make these modifiable
         metadataString = metadataString..string.format("DialogueTryAgain = \"%s\", DialogueOK = \"%s\", DialogueSuperb = \"%s\", DialoguePerfect = \"%s\"}", tryagainInput.Text, okayInput.Text, superbInput.Text, perfectInput.Text)
-
+        
         love.filesystem.write("/customLevels/"..nameInputter.Text.."/metadata.lua", metadataString)
         
         -- create chart.lua
