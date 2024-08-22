@@ -71,10 +71,6 @@ function Export()
 end
 
 function editor:Init()
-    for _, v in ipairs(chart) do
-        v.B = v.B - 4 
-    end
-    Export()
     loadedSong = love.audio.newSource(song, "static")
     loadedSong:setVolume(0.7)
 
@@ -274,7 +270,7 @@ function editor:Draw()
     for _, note in ipairs(chart) do
         love.graphics.circle("fill", (note.N) * 70 + xOffset, (-note.B * pixelsPerBeat + 500) + scrollOffset, 30)
         if note.D ~= nil then
-            love.graphics.rectangle("fill", (note.N) * 70 + xOffset - 10, note.Y + scrollOffset - note.D * 300, 20, note.D * 300, 10, 10)
+            love.graphics.rectangle("fill", (note.N) * 70 + xOffset - 10, (-note.B * pixelsPerBeat + 500) + scrollOffset - note.D * 300, 20, note.D * 300, 10, 10)
         end                  
     end
 
