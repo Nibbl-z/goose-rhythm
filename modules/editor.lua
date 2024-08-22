@@ -38,7 +38,9 @@ local sprites = {
     Crust = love.graphics.newImage("/img/crust.png")
 }
 
-
+local sfx = {
+    Select = love.audio.newSource("/sfx/select.wav", "static")
+}
 
 local BGSprite
 local message = ""
@@ -141,22 +143,57 @@ function editor:Init()
     messageLabel.AnchorPoint = Vector2.new(0,1)
     messageLabel.Size = UIVector2.new(1,0,0.1,0)
     messageLabel.TextColor = Color.new(1,1,1,1)
-
-    snapInput = yan:TextInputter(self.Screen, "0.5", 16, "left", "center")
+    
+    snapInput = yan:TextInputter(self.Screen, "0.5", 16, "left", "center", "/ComicNeue.ttf")
     snapInput.Position = UIVector2.new(1, -10, 0, 10)
     snapInput.Size = UIVector2.new(0.1,0,0.05,0)
     snapInput.AnchorPoint = Vector2.new(1,0)
     snapInput.TextColor = Color.new(0,0,0,1)
-    snapInput.MouseDown = function () end 
-    
+    snapInput.MouseEnter = function () snapInput.Color = Color.new(0.7,0.7,0.7,1) end 
+    snapInput.MouseLeave = function () snapInput.Color = Color.new(1,1,1,1) end 
+    snapInput.MouseDown = function () sfx.Select:play() end 
+    snapInput.CornerRoundness = 8
     snapInput.OnEnter = function ()
         if tonumber(snapInput.Text) ~= nil then
             if tonumber(snapInput.Text) > 0 then
+                sfx.Select:play()
                 snap = tonumber(snapInput.Text)
             end
         end
     end
 
+    snapLabel = yan:Label(self.Screen, "Snap", 16, "right", "center", "/ComicNeue.ttf")
+    snapLabel:SetParent(snapInput)
+    snapLabel.AnchorPoint = Vector2.new(1,0)
+    snapLabel.Position = UIVector2.new(0,-5,0,0)
+    snapLabel.Size = UIVector2.new(1,0,1,0)
+    snapLabel.TextColor = Color.new(1,1,1,1)
+
+    beatInput = yan:TextInputter(self.Screen, "0", 16, "left", "center", "/ComicNeue.ttf")
+    beatInput.Position = UIVector2.new(1, -10, 0.05, 15)
+    beatInput.Size = UIVector2.new(0.1,0,0.05,0)
+    beatInput.AnchorPoint = Vector2.new(1,0)
+    beatInput.TextColor = Color.new(0,0,0,1)
+    beatInput.MouseEnter = function () beatInput.Color = Color.new(0.7,0.7,0.7,1) end 
+    beatInput.MouseLeave = function () beatInput.Color = Color.new(1,1,1,1) end 
+    beatInput.MouseDown = function () sfx.Select:play() end 
+    beatInput.CornerRoundness = 8
+    beatInput.OnEnter = function ()
+        if tonumber(beatInput.Text) ~= nil then
+            if tonumber(beatInput.Text) >= 0 then
+                sfx.Select:play()
+                scrollOffset = tonumber(beatInput.Text) * 300
+            end
+        end
+    end
+
+    tobeatLabel = yan:Label(self.Screen, "Jump to Beat", 16, "right", "center", "/ComicNeue.ttf")
+    tobeatLabel:SetParent(beatInput)
+    tobeatLabel.AnchorPoint = Vector2.new(1,0)
+    tobeatLabel.Position = UIVector2.new(0,-5,0,0)
+    tobeatLabel.Size = UIVector2.new(1,0,1,0)
+    tobeatLabel.TextColor = Color.new(1,1,1,1)
+    
     saveBtn = yan:ImageButton(self.Screen, "/img/save.png")
     saveBtn.Size = UIVector2.new(0,40,0,40)
     saveBtn.Position = UIVector2.new(0,5,0,5)
@@ -164,6 +201,7 @@ function editor:Init()
     saveBtn.MouseEnter = function () saveBtn.Color = Color.new(0.7,0.7,0.7,1) end
     saveBtn.MouseLeave = function () saveBtn.Color = Color.new(1,1,1,1) end
     saveBtn.MouseDown = function ()
+        sfx.Select:play()
         Export()
         message = "Chart saved successfully!"
         messageResetTime = love.timer.getTime() + 3
@@ -260,6 +298,7 @@ function editor:WheelMoved(x, y)
     if love.keyboard.isDown("lctrl") then
         snapIndex = utils:Clamp(snapIndex + y, 1, #snaps)
         snap = snaps[snapIndex]
+        snapInput.Text = tostring(math.floor(snap * 1000) / 1000)
         return
     end
 
@@ -270,14 +309,25 @@ function editor:WheelMoved(x, y)
                 if chart[i].D == nil then
                     chart[i].D = 0
                 end
-
+                
                 chart[i].D = chart[i].D + snap * y
 
                 if chart[i].D < 0 then
                     chart[i].D = nil
                 end
-
+                
                 print(chart[i].D, snap * y)
+            end
+            
+            if v.D ~= nil then
+                for _, note in ipairs(chart) do
+                    if note.D ~= nil then
+                        local pX, pY, sX, sY = (note.N) * 70 + xOffset + 20, (-note.B * pixelsPerBeat + 500) + scrollOffset - note.D * 300, 20, note.D * 300
+                        if utils:CheckCollision(love.mouse.getX(), love.mouse.getY(), 1, 1, pX, pY, sX, sY) then
+                            chart[i].D = chart[i].D + snap * y
+                        end
+                    end 
+                end
             end
         end
 
@@ -312,7 +362,7 @@ function editor:Draw()
         love.graphics.line(l.x1, l.y1 + scrollOffset, l.x2, l.y2 + scrollOffset)
     end
 
-    if quadrant ~= -1 and beatQuadrant.y1 ~= nil then
+    if quadrant ~= -1 and beatQuadrant.y1 ~= nil and not playing then
         for i, v in ipairs(chart) do
             if v.B == beatQuadrant.b and v.N == quadrant then
                 love.graphics.draw(sprites.Crust, (quadrant) * 70 + xOffset, beatQuadrant.y1 + scrollOffset - 30, 0, 1.2, 1.2, 5, 5)

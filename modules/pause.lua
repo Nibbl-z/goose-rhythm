@@ -68,7 +68,7 @@ function pause:Init()
 
     quitButton.MouseDown = function ()
         sfx.Select:play()
-
+        
         if self.Type == "editor" then
             local hasSaved = self.HasSaved()
             if hasSaved == true then
