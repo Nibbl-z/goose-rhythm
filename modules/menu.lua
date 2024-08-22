@@ -57,6 +57,7 @@ local creatingLevel = {
 }
 
 local createLevelMode = "create"
+local previousLevelName = ""
 
 local droppingFile = nil
 
@@ -237,12 +238,12 @@ function RefreshCustomLevels()
             mapperInputter.Text = loadedMetadata.Charter 
             bpmInputter.Text = tostring(loadedMetadata.BPM)
             songPreviewTimeInputter.Text = tostring(loadedMetadata.PreviewSongTime)
-            
+            previousLevelName = loadedMetadata.SongName
             creatingLevel.SongOgg = love.filesystem.newFile(chart.."/song.ogg")
             creatingLevel.Cover = love.filesystem.newFile(chart.."/cover"..coverfileExt)
             creatingLevel.BG = love.filesystem.newFile(chart.."/assets/bg"..bgfileExt)
             creatingLevel.Goose = love.filesystem.newFile(chart.."/assets/goose"..goosefileExt)
-            creatingLevel.GooseMiss = love.filesystem.newFile(chart.."/asset/goose_miss"..goosemissFileExt)
+            creatingLevel.GooseMiss = love.filesystem.newFile(chart.."/assets/goose_miss"..goosemissFileExt)
             
             tryagainInput.Text = loadedMetadata.DialogueTryAgain
             okayInput.Text = loadedMetadata.DialogueOK
@@ -407,16 +408,19 @@ function menu:Init()
             previewMusic:stop()
         end
         
-        local metadata = love.filesystem.read(customCharts[customChartSelectionIndex].."/metadata.lua")
-        local loadedMetadata = loadstring(metadata)()
-
-        previewMusic = love.audio.newSource(customCharts[customChartSelectionIndex].."/song.ogg", "stream")
-        previewMusic:setVolume(0.1)
-        previewMusic:play()
-        previewMusic:seek(loadedMetadata.PreviewSongTime, "seconds")
+        if #customCharts > 0 then
+            local metadata = love.filesystem.read(customCharts[customChartSelectionIndex].."/metadata.lua")
+            local loadedMetadata = loadstring(metadata)()
+            
+            previewMusic = love.audio.newSource(customCharts[customChartSelectionIndex].."/song.ogg", "stream")
+            previewMusic:setVolume(0.1)
+            previewMusic:play()
+            previewMusic:seek(loadedMetadata.PreviewSongTime, "seconds")
+            
+            menuMusic:stop()
+            menuMusicSettings:stop()
+        end
         
-        menuMusic:stop()
-        menuMusicSettings:stop()
     end
     
     settingsBtn = yan:TextButton(self.Screen, "settings", 50, "center", "center", "/ComicNeue.ttf")
@@ -1170,12 +1174,14 @@ function menu:Init()
             createSongBtn.Text = "The song preview time has to be a number, silly goose!"
             return
         end
-
+        
         if love.filesystem.getInfo("/customLevels/"..nameInputter.Text) ~= nil and createLevelMode == "create" then
             sfx.Error:play()
             createSongBtn.Text = "Level with same name already exists!"
             return
         end
+        
+        
 
         if creatingLevel.SongOgg == nil then
             sfx.Error:play()
@@ -1221,8 +1227,16 @@ function menu:Init()
         love.filesystem.write("/customLevels/"..nameInputter.Text.."/metadata.lua", metadataString)
         
         -- create chart.lua
-
-        love.filesystem.write("/customLevels/"..nameInputter.Text.."/chart.lua", "return {}")
+        
+        if createLevelMode == "create" then
+            love.filesystem.write("/customLevels/"..nameInputter.Text.."/chart.lua", "return {}")
+        else
+            local thechart = love.filesystem.newFile("/customLevels/"..previousLevelName.."/chart.lua")
+            thechart:open("r")
+            love.filesystem.write("/customLevels/"..nameInputter.Text.."/chart.lua", thechart:read())
+            thechart:close()
+        end
+        
 
         -- create assets
         
@@ -1236,6 +1250,7 @@ function menu:Init()
         local gooseExt = creatingLevel.Goose:getFilename():match("^.+(%..+)$")
         love.filesystem.write("/customLevels/"..nameInputter.Text.."/assets/goose"..gooseExt, creatingLevel.Goose:read())
         
+        
         local goosemissExt = creatingLevel.GooseMiss:getFilename():match("^.+(%..+)$")
         love.filesystem.write("/customLevels/"..nameInputter.Text.."/assets/goose_miss"..goosemissExt, creatingLevel.GooseMiss:read())
 
@@ -1243,6 +1258,23 @@ function menu:Init()
         love.filesystem.write("/customLevels/"..nameInputter.Text.."/assets/bg"..bgExt, creatingLevel.BG:read())
         
         yan:NewTween(newLevelPopup, yan:TweenInfo(1, EasingStyle.BackIn), {Position = UIVector2.new(0.5,0,1.5,0)}):Play()
+        
+        if love.filesystem.getInfo("/customLevels/"..previousLevelName) ~= nil and createLevelMode == "edit" and previousLevelName ~= nameInputter.Text then
+            local function recursivelyDelete(item)
+                if love.filesystem.getInfo(item).type == "directory" then
+                    for _, child in ipairs(love.filesystem.getDirectoryItems(item)) do
+                        recursivelyDelete(item..'/'..child)
+                        love.filesystem.remove(item..'/'..child)
+                    end
+                elseif love.filesystem.getInfo(item).type == "file" then
+                    love.filesystem.remove(item)
+                end
+                love.filesystem.remove(item)
+            end
+
+            recursivelyDelete("/customLevels/"..previousLevelName)
+            love.filesystem.remove("/customLevels/"..previousLevelName)
+        end
     end
 
     RefreshCustomLevels()
