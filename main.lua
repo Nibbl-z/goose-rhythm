@@ -211,7 +211,7 @@ function love.update(dt)
             menu:Reset()
             fading = false
             editor.Screen.Enabled = false
-
+            conductor.IsSong = false
             
             pause.Paused = false
             pause.Screen.Enabled = false

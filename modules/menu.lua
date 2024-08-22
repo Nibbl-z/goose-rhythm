@@ -83,6 +83,20 @@ function RefreshCustomLevels()
     customCharts = {}
 
     for _, v in ipairs(customChartFrames) do
+        --[[for i, v2 in ipairs(v.Children) do
+            print(i)
+            v2.Visible = false
+           
+            table.remove(v.Children, i)
+            v2 = nil
+            print(v2)
+        end]]
+        v.Position = UIVector2.new(100,0,0,0)
+        v.Visible =false
+        v = nil
+    end
+    for i, v in ipairs(customLevelsContainer.Children) do
+        table.remove(customLevelsContainer.Children, i)
         v = nil
     end
     customChartFrames = {}
@@ -251,7 +265,7 @@ function RefreshCustomLevels()
             perfectInput.Text = loadedMetadata.DialoguePerfect 
         end
 
-        table.insert(customChartFrames, frame)
+        
         frame:SetParent(customLevelsContainer)
         cover:SetParent(frame)
         title:SetParent(frame)
@@ -260,6 +274,8 @@ function RefreshCustomLevels()
         mapper:SetParent(frame)
         editButton:SetParent(frame)
         editMetadataBtn:SetParent(frame)
+
+        table.insert(customChartFrames, frame)
     end
     
     if #customCharts ~= 0 then
@@ -1275,6 +1291,8 @@ function menu:Init()
             recursivelyDelete("/customLevels/"..previousLevelName)
             love.filesystem.remove("/customLevels/"..previousLevelName)
         end
+
+        RefreshCustomLevels()
     end
 
     RefreshCustomLevels()
