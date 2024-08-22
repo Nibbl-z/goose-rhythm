@@ -250,7 +250,7 @@ function menu:Init()
         if menuMoving then return end
         menuMoving = true
         menuStopMovingDelay = love.timer.getTime() + 1
-
+        
         sfx.Select:play()
         page = "main"
         yan:NewTween(levelsContainer, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(0, 0, 0, 0)}):Play()
@@ -266,11 +266,9 @@ function menu:Init()
 
         conductor.BPM = 128
         conductor:Init()
-
+        
         levelsBackBtn.Color = Color.new(1,1,1,1)
     end
-
-    
     
     for i, chart in ipairs(charts) do
         local metadata = love.filesystem.read(chart.."/metadata.lua")
@@ -470,10 +468,206 @@ function menu:Init()
         
     end
     
-    
     function volumeSlider.OnSlide(value)
         settings.MusicVolume = value
     end
+    
+    --// CUSTOM LEVELS \\--
+
+    customLevelsContainer = yan:Frame(self.Screen)
+    customLevelsContainer.Size = UIVector2.new(1,0,1,0)
+    customLevelsContainer.Color = Color.new(0,0,0,0)
+    customLevelsContainer:SetParent(customLevelsPage)
+    
+    customLevelsBackBtn = yan:ImageButton(self.Screen, "/img/back_btn.png")
+    customLevelsBackBtn.Size = UIVector2.new(0,50,0,50)
+    customLevelsBackBtn.Position = UIVector2.new(0,10,0,10)
+    customLevelsBackBtn:SetParent(customLevelsPage)
+    customLevelsBackBtn.ZIndex = 10
+    customLevelsBackBtn.MouseEnter = function ()
+        customLevelsBackBtn.Color = Color.new(0.7,0.7,0.7,1)
+    end
+    
+    customLevelsBackBtn.MouseLeave = function ()
+        customLevelsBackBtn.Color = Color.new(1,1,1,1)
+    end
+    
+    customLevelsBackBtn.MouseDown = function ()
+        if menuMoving then return end
+        menuMoving = true
+        menuStopMovingDelay = love.timer.getTime() + 1
+        sfx.Select:play()
+        page = "main"
+        --yan:NewTween(levelsContainer, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(0, 0, 0, 0)}):Play()
+        yan:NewTween(mainPage, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(0,0,0,0)}):Play()
+        yan:NewTween(customLevelsPage, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(1,0,0,0)}):Play()
+        
+        menuMusic:play()
+        menuMusicSettings:play()
+        
+        conductor.BPM = 128
+        conductor:Init()
+        
+        customLevelsBackBtn.Color = Color.new(1,1,1,1)
+    end
+    
+    newLevelBtn = yan:ImageButton(self.Screen, "/img/new_level.png")
+    newLevelBtn.Size = UIVector2.new(0,50,0,50)
+    newLevelBtn.Position = UIVector2.new(1,-60,0,10)
+    newLevelBtn:SetParent(customLevelsPage)
+    newLevelBtn.ZIndex = 10
+    newLevelBtn.MouseEnter = function ()
+        newLevelBtn.Color = Color.new(0.7,0.7,0.7,1)
+    end
+    
+    newLevelBtn.MouseLeave = function ()
+        newLevelBtn.Color = Color.new(1,1,1,1)
+    end
+    
+    newLevelBtn.MouseDown = function ()
+        newLevelBtn.Color = Color.new(1,1,1,1)
+    end
+
+    noLevelsLabel = yan:Label(self.Screen, "You have no custom levels! Try creating one by pressing the + button at the top.", 64, "center", "center", "/ComicNeue.ttf")
+    noLevelsLabel.Parent = customLevelsPage
+    noLevelsLabel.TextColor = Color.new(1,1,1,1)
+
+    newLevelPopup = yan:Frame(self.Screen)
+    newLevelPopup.Position = UIVector2.new(0.5,0,2.5,0)
+    newLevelPopup.Size = UIVector2.new(0.7,0,0.7,0)
+    newLevelPopup.Color = Color.new(0.1,0.1,0.1,1)
+    newLevelPopup.AnchorPoint = Vector2.new(0.5,0.5)
+    newLevelPopup.CornerRoundness = 8
+    newLevelPopup.ZIndex = 10
+    
+    newLevelTitle = yan:Label(self.Screen, "Creating New Level", 40, "center", "center", "/ComicNeue.ttf")
+    newLevelTitle.TextColor = Color.new(1,1,1,1)
+    newLevelTitle.Size = UIVector2.new(1,0,0.1,0)
+    newLevelTitle.AnchorPoint = Vector2.new(0,1)
+    newLevelTitle.ZIndex = 11
+    newLevelTitle:SetParent(newLevelPopup)
+    
+    -- tabs
+    
+    local currentTab = "metadata"
+
+    metadataFrame = yan:Frame(self.Screen)
+    metadataFrame.Color = Color.new(0,0,0,0)
+    metadataFrame:SetParent(newLevelPopup)
+
+    metadataTabBtn = yan:TextButton(self.Screen, "Song Metadata", 20, "center", "center", "/ComicNeue.ttf")
+    metadataTabBtn.Position = UIVector2.new(0,10,0,10)
+    metadataTabBtn.Size = UIVector2.new(0.33,-10,0.1,0)
+    metadataTabBtn.AnchorPoint = Vector2.new(0,0)
+    metadataTabBtn.Color = Color.new(1,1,1,1)
+    metadataTabBtn.TextColor = Color.new(0,0,0,1)
+    metadataTabBtn.ZIndex = 11
+    metadataTabBtn.CornerRoundness = 8
+    metadataTabBtn:SetParent(newLevelPopup)
+    
+    metadataTabBtn.MouseEnter = function () if currentTab ~= "metadata" then metadataTabBtn.Color = Color.new(0.7,0.7,0.7,1) end end
+    metadataTabBtn.MouseLeave = function () if currentTab ~= "metadata" then metadataTabBtn.Color = Color.new(1,1,1,1) end end
+    metadataTabBtn.MouseDown = function()
+        currentTab = "metadata"
+        metadataFrame.Position = UIVector2.new(0,0,0,0)
+        metadataTabBtn.Color = Color.new(0.5,0.5,0.5,1)
+    end
+
+    assetsTabBtn = yan:TextButton(self.Screen, "Assets", 20, "center", "center", "/ComicNeue.ttf")
+    assetsTabBtn.Position = UIVector2.new(0.33,7,0,10)
+    assetsTabBtn.Size = UIVector2.new(0.33,-10,0.1,0)
+    assetsTabBtn.AnchorPoint = Vector2.new(0,0)
+    assetsTabBtn.Color = Color.new(1,1,1,1)
+    assetsTabBtn.TextColor = Color.new(0,0,0,1)
+    assetsTabBtn.ZIndex = 11
+    assetsTabBtn.CornerRoundness = 8
+    assetsTabBtn:SetParent(newLevelPopup)
+    
+    assetsTabBtn.MouseEnter = function () assetsTabBtn.Color = Color.new(0.7,0.7,0.7,1) end
+    assetsTabBtn.MouseLeave = function () assetsTabBtn.Color = Color.new(1,1,1,1) end
+    assetsTabBtn.MouseDown = function() 
+        currentTab = "assets"
+        metadataFrame.Position = UIVector2.new(0,0,-5,0)
+        metadataTabBtn.Color = Color.new(1,1,1,1)
+    end
+
+    dialogueTabBtn = yan:TextButton(self.Screen, "Results Dialogue", 20, "center", "center", "/ComicNeue.ttf")
+    dialogueTabBtn.Position = UIVector2.new(0.66,5,0,10)
+    dialogueTabBtn.Size = UIVector2.new(0.33,-10,0.1,0)
+    dialogueTabBtn.AnchorPoint = Vector2.new(0,0)
+    dialogueTabBtn.Color = Color.new(1,1,1,1)
+    dialogueTabBtn.TextColor = Color.new(0,0,0,1)
+    dialogueTabBtn.ZIndex = 11
+    dialogueTabBtn.CornerRoundness = 8
+    dialogueTabBtn:SetParent(newLevelPopup)
+    
+    dialogueTabBtn.MouseEnter = function () dialogueTabBtn.Color = Color.new(0.7,0.7,0.7,1) end
+    dialogueTabBtn.MouseLeave = function () dialogueTabBtn.Color = Color.new(1,1,1,1) end
+    dialogueTabBtn.MouseDown = function() 
+        currentTab = "dialogue"
+        metadataFrame.Position = UIVector2.new(0,0,-5,0)
+        metadataTabBtn.Color = Color.new(1,1,1,1)
+    end
+    
+    -- METADATA TAB
+
+    
+
+    nameInputter = yan:TextInputter(self.Screen, "Enter Song Name", 30, "center", "center", "/ComicNeue.ttf")
+    nameInputter.Position = UIVector2.new(0.5,0,0.2,0)
+    nameInputter.Size = UIVector2.new(0.8,0,0.15,0)
+    nameInputter.AnchorPoint = Vector2.new(0.5,0)
+    nameInputter.Color = Color.new(1,1,1,1)
+    nameInputter.TextColor = Color.new(0,0,0,1)
+    nameInputter.ZIndex = 11
+    nameInputter.CornerRoundness = 8
+    nameInputter:SetParent(metadataFrame)
+    
+    nameInputter.MouseEnter = function () nameInputter.Color = Color.new(0.7,0.7,0.7,1) end
+    nameInputter.MouseLeave = function () nameInputter.Color = Color.new(1,1,1,1) end
+    nameInputter.MouseDown = function() end
+    
+    artistInputter = yan:TextInputter(self.Screen, "Enter Artist Name", 30, "center", "center", "/ComicNeue.ttf")
+    artistInputter.Position = UIVector2.new(0.5,0,0.35,10)
+    artistInputter.Size = UIVector2.new(0.8,0,0.15,0)
+    artistInputter.AnchorPoint = Vector2.new(0.5,0)
+    artistInputter.Color = Color.new(1,1,1,1)
+    artistInputter.TextColor = Color.new(0,0,0,1)
+    artistInputter.ZIndex = 11
+    artistInputter.CornerRoundness = 8
+    artistInputter:SetParent(metadataFrame)
+    
+    artistInputter.MouseEnter = function () artistInputter.Color = Color.new(0.7,0.7,0.7,1) end
+    artistInputter.MouseLeave = function () artistInputter.Color = Color.new(1,1,1,1) end
+    artistInputter.MouseDown = function() end
+
+    mapperInputter = yan:TextInputter(self.Screen, "Enter Mapper Name (that's you!)", 30, "center", "center", "/ComicNeue.ttf")
+    mapperInputter.Position = UIVector2.new(0.5,0,0.5,20)
+    mapperInputter.Size = UIVector2.new(0.8,0,0.15,0)
+    mapperInputter.AnchorPoint = Vector2.new(0.5,0)
+    mapperInputter.Color = Color.new(1,1,1,1)
+    mapperInputter.TextColor = Color.new(0,0,0,1)
+    mapperInputter.ZIndex = 11
+    mapperInputter.CornerRoundness = 8
+    mapperInputter:SetParent(metadataFrame)
+    
+    mapperInputter.MouseEnter = function () mapperInputter.Color = Color.new(0.7,0.7,0.7,1) end
+    mapperInputter.MouseLeave = function () mapperInputter.Color = Color.new(1,1,1,1) end
+    mapperInputter.MouseDown = function() end
+
+    createSongBtn = yan:TextButton(self.Screen, "Create Level", 30, "center", "center", "/ComicNeue.ttf")
+    createSongBtn.Position = UIVector2.new(0.5,0,1,-20)
+    createSongBtn.Size = UIVector2.new(0.8,0,0.15,0)
+    createSongBtn.AnchorPoint = Vector2.new(0.5,1)
+    createSongBtn.Color = Color.new(1,1,1,1)
+    createSongBtn.TextColor = Color.new(0,0,0,1)
+    createSongBtn.ZIndex = 11
+    createSongBtn.CornerRoundness = 8
+    createSongBtn:SetParent(newLevelPopup)
+    
+    createSongBtn.MouseEnter = function () createSongBtn.Color = Color.new(0.7,0.7,0.7,1) end
+    createSongBtn.MouseLeave = function () createSongBtn.Color = Color.new(1,1,1,1) end
+    createSongBtn.MouseDown = function() end
 end
 
 function menu:Draw()
@@ -629,7 +823,7 @@ function menu:KeyPressed(key)
         if key == "escape" and not menuMoving then
             menuMoving = true
             menuStopMovingDelay = love.timer.getTime() + 1
-
+            
             page = "main"
             --yan:NewTween(levelsContainer, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(0, 0, 0, 0)}):Play()
             yan:NewTween(mainPage, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(0,0,0,0)}):Play()
