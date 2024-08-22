@@ -40,7 +40,12 @@ local menuStopMovingDelay = -1
 local creatingLevel = {
     SongName = "",
     SongArtist = "",
-    Charter = ""
+    Charter = "",
+    SongOgg = nil,
+    BG = nil,
+    Goose = nil,
+    GooseMiss = nil,
+    Cover = nil
 }
 local droppingFile = nil
 
@@ -698,9 +703,9 @@ function menu:Init()
 
     -- ASSETS TAB
     
-    songInput = yan:TextButton(self.Screen, "Choose Song", 30, "center", "center", "/ComicNeue.ttf")
-    songInput.Position = UIVector2.new(0.5,0,0.2,0)
-    songInput.Size = UIVector2.new(0.8,0,0.15,0)
+    songInput = yan:TextButton(self.Screen, "Choose Song", 25, "center", "center", "/ComicNeue.ttf")
+    songInput.Position = UIVector2.new(0.5,0,0.15,0)
+    songInput.Size = UIVector2.new(0.8,0,0.1,0)
     songInput.AnchorPoint = Vector2.new(0.5,0)
     songInput.Color = Color.new(1,1,1,1)
     songInput.TextColor = Color.new(0,0,0,1)
@@ -715,13 +720,73 @@ function menu:Init()
         droppingFile = "song"
     end
     
+    coverInput = yan:TextButton(self.Screen, "Choose Cover Art", 25, "center", "center", "/ComicNeue.ttf")
+    coverInput.Position = UIVector2.new(0.5,0,0.25,10)
+    coverInput.Size = UIVector2.new(0.8,0,0.1,0)
+    coverInput.AnchorPoint = Vector2.new(0.5,0)
+    coverInput.Color = Color.new(1,1,1,1)
+    coverInput.TextColor = Color.new(0,0,0,1)
+    coverInput.ZIndex = 11
+    coverInput.CornerRoundness = 8
+    coverInput:SetParent(assetsFrame)
     
+    coverInput.MouseEnter = function () coverInput.Color = Color.new(0.7,0.7,0.7,1) end
+    coverInput.MouseLeave = function () coverInput.Color = Color.new(1,1,1,1) end
+    coverInput.MouseDown = function() 
+        coverInput.Text = "Drop an image onto the window"
+        droppingFile = "cover"
+    end
     
+    bgInput = yan:TextButton(self.Screen, "Choose Background Image (800x600)", 25, "center", "center", "/ComicNeue.ttf")
+    bgInput.Position = UIVector2.new(0.5,0,0.35,20)
+    bgInput.Size = UIVector2.new(0.8,0,0.1,0)
+    bgInput.AnchorPoint = Vector2.new(0.5,0)
+    bgInput.Color = Color.new(1,1,1,1)
+    bgInput.TextColor = Color.new(0,0,0,1)
+    bgInput.ZIndex = 11
+    bgInput.CornerRoundness = 8
+    bgInput:SetParent(assetsFrame)
     
+    bgInput.MouseEnter = function () bgInput.Color = Color.new(0.7,0.7,0.7,1) end
+    bgInput.MouseLeave = function () bgInput.Color = Color.new(1,1,1,1) end
+    bgInput.MouseDown = function() 
+        bgInput.Text = "Drop an image onto the window"
+        droppingFile = "bg"
+    end
     
+    gooseInput = yan:TextButton(self.Screen, "Choose Goose Sprite (50x50)", 25, "center", "center", "/ComicNeue.ttf")
+    gooseInput.Position = UIVector2.new(0.5,0,0.45,30)
+    gooseInput.Size = UIVector2.new(0.8,0,0.1,0)
+    gooseInput.AnchorPoint = Vector2.new(0.5,0)
+    gooseInput.Color = Color.new(1,1,1,1)
+    gooseInput.TextColor = Color.new(0,0,0,1)
+    gooseInput.ZIndex = 11
+    gooseInput.CornerRoundness = 8
+    gooseInput:SetParent(assetsFrame)
     
+    gooseInput.MouseEnter = function () gooseInput.Color = Color.new(0.7,0.7,0.7,1) end
+    gooseInput.MouseLeave = function () gooseInput.Color = Color.new(1,1,1,1) end
+    gooseInput.MouseDown = function() 
+        gooseInput.Text = "Drop an image onto the window"
+        droppingFile = "goose"
+    end
     
+    gooseMissInput = yan:TextButton(self.Screen, "Choose Goose Miss Sprite (50x50)", 25, "center", "center", "/ComicNeue.ttf")
+    gooseMissInput.Position = UIVector2.new(0.5,0,0.55,40)
+    gooseMissInput.Size = UIVector2.new(0.8,0,0.1,0)
+    gooseMissInput.AnchorPoint = Vector2.new(0.5,0)
+    gooseMissInput.Color = Color.new(1,1,1,1)
+    gooseMissInput.TextColor = Color.new(0,0,0,1)
+    gooseMissInput.ZIndex = 11
+    gooseMissInput.CornerRoundness = 8
+    gooseMissInput:SetParent(assetsFrame)
     
+    gooseMissInput.MouseEnter = function () gooseMissInput.Color = Color.new(0.7,0.7,0.7,1) end
+    gooseMissInput.MouseLeave = function () gooseMissInput.Color = Color.new(1,1,1,1) end
+    gooseMissInput.MouseDown = function() 
+        gooseMissInput.Text = "Drop an image onto the window"
+        droppingFile = "goosemiss"
+    end
     
     
     
@@ -913,16 +978,96 @@ end
 
 function love.filedropped(file)
     if droppingFile == nil then return end
-
+    
     if droppingFile == "song" then
+        
         droppingFile = nil
         
+        if file:getFilename():match("^.+(%..+)$") ~= ".ogg" then 
+            songInput.Text = "File must be a .ogg"
+            return
+        end
+
+        creatingLevel.SongOgg = file
+
+        
+
         local t={}
         for str in string.gmatch(file:getFilename(), "([^".."\\".."]+)") do
             table.insert(t, str)
         end
-
+        
         songInput.Text = t[#t]
+    end
+    
+    if droppingFile == "cover" then
+        droppingFile = nil
+        
+        local fileExt = file:getFilename():match("^.+(%..+)$")
+        
+        if fileExt ~= ".png" and fileExt ~= ".jpg" and fileExt ~= ".jpeg" and fileExt ~= ".bmp" then
+            coverInput.Text = "File must be a .png, .jpg, .jpeg, or .bmp"
+            return
+        end
+
+        creatingLevel.Cover = file
+        local t={}
+        for str in string.gmatch(file:getFilename(), "([^".."\\".."]+)") do
+            table.insert(t, str)
+        end
+        
+        coverInput.Text = t[#t]
+    end
+
+    if droppingFile == "bg" then
+        droppingFile = nil
+        local fileExt = file:getFilename():match("^.+(%..+)$")
+        
+        if fileExt ~= ".png" and fileExt ~= ".jpg" and fileExt ~= ".jpeg" and fileExt ~= ".bmp" then
+            bgInput.Text = "File must be a .png, .jpg, .jpeg, or .bmp"
+            return
+        end
+        creatingLevel.BG = file
+        local t={}
+        for str in string.gmatch(file:getFilename(), "([^".."\\".."]+)") do
+            table.insert(t, str)
+        end
+        
+        bgInput.Text = t[#t]
+    end
+
+    if droppingFile == "goose" then
+        droppingFile = nil
+        local fileExt = file:getFilename():match("^.+(%..+)$")
+        
+        if fileExt ~= ".png" and fileExt ~= ".jpg" and fileExt ~= ".jpeg" and fileExt ~= ".bmp" then
+            gooseInput.Text = "File must be a .png, .jpg, .jpeg, or .bmp"
+            return
+        end
+        creatingLevel.Goose = file
+        local t={}
+        for str in string.gmatch(file:getFilename(), "([^".."\\".."]+)") do
+            table.insert(t, str)
+        end
+        
+        gooseInput.Text = t[#t]
+    end
+
+    if droppingFile == "goosemiss" then
+        droppingFile = nil
+        local fileExt = file:getFilename():match("^.+(%..+)$")
+        
+        if fileExt ~= ".png" and fileExt ~= ".jpg" and fileExt ~= ".jpeg" and fileExt ~= ".bmp" then
+            gooseMissInput.Text = "File must be a .png, .jpg, .jpeg, or .bmp"
+            return
+        end
+        creatingLevel.GooseMiss = file
+        local t={}
+        for str in string.gmatch(file:getFilename(), "([^".."\\".."]+)") do
+            table.insert(t, str)
+        end
+        
+        gooseMissInput.Text = t[#t]
     end
 end
 
