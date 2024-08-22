@@ -37,6 +37,13 @@ local choosingButton = nil
 local menuMoving = false
 local menuStopMovingDelay = -1
 
+local creatingLevel = {
+    SongName = "",
+    SongArtist = "",
+    Charter = ""
+}
+local droppingFile = nil
+
 function menu:Reset()
     page = "main"
     transitions:FadeIn(0)
@@ -472,7 +479,27 @@ function menu:Init()
         settings.MusicVolume = value
     end
     
+
+
+
+
+
+
+
+
+
+
     --// CUSTOM LEVELS \\--
+
+
+
+
+
+
+
+
+
+
 
     customLevelsContainer = yan:Frame(self.Screen)
     customLevelsContainer.Size = UIVector2.new(1,0,1,0)
@@ -526,6 +553,8 @@ function menu:Init()
     
     newLevelBtn.MouseDown = function ()
         newLevelBtn.Color = Color.new(1,1,1,1)
+        
+        yan:NewTween(newLevelPopup, yan:TweenInfo(1, EasingStyle.BackOut), {Position = UIVector2.new(0.5,0,0.5,0)}):Play()
     end
 
     noLevelsLabel = yan:Label(self.Screen, "You have no custom levels! Try creating one by pressing the + button at the top.", 64, "center", "center", "/ComicNeue.ttf")
@@ -555,6 +584,11 @@ function menu:Init()
     metadataFrame.Color = Color.new(0,0,0,0)
     metadataFrame:SetParent(newLevelPopup)
 
+    assetsFrame = yan:Frame(self.Screen)
+    assetsFrame.Position = UIVector2.new(0,0,-5,0)
+    assetsFrame.Color = Color.new(0,0,0,0)
+    assetsFrame:SetParent(newLevelPopup)
+
     metadataTabBtn = yan:TextButton(self.Screen, "Song Metadata", 20, "center", "center", "/ComicNeue.ttf")
     metadataTabBtn.Position = UIVector2.new(0,10,0,10)
     metadataTabBtn.Size = UIVector2.new(0.33,-10,0.1,0)
@@ -570,6 +604,7 @@ function menu:Init()
     metadataTabBtn.MouseDown = function()
         currentTab = "metadata"
         metadataFrame.Position = UIVector2.new(0,0,0,0)
+        assetsFrame.Position = UIVector2.new(0,0,-5,0)
         metadataTabBtn.Color = Color.new(0.5,0.5,0.5,1)
     end
 
@@ -588,6 +623,7 @@ function menu:Init()
     assetsTabBtn.MouseDown = function() 
         currentTab = "assets"
         metadataFrame.Position = UIVector2.new(0,0,-5,0)
+        assetsFrame.Position = UIVector2.new(0,0,0,0)
         metadataTabBtn.Color = Color.new(1,1,1,1)
     end
 
@@ -606,12 +642,13 @@ function menu:Init()
     dialogueTabBtn.MouseDown = function() 
         currentTab = "dialogue"
         metadataFrame.Position = UIVector2.new(0,0,-5,0)
+        assetsFrame.Position = UIVector2.new(0,0,-5,0)
         metadataTabBtn.Color = Color.new(1,1,1,1)
     end
     
     -- METADATA TAB
-
-    
+    --
+    --
 
     nameInputter = yan:TextInputter(self.Screen, "Enter Song Name", 30, "center", "center", "/ComicNeue.ttf")
     nameInputter.Position = UIVector2.new(0.5,0,0.2,0)
@@ -654,6 +691,42 @@ function menu:Init()
     mapperInputter.MouseEnter = function () mapperInputter.Color = Color.new(0.7,0.7,0.7,1) end
     mapperInputter.MouseLeave = function () mapperInputter.Color = Color.new(1,1,1,1) end
     mapperInputter.MouseDown = function() end
+    
+
+
+
+
+    -- ASSETS TAB
+    
+    songInput = yan:TextButton(self.Screen, "Choose Song", 30, "center", "center", "/ComicNeue.ttf")
+    songInput.Position = UIVector2.new(0.5,0,0.2,0)
+    songInput.Size = UIVector2.new(0.8,0,0.15,0)
+    songInput.AnchorPoint = Vector2.new(0.5,0)
+    songInput.Color = Color.new(1,1,1,1)
+    songInput.TextColor = Color.new(0,0,0,1)
+    songInput.ZIndex = 11
+    songInput.CornerRoundness = 8
+    songInput:SetParent(assetsFrame)
+    
+    songInput.MouseEnter = function () songInput.Color = Color.new(0.7,0.7,0.7,1) end
+    songInput.MouseLeave = function () songInput.Color = Color.new(1,1,1,1) end
+    songInput.MouseDown = function() 
+        songInput.Text = "Drop an .ogg onto the window"
+        droppingFile = "song"
+    end
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 
     createSongBtn = yan:TextButton(self.Screen, "Create Level", 30, "center", "center", "/ComicNeue.ttf")
     createSongBtn.Position = UIVector2.new(0.5,0,1,-20)
@@ -835,6 +908,21 @@ function menu:KeyPressed(key)
             conductor.BPM = 128
             conductor:Init()
         end
+    end
+end
+
+function love.filedropped(file)
+    if droppingFile == nil then return end
+
+    if droppingFile == "song" then
+        droppingFile = nil
+        
+        local t={}
+        for str in string.gmatch(file:getFilename(), "([^".."\\".."]+)") do
+            table.insert(t, str)
+        end
+
+        songInput.Text = t[#t]
     end
 end
 
