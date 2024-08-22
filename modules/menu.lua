@@ -594,6 +594,11 @@ function menu:Init()
     assetsFrame.Color = Color.new(0,0,0,0)
     assetsFrame:SetParent(newLevelPopup)
 
+    dialogueFrame = yan:Frame(self.Screen)
+    dialogueFrame.Position = UIVector2.new(0,0,-5,0)
+    dialogueFrame.Color = Color.new(0,0,0,0)
+    dialogueFrame:SetParent(newLevelPopup)
+
     metadataTabBtn = yan:TextButton(self.Screen, "Song Metadata", 20, "center", "center", "/ComicNeue.ttf")
     metadataTabBtn.Position = UIVector2.new(0,10,0,10)
     metadataTabBtn.Size = UIVector2.new(0.33,-10,0.1,0)
@@ -610,6 +615,7 @@ function menu:Init()
         currentTab = "metadata"
         metadataFrame.Position = UIVector2.new(0,0,0,0)
         assetsFrame.Position = UIVector2.new(0,0,-5,0)
+        dialogueFrame.Position = UIVector2.new(0,0,-5,0)
         metadataTabBtn.Color = Color.new(0.5,0.5,0.5,1)
     end
 
@@ -629,6 +635,7 @@ function menu:Init()
         currentTab = "assets"
         metadataFrame.Position = UIVector2.new(0,0,-5,0)
         assetsFrame.Position = UIVector2.new(0,0,0,0)
+        dialogueFrame.Position = UIVector2.new(0,0,-5,0)
         metadataTabBtn.Color = Color.new(1,1,1,1)
     end
 
@@ -648,6 +655,7 @@ function menu:Init()
         currentTab = "dialogue"
         metadataFrame.Position = UIVector2.new(0,0,-5,0)
         assetsFrame.Position = UIVector2.new(0,0,-5,0)
+        dialogueFrame.Position = UIVector2.new(0,0,0,0)
         metadataTabBtn.Color = Color.new(1,1,1,1)
     end
     
@@ -789,9 +797,63 @@ function menu:Init()
     end
     
     
+    -- DIALOGUE TABB
     
+    tryagainInput = yan:TextInputter(self.Screen, "Enter Try Again Dialogue", 30, "center", "center", "/ComicNeue.ttf")
+    tryagainInput.Position = UIVector2.new(0.5,0,0.2,0)
+    tryagainInput.Size = UIVector2.new(0.8,0,0.1,0)
+    tryagainInput.AnchorPoint = Vector2.new(0.5,0)
+    tryagainInput.Color = Color.new(1,1,1,1)
+    tryagainInput.TextColor = Color.new(0,0,0,1)
+    tryagainInput.ZIndex = 11
+    tryagainInput.CornerRoundness = 8
+    tryagainInput:SetParent(dialogueFrame)
     
+    tryagainInput.MouseEnter = function () tryagainInput.Color = Color.new(0.7,0.7,0.7,1) end
+    tryagainInput.MouseLeave = function () tryagainInput.Color = Color.new(1,1,1,1) end
+    tryagainInput.MouseDown = function() end
     
+    okayInput = yan:TextInputter(self.Screen, "Enter OK Dialogue", 30, "center", "center", "/ComicNeue.ttf")
+    okayInput.Position = UIVector2.new(0.5,0,0.3,10)
+    okayInput.Size = UIVector2.new(0.8,0,0.1,0)
+    okayInput.AnchorPoint = Vector2.new(0.5,0)
+    okayInput.Color = Color.new(1,1,1,1)
+    okayInput.TextColor = Color.new(0,0,0,1)
+    okayInput.ZIndex = 11
+    okayInput.CornerRoundness = 8
+    okayInput:SetParent(dialogueFrame)
+    
+    okayInput.MouseEnter = function () okayInput.Color = Color.new(0.7,0.7,0.7,1) end
+    okayInput.MouseLeave = function () okayInput.Color = Color.new(1,1,1,1) end
+    okayInput.MouseDown = function() end
+
+    superbInput = yan:TextInputter(self.Screen, "Enter Superb Dialogue", 30, "center", "center", "/ComicNeue.ttf")
+    superbInput.Position = UIVector2.new(0.5,0,0.4,20)
+    superbInput.Size = UIVector2.new(0.8,0,0.1,0)
+    superbInput.AnchorPoint = Vector2.new(0.5,0)
+    superbInput.Color = Color.new(1,1,1,1)
+    superbInput.TextColor = Color.new(0,0,0,1)
+    superbInput.ZIndex = 11
+    superbInput.CornerRoundness = 8
+    superbInput:SetParent(dialogueFrame)
+    
+    superbInput.MouseEnter = function () superbInput.Color = Color.new(0.7,0.7,0.7,1) end
+    superbInput.MouseLeave = function () superbInput.Color = Color.new(1,1,1,1) end
+    superbInput.MouseDown = function() end
+    
+    perfectInput = yan:TextInputter(self.Screen, "Enter Perfect Dialogue", 30, "center", "center", "/ComicNeue.ttf")
+    perfectInput.Position = UIVector2.new(0.5,0,0.5,30)
+    perfectInput.Size = UIVector2.new(0.8,0,0.1,0)
+    perfectInput.AnchorPoint = Vector2.new(0.5,0)
+    perfectInput.Color = Color.new(1,1,1,1)
+    perfectInput.TextColor = Color.new(0,0,0,1)
+    perfectInput.ZIndex = 11
+    perfectInput.CornerRoundness = 8
+    perfectInput:SetParent(dialogueFrame)
+    
+    perfectInput.MouseEnter = function () perfectInput.Color = Color.new(0.7,0.7,0.7,1) end
+    perfectInput.MouseLeave = function () perfectInput.Color = Color.new(1,1,1,1) end
+    perfectInput.MouseDown = function() end
 
     createSongBtn = yan:TextButton(self.Screen, "Create Level", 30, "center", "center", "/ComicNeue.ttf")
     createSongBtn.Position = UIVector2.new(0.5,0,1,-20)
