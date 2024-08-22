@@ -410,7 +410,7 @@ function love.draw()
                     for _, n in ipairs(v.N) do
                         if v.D[tostring(n)] ~= nil then
                             love.graphics.stencil(function ()
-                                love.graphics.rectangle("fill", 0,0,800,500)
+                                love.graphics.rectangle("fill", 0,0,800,470)
                             end, "replace", 1)
                             love.graphics.setStencilTest("greater", 0)
                             love.graphics.setColor(1, 183/255, 135/255)

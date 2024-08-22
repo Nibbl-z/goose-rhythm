@@ -12,7 +12,7 @@ editor.Enabled = false
 local scrollOffset = 0
 local quadrant = -1
 local totalYOffset = 100
-local xOffset = (love.graphics.getWidth() - 4 * 70) / 2 - 35
+local xOffset = (love.graphics.getWidth() - 4 * 70) / 2 - 60
 local snap = 0.5
 local beats = 8
 local beatQuadrant = {}
@@ -31,6 +31,13 @@ local playing = false
 local minVisibleBeat = 0
 local maxVisibleBeat = 6
 
+local sprites = {
+    Bread = love.graphics.newImage("/img/bread.png"),
+    Crust = love.graphics.newImage("/img/crust.png")
+}
+
+local BGSprite
+
 function editor:LoadChart(c)
     chartPath = c
     local chartData = love.filesystem.read(c.."/chart.lua")
@@ -41,6 +48,17 @@ function editor:LoadChart(c)
     
     loadedSong = love.audio.newSource(c.."/song.ogg", "static")
     conductor.BPM = loadedMetadata.BPM
+    local bgfileExt = ".png"
+
+    if love.filesystem.getInfo(c.."/assets/bg.jpg") ~= nil then
+        bgfileExt = ".jpg"
+    elseif love.filesystem.getInfo(c.."/assets/bg.jpeg") ~= nil then
+        bgfileExt = ".jpeg"
+    elseif love.filesystem.getInfo(c.."/assets/bg.bmp") ~= nil then
+        bgfileExt = ".bmp"
+    end
+
+    BGSprite = love.graphics.newImage(c.."/assets/bg"..bgfileExt)
 end
 
 function PlaceNote()
@@ -247,23 +265,14 @@ function editor:WheelMoved(x, y)
 end
 
 function editor:Draw()
-    if quadrant ~= -1 and beatQuadrant.y1 ~= nil then
-        love.graphics.circle("line", (quadrant) * 70 + xOffset, beatQuadrant.y1 + scrollOffset, 30)
+    if BGSprite ~= nil then
+        love.graphics.setColor(0.5,0.5,0.5,1)
+        love.graphics.draw(BGSprite)
     end
+    love.graphics.setColor(1,1,1,1)
     
-    for i = 1, 4 do
-        love.graphics.circle("line", i * 70 + xOffset, 500, 30)
-    end
-    
-    for _, note in ipairs(chart) do
-        love.graphics.circle("fill", (note.N) * 70 + xOffset, (-note.B * pixelsPerBeat + 500) + scrollOffset, 30)
-        if note.D ~= nil then
-            love.graphics.rectangle("fill", (note.N) * 70 + xOffset - 10, (-note.B * pixelsPerBeat + 500) + scrollOffset - note.D * 300, 20, note.D * 300, 10, 10)
-        end                  
-    end
-
     for _, l in ipairs(lines) do
-        
+
         
         if l.partial == false then
             love.graphics.setFont(mainBeatFont)
@@ -278,6 +287,26 @@ function editor:Draw()
         
         love.graphics.line(l.x1, l.y1 + scrollOffset, l.x2, l.y2 + scrollOffset)
     end
+
+    if quadrant ~= -1 and beatQuadrant.y1 ~= nil then
+        love.graphics.draw(sprites.Crust, (quadrant) * 70 + xOffset, beatQuadrant.y1 + scrollOffset - 30)
+    end
+    
+    for i = 1, 4 do
+        love.graphics.draw(sprites.Crust, i * 70 + xOffset, 470)
+    end
+    
+    for _, note in ipairs(chart) do
+        if note.D ~= nil then
+            love.graphics.setColor(1, 183/255, 135/255)
+            love.graphics.rectangle("fill", (note.N) * 70 + xOffset + 20, (-note.B * pixelsPerBeat + 500) + scrollOffset - note.D * 300, 20, note.D * 300, 10, 10)
+        end   
+        love.graphics.setColor(1,1,1,1)
+        love.graphics.draw(sprites.Bread, (note.N) * 70 + xOffset, (-note.B * pixelsPerBeat + 470) + scrollOffset)
+                       
+    end
+    
+    
     
     love.graphics.setColor(1,1,1,1)
 end

@@ -1369,7 +1369,7 @@ function menu:Update(dt)
         menuStopMovingDelay = -1
         menuMoving = false
     end
-
+    
     if deleteBtnDelay ~= -1 and love.timer.getTime() > deleteBtnDelay then
         canDelete = true
         deleteBtnDelay = -1
