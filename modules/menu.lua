@@ -868,18 +868,70 @@ function menu:Init()
     createSongBtn.MouseEnter = function () createSongBtn.Color = Color.new(0.7,0.7,0.7,1) end
     createSongBtn.MouseLeave = function () createSongBtn.Color = Color.new(1,1,1,1) end
     createSongBtn.MouseDown = function() 
+        if nameInputter.Text == "" then
+            createSongBtn.Text = "You have to name the song, silly!"
+            return
+        end
+
         if love.filesystem.getInfo("/customLevels/"..nameInputter.Text) ~= nil then
             createSongBtn.Text = "Level with same name already exists!"
             return
         end
+
+        if creatingLevel.SongOgg == nil then
+            createSongBtn.Text = "Song is missing!"
+            return
+        end
         
+        if creatingLevel.Cover == nil then
+            createSongBtn.Text = "Cover art is missing!"
+            return
+        end
+
+        if creatingLevel.BG == nil then
+            createSongBtn.Text = "Background is missing!"
+            return
+        end
+        
+        if creatingLevel.Goose == nil then
+            createSongBtn.Text = "Goose is missing!"
+            return
+        end
+
+        if creatingLevel.GooseMiss == nil then
+            createSongBtn.Text = "Goose miss is missing!"
+            return
+        end
+        -- create folder
+        love.filesystem.createDirectory("/customLevels/"..nameInputter.Text)
+        -- create metadata
         local metadataString = string.format("return {SongName = \"%s\", SongArtist = \"%s\", Charter = \"%s\",", nameInputter.Text, artistInputter.Text, mapperInputter.Text)
         metadataString = metadataString..("BPM = 150, GooseSize = 2, PreviewStartTime = 0.0,")--todo make these modifiable
         metadataString = metadataString..string.format("DialogueTryAgain = \"%s\", DialogueOK = \"%s\", DialogueSuperb = \"%s\", DialoguePerfect = \"%s\"}", tryagainInput.Text, okayInput.Text, superbInput.Text, perfectInput.Text)
-        print(metadataString)
-        love.filesystem.createDirectory("/customLevels/"..nameInputter.Text)
+
         love.filesystem.write("/customLevels/"..nameInputter.Text.."/metadata.lua", metadataString)
         
+        -- create chart.lua
+
+        love.filesystem.write("/customLevels/"..nameInputter.Text.."/chart.lua", "return {}")
+
+        -- create assets
+        
+        love.filesystem.createDirectory("/customLevels/"..nameInputter.Text.."/assets")
+        
+        love.filesystem.write("/customLevels/"..nameInputter.Text.."/song.ogg", creatingLevel.SongOgg:read())
+
+        local coverExt = creatingLevel.Cover:getFilename():match("^.+(%..+)$")
+        love.filesystem.write("/customLevels/"..nameInputter.Text.."/cover"..coverExt, creatingLevel.Cover:read())
+        
+        local gooseExt = creatingLevel.Goose:getFilename():match("^.+(%..+)$")
+        love.filesystem.write("/customLevels/"..nameInputter.Text.."/assets/goose"..gooseExt, creatingLevel.Goose:read())
+        
+        local goosemissExt = creatingLevel.GooseMiss:getFilename():match("^.+(%..+)$")
+        love.filesystem.write("/customLevels/"..nameInputter.Text.."/assets/goose_miss"..goosemissExt, creatingLevel.GooseMiss:read())
+
+        local bgExt = creatingLevel.BG:getFilename():match("^.+(%..+)$")
+        love.filesystem.write("/customLevels/"..nameInputter.Text.."/assets/bg"..bgExt, creatingLevel.BG:read())
     end
 end
 
