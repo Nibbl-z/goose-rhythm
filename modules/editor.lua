@@ -4,8 +4,7 @@ require("modules.conductor")
 require("yan")
 
 local utils = require("yan.utils")
-
-local textinput = require("yan.instance.ui.textinput")
+local settings = require("modules.settings")
 
 editor.Enabled = false
 
@@ -36,7 +35,11 @@ local sprites = {
     Crust = love.graphics.newImage("/img/crust.png")
 }
 
+
+
 local BGSprite
+local message = ""
+local messageResetTime = 0
 
 function editor:LoadChart(c)
     chartPath = c
@@ -48,6 +51,7 @@ function editor:LoadChart(c)
     
     loadedSong = love.audio.newSource(c.."/song.ogg", "static")
     conductor.BPM = loadedMetadata.BPM
+    loadedSong:setVolume(settings:GetMusicVolume())
     local bgfileExt = ".png"
 
     if love.filesystem.getInfo(c.."/assets/bg.jpg") ~= nil then
@@ -128,6 +132,12 @@ function editor:Init()
         end
     end
     
+    messageLabel = yan:Label(self.Screen, message, 32, "left", "bottom", "/ComicNeue.ttf")
+    messageLabel.Position = UIVector2.new(0,5,1,5)
+    messageLabel.AnchorPoint = Vector2.new(0,1)
+    messageLabel.Size = UIVector2.new(1,0,0.1,0)
+    messageLabel.TextColor = Color.new(1,1,1,1)
+
     snapInput = yan:TextInputter(self.Screen, "0.5", 16, "left", "center")
     snapInput.Position = UIVector2.new(1, -10, 0, 10)
     snapInput.Size = UIVector2.new(0.1,0,0.05,0)
@@ -151,6 +161,8 @@ function editor:Init()
     saveBtn.MouseLeave = function () saveBtn.Color = Color.new(1,1,1,1) end
     saveBtn.MouseDown = function ()
         Export()
+        message = "Chart saved successfully!"
+        messageResetTime = love.timer.getTime() + 3
     end
 end
 
@@ -197,6 +209,10 @@ function editor:Update(dt)
         conductor:Update(dt)
 
         scrollOffset = conductor.SongPositionInBeats * pixelsPerBeat
+    end
+    messageLabel.Text = message
+    if messageResetTime < love.timer.getTime() then
+        message = ""
     end
 end
 
