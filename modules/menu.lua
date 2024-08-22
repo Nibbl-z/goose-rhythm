@@ -15,6 +15,8 @@ local charts = {
 
 local sfx = {
     Select = love.audio.newSource("/sfx/select.wav", "static"),
+    Error = love.audio.newSource("/sfx/error.wav", "static"),
+    Success = love.audio.newSource("/sfx/success.wav", "static")
 }
 
 local chartSelectionIndex = 1
@@ -557,6 +559,7 @@ function menu:Init()
     end
     
     newLevelBtn.MouseDown = function ()
+        sfx.Select:play()
         newLevelBtn.Color = Color.new(1,1,1,1)
         
         yan:NewTween(newLevelPopup, yan:TweenInfo(1, EasingStyle.BackOut), {Position = UIVector2.new(0.5,0,0.5,0)}):Play()
@@ -567,7 +570,7 @@ function menu:Init()
     noLevelsLabel.TextColor = Color.new(1,1,1,1)
 
     newLevelPopup = yan:Frame(self.Screen)
-    newLevelPopup.Position = UIVector2.new(0.5,0,2.5,0)
+    newLevelPopup.Position = UIVector2.new(0.5,0,1.5,0)
     newLevelPopup.Size = UIVector2.new(0.7,0,0.7,0)
     newLevelPopup.Color = Color.new(0.1,0.1,0.1,1)
     newLevelPopup.AnchorPoint = Vector2.new(0.5,0.5)
@@ -580,7 +583,19 @@ function menu:Init()
     newLevelTitle.AnchorPoint = Vector2.new(0,1)
     newLevelTitle.ZIndex = 11
     newLevelTitle:SetParent(newLevelPopup)
+
+    newLevelClose = yan:ImageButton(self.Screen, "/img/exit.png")
+    newLevelClose.Size = UIVector2.new(0,50,0,50)
+    newLevelClose.Position = UIVector2.new(0,5,0,-60)
+    newLevelClose:SetParent(newLevelPopup)
+    newLevelClose.ZIndex = 10
+    newLevelClose.MouseEnter = function () newLevelClose.Color = Color.new(0.7,0.7,0.7,1) end
     
+    newLevelClose.MouseLeave = function () newLevelClose.Color = Color.new(1,1,1,1) end
+    newLevelClose.MouseDown = function ()
+        sfx.Select:play()
+        yan:NewTween(newLevelPopup, yan:TweenInfo(1, EasingStyle.BackIn), {Position = UIVector2.new(0.5,0,1.5,0)}):Play()
+    end
     -- tabs
     
     local currentTab = "metadata"
@@ -612,11 +627,14 @@ function menu:Init()
     metadataTabBtn.MouseEnter = function () if currentTab ~= "metadata" then metadataTabBtn.Color = Color.new(0.7,0.7,0.7,1) end end
     metadataTabBtn.MouseLeave = function () if currentTab ~= "metadata" then metadataTabBtn.Color = Color.new(1,1,1,1) end end
     metadataTabBtn.MouseDown = function()
+        sfx.Select:play()
         currentTab = "metadata"
         metadataFrame.Position = UIVector2.new(0,0,0,0)
         assetsFrame.Position = UIVector2.new(0,0,-5,0)
         dialogueFrame.Position = UIVector2.new(0,0,-5,0)
         metadataTabBtn.Color = Color.new(0.5,0.5,0.5,1)
+        assetsTabBtn.Color = Color.new(1,1,1,1)
+        dialogueTabBtn.Color = Color.new(1,1,1,1)
     end
 
     assetsTabBtn = yan:TextButton(self.Screen, "Assets", 20, "center", "center", "/ComicNeue.ttf")
@@ -629,14 +647,17 @@ function menu:Init()
     assetsTabBtn.CornerRoundness = 8
     assetsTabBtn:SetParent(newLevelPopup)
     
-    assetsTabBtn.MouseEnter = function () assetsTabBtn.Color = Color.new(0.7,0.7,0.7,1) end
-    assetsTabBtn.MouseLeave = function () assetsTabBtn.Color = Color.new(1,1,1,1) end
+    assetsTabBtn.MouseEnter = function () if currentTab ~= "assets" then assetsTabBtn.Color = Color.new(0.7,0.7,0.7,1) end end
+    assetsTabBtn.MouseLeave = function () if currentTab ~= "assets" then assetsTabBtn.Color = Color.new(1,1,1,1) end end
     assetsTabBtn.MouseDown = function() 
+        sfx.Select:play()
         currentTab = "assets"
         metadataFrame.Position = UIVector2.new(0,0,-5,0)
         assetsFrame.Position = UIVector2.new(0,0,0,0)
         dialogueFrame.Position = UIVector2.new(0,0,-5,0)
         metadataTabBtn.Color = Color.new(1,1,1,1)
+        assetsTabBtn.Color = Color.new(0.5,0.5,0.5,1)
+        dialogueTabBtn.Color = Color.new(1,1,1,1)
     end
 
     dialogueTabBtn = yan:TextButton(self.Screen, "Results Dialogue", 20, "center", "center", "/ComicNeue.ttf")
@@ -649,14 +670,17 @@ function menu:Init()
     dialogueTabBtn.CornerRoundness = 8
     dialogueTabBtn:SetParent(newLevelPopup)
     
-    dialogueTabBtn.MouseEnter = function () dialogueTabBtn.Color = Color.new(0.7,0.7,0.7,1) end
-    dialogueTabBtn.MouseLeave = function () dialogueTabBtn.Color = Color.new(1,1,1,1) end
+    dialogueTabBtn.MouseEnter = function () if currentTab ~= "dialogue" then dialogueTabBtn.Color = Color.new(0.7,0.7,0.7,1) end end
+    dialogueTabBtn.MouseLeave = function () if currentTab ~= "dialogue" then dialogueTabBtn.Color = Color.new(1,1,1,1) end end
     dialogueTabBtn.MouseDown = function() 
+        sfx.Select:play()
         currentTab = "dialogue"
         metadataFrame.Position = UIVector2.new(0,0,-5,0)
         assetsFrame.Position = UIVector2.new(0,0,-5,0)
         dialogueFrame.Position = UIVector2.new(0,0,0,0)
         metadataTabBtn.Color = Color.new(1,1,1,1)
+        assetsTabBtn.Color = Color.new(1,1,1,1)
+        dialogueTabBtn.Color = Color.new(0.5,0.5,0.5,1)
     end
     
     -- METADATA TAB
@@ -675,7 +699,7 @@ function menu:Init()
     
     nameInputter.MouseEnter = function () nameInputter.Color = Color.new(0.7,0.7,0.7,1) end
     nameInputter.MouseLeave = function () nameInputter.Color = Color.new(1,1,1,1) end
-    nameInputter.MouseDown = function() end
+    nameInputter.MouseDown = function() sfx.Select:play() end
     
     artistInputter = yan:TextInputter(self.Screen, "Enter Artist Name", 30, "center", "center", "/ComicNeue.ttf")
     artistInputter.Position = UIVector2.new(0.5,0,0.35,10)
@@ -689,7 +713,7 @@ function menu:Init()
     
     artistInputter.MouseEnter = function () artistInputter.Color = Color.new(0.7,0.7,0.7,1) end
     artistInputter.MouseLeave = function () artistInputter.Color = Color.new(1,1,1,1) end
-    artistInputter.MouseDown = function() end
+    artistInputter.MouseDown = function() sfx.Select:play() end
 
     mapperInputter = yan:TextInputter(self.Screen, "Enter Mapper Name (that's you!)", 30, "center", "center", "/ComicNeue.ttf")
     mapperInputter.Position = UIVector2.new(0.5,0,0.5,20)
@@ -703,7 +727,7 @@ function menu:Init()
     
     mapperInputter.MouseEnter = function () mapperInputter.Color = Color.new(0.7,0.7,0.7,1) end
     mapperInputter.MouseLeave = function () mapperInputter.Color = Color.new(1,1,1,1) end
-    mapperInputter.MouseDown = function() end
+    mapperInputter.MouseDown = function() sfx.Select:play() end
     
 
 
@@ -724,6 +748,7 @@ function menu:Init()
     songInput.MouseEnter = function () songInput.Color = Color.new(0.7,0.7,0.7,1) end
     songInput.MouseLeave = function () songInput.Color = Color.new(1,1,1,1) end
     songInput.MouseDown = function() 
+        sfx.Select:play()
         songInput.Text = "Drop an .ogg onto the window"
         droppingFile = "song"
     end
@@ -741,6 +766,7 @@ function menu:Init()
     coverInput.MouseEnter = function () coverInput.Color = Color.new(0.7,0.7,0.7,1) end
     coverInput.MouseLeave = function () coverInput.Color = Color.new(1,1,1,1) end
     coverInput.MouseDown = function() 
+        sfx.Select:play()
         coverInput.Text = "Drop an image onto the window"
         droppingFile = "cover"
     end
@@ -758,6 +784,7 @@ function menu:Init()
     bgInput.MouseEnter = function () bgInput.Color = Color.new(0.7,0.7,0.7,1) end
     bgInput.MouseLeave = function () bgInput.Color = Color.new(1,1,1,1) end
     bgInput.MouseDown = function() 
+        sfx.Select:play()
         bgInput.Text = "Drop an image onto the window"
         droppingFile = "bg"
     end
@@ -775,6 +802,7 @@ function menu:Init()
     gooseInput.MouseEnter = function () gooseInput.Color = Color.new(0.7,0.7,0.7,1) end
     gooseInput.MouseLeave = function () gooseInput.Color = Color.new(1,1,1,1) end
     gooseInput.MouseDown = function() 
+        sfx.Select:play()
         gooseInput.Text = "Drop an image onto the window"
         droppingFile = "goose"
     end
@@ -792,6 +820,7 @@ function menu:Init()
     gooseMissInput.MouseEnter = function () gooseMissInput.Color = Color.new(0.7,0.7,0.7,1) end
     gooseMissInput.MouseLeave = function () gooseMissInput.Color = Color.new(1,1,1,1) end
     gooseMissInput.MouseDown = function() 
+        sfx.Select:play()
         gooseMissInput.Text = "Drop an image onto the window"
         droppingFile = "goosemiss"
     end
@@ -811,7 +840,7 @@ function menu:Init()
     
     tryagainInput.MouseEnter = function () tryagainInput.Color = Color.new(0.7,0.7,0.7,1) end
     tryagainInput.MouseLeave = function () tryagainInput.Color = Color.new(1,1,1,1) end
-    tryagainInput.MouseDown = function() end
+    tryagainInput.MouseDown = function() sfx.Select:play() end
     
     okayInput = yan:TextInputter(self.Screen, "Enter OK Dialogue", 30, "center", "center", "/ComicNeue.ttf")
     okayInput.Position = UIVector2.new(0.5,0,0.3,10)
@@ -825,7 +854,7 @@ function menu:Init()
     
     okayInput.MouseEnter = function () okayInput.Color = Color.new(0.7,0.7,0.7,1) end
     okayInput.MouseLeave = function () okayInput.Color = Color.new(1,1,1,1) end
-    okayInput.MouseDown = function() end
+    okayInput.MouseDown = function() sfx.Select:play() end
 
     superbInput = yan:TextInputter(self.Screen, "Enter Superb Dialogue", 30, "center", "center", "/ComicNeue.ttf")
     superbInput.Position = UIVector2.new(0.5,0,0.4,20)
@@ -839,7 +868,7 @@ function menu:Init()
     
     superbInput.MouseEnter = function () superbInput.Color = Color.new(0.7,0.7,0.7,1) end
     superbInput.MouseLeave = function () superbInput.Color = Color.new(1,1,1,1) end
-    superbInput.MouseDown = function() end
+    superbInput.MouseDown = function() sfx.Select:play() end
     
     perfectInput = yan:TextInputter(self.Screen, "Enter Perfect Dialogue", 30, "center", "center", "/ComicNeue.ttf")
     perfectInput.Position = UIVector2.new(0.5,0,0.5,30)
@@ -853,7 +882,7 @@ function menu:Init()
     
     perfectInput.MouseEnter = function () perfectInput.Color = Color.new(0.7,0.7,0.7,1) end
     perfectInput.MouseLeave = function () perfectInput.Color = Color.new(1,1,1,1) end
-    perfectInput.MouseDown = function() end
+    perfectInput.MouseDown = function() sfx.Select:play() end
 
     createSongBtn = yan:TextButton(self.Screen, "Create Level", 30, "center", "center", "/ComicNeue.ttf")
     createSongBtn.Position = UIVector2.new(0.5,0,1,-20)
@@ -865,43 +894,60 @@ function menu:Init()
     createSongBtn.CornerRoundness = 8
     createSongBtn:SetParent(newLevelPopup)
     
-    createSongBtn.MouseEnter = function () createSongBtn.Color = Color.new(0.7,0.7,0.7,1) end
-    createSongBtn.MouseLeave = function () createSongBtn.Color = Color.new(1,1,1,1) end
+    createSongBtn.MouseEnter = function () 
+       
+        createSongBtn.Color = Color.new(0.7,0.7,0.7,1) 
+    end
+    createSongBtn.MouseLeave = function () 
+        createSongBtn.Text = "Create Level"
+        createSongBtn.Color = Color.new(1,1,1,1) end
     createSongBtn.MouseDown = function() 
         if nameInputter.Text == "" then
+            sfx.Error:play()
             createSongBtn.Text = "You have to name the song, silly!"
             return
         end
 
         if love.filesystem.getInfo("/customLevels/"..nameInputter.Text) ~= nil then
+            sfx.Error:play()
             createSongBtn.Text = "Level with same name already exists!"
             return
         end
 
         if creatingLevel.SongOgg == nil then
+            sfx.Error:play()
             createSongBtn.Text = "Song is missing!"
             return
         end
         
         if creatingLevel.Cover == nil then
+            sfx.Error:play()
             createSongBtn.Text = "Cover art is missing!"
             return
         end
 
         if creatingLevel.BG == nil then
+            sfx.Error:play()
             createSongBtn.Text = "Background is missing!"
             return
         end
         
         if creatingLevel.Goose == nil then
+            sfx.Error:play()
             createSongBtn.Text = "Goose is missing!"
             return
         end
 
         if creatingLevel.GooseMiss == nil then
+            sfx.Error:play()
             createSongBtn.Text = "Goose miss is missing!"
             return
         end
+
+        sfx.Success:play()
+
+        createSongBtn.Text = "Level Created!"
+
         -- create folder
         love.filesystem.createDirectory("/customLevels/"..nameInputter.Text)
         -- create metadata
@@ -932,6 +978,8 @@ function menu:Init()
 
         local bgExt = creatingLevel.BG:getFilename():match("^.+(%..+)$")
         love.filesystem.write("/customLevels/"..nameInputter.Text.."/assets/bg"..bgExt, creatingLevel.BG:read())
+        
+        yan:NewTween(newLevelPopup, yan:TweenInfo(1, EasingStyle.BackIn), {Position = UIVector2.new(0.5,0,1.5,0)}):Play()
     end
 end
 

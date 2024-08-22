@@ -48,7 +48,6 @@ function Reset()
 end
 
 function StartSong(chart)
-    chart = "/customLevels/awesome song"
     Reset()
     chartPath = chart
     local chartData = love.filesystem.read(chart.."/chart.lua")
