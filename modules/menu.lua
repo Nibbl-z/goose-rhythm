@@ -13,6 +13,8 @@ local charts = {
     "/charts/greengoose", "/charts/purplegoose", "/charts/orangegoose", "/charts/whitegoose", "/charts/bluegoose"
 }
 
+local customCharts = {}
+
 local sfx = {
     Select = love.audio.newSource("/sfx/select.wav", "static"),
     Error = love.audio.newSource("/sfx/error.wav", "static"),
@@ -20,7 +22,9 @@ local sfx = {
 }
 
 local chartSelectionIndex = 1
+local customChartSelectionIndex = 1
 local selectionPos = 0
+local customSelectionPos = 0
 local page = "main"
 
 local previewMusic = nil
@@ -38,6 +42,8 @@ local choosingButton = nil
 
 local menuMoving = false
 local menuStopMovingDelay = -1
+
+local customChartFrames = {}
 
 local creatingLevel = {
     SongName = "",
@@ -64,9 +70,115 @@ function menu:Reset()
     mainPage.Position = UIVector2.new(0,0,0,0)
     levelsPage.Position = UIVector2.new(1,0,0,0)
     levelsContainer.Position = UIVector2.new(0,0,0,0)
+
+    customLevelsPage.Position = UIVector2.new(1,0,0,0)
+    customLevelsContainer.Position = UIVector2.new(0,0,0,0)
+end
+
+function RefreshCustomLevels()
+    customCharts = {}
+
+    for _, v in ipairs(customChartFrames) do
+        v = nil
+    end
+    customChartFrames = {}
+
+    for _, file in ipairs(love.filesystem.getDirectoryItems("/customLevels")) do
+        print(file)
+        if love.filesystem.getInfo("/customLevels/"..file).type == "directory" then
+            table.insert(customCharts, "/customLevels/"..file)
+        end
+    end
+
+    for i, chart in ipairs(customCharts) do
+        local metadata = love.filesystem.read(chart.."/metadata.lua")
+        local loadedMetadata = loadstring(metadata)()
+        
+        local bgfileExt = ".png"
+        if love.filesystem.getInfo(chart.."/assets/bg.png") ~= nil then
+            bgfileExt = ".png"
+        elseif love.filesystem.getInfo(chart.."/assets/bg.jpg") ~= nil then
+            bgfileExt = ".jpg"
+        elseif love.filesystem.getInfo(chart.."/assets/bg.jpeg") ~= nil then
+            bgfileExt = ".jpeg"
+        elseif love.filesystem.getInfo(chart.."/assets/bg.bmp") ~= nil then
+            bgfileExt = ".bmp"
+        end
+        
+        local coverfileExt = ".png"
+        if love.filesystem.getInfo(chart.."/cover.png") ~= nil then
+            coverfileExt = ".png"
+        elseif love.filesystem.getInfo(chart.."/cover.jpg") ~= nil then
+            coverfileExt = ".jpg"
+        elseif love.filesystem.getInfo(chart.."/cover.jpeg") ~= nil then
+            coverfileExt = ".jpeg"
+        elseif love.filesystem.getInfo(chart.."/cover.bmp") ~= nil then
+            coverfileExt = ".bmp"
+        end
+        
+        local frame = yan:Image(menu.Screen, chart.."/assets/bg"..bgfileExt)
+        frame.Size = UIVector2.new(1,0,1,0)
+        frame.Position = UIVector2.new(i - 1, 0, 0, 0)
+        frame.Color = Color.new(0.5,0.5,0.5,1)
+        frame.ZIndex = -2
+        
+        local cover = yan:Image(menu.Screen, chart.."/cover"..coverfileExt)
+        cover.Size = UIVector2.new(0,250,0,250)
+        cover.Position = UIVector2.new(0.5,0,0.5,0)
+        cover.AnchorPoint = Vector2.new(0.5,0.5)
+        
+        local title = yan:Label(menu.Screen, loadedMetadata.SongName, 50, "center", "center", "/ComicNeue.ttf")
+        title.Size = UIVector2.new(1,0,0.15,0)
+        title.TextColor = Color.new(1,1,1,1)
+        
+        local artist = yan:Label(menu.Screen, "by "..loadedMetadata.SongArtist, 30, "center", "center", "/ComicNeue.ttf")
+        artist.Size = UIVector2.new(1,0,0.1,0)
+        artist.Position = UIVector2.new(0,0,0.1,0)
+        artist.TextColor = Color.new(1,1,1,1)
+        
+        local mapper = yan:Label(menu.Screen, "mapped by "..loadedMetadata.Charter, 20, "center", "center", "/ComicNeue.ttf")
+        mapper.Size = UIVector2.new(1,0,0.05,0)
+        mapper.Position = UIVector2.new(0,0,0.17,0)
+        mapper.TextColor = Color.new(0.8,0.8,0.8,1)
+        
+        local playButton = yan:TextButton(menu.Screen, "Play", 50, "center", "center", "/ComicNeue.ttf")
+        playButton.Position = UIVector2.new(0.5,0,1,-20)
+        playButton.Size = UIVector2.new(0.3,0,0.1,0)
+        playButton.AnchorPoint = Vector2.new(0.5, 1)
+        
+
+        playButton.MouseEnter = function ()
+            playButton.Color = Color.new(0.7,0.7,0.7,1)
+        end
+        
+        playButton.MouseLeave = function ()
+            playButton.Color = Color.new(1,1,1,1)
+        end
+        playButton.MouseDown = function ()
+            sfx.Select:play()
+            transitions:FadeIn(0.2)
+
+            fading = "play"
+            fadeDelay = love.timer.getTime() + 0.5
+            menuMusic:stop()
+            menuMusicSettings:stop()
+        end
+        table.insert(customChartFrames, frame)
+        frame:SetParent(customLevelsContainer)
+        cover:SetParent(frame)
+        title:SetParent(frame)
+        artist:SetParent(frame)
+        playButton:SetParent(frame)
+        mapper:SetParent(frame)
+    end
+
+    if #customCharts ~= 0 then
+        noLevelsLabel.Visible = false
+    end
 end
 
 function menu:Init()
+    
     transitions:Init()
     
     menuMusic = love.audio.newSource("/music/menu.mp3", "static")
@@ -88,6 +200,7 @@ function menu:Init()
     bgQuad = love.graphics.newQuad(0, 0, 20000000, 20000000, 800, 600)
     
     self.Screen = yan:Screen()
+    
     
     mainPage = yan:Frame(self.Screen)
     mainPage.Size = UIVector2.new(1,0,1,0)
@@ -198,6 +311,23 @@ function menu:Init()
         page = "customlevels"
         moveMainTween:Play()
         moveCustomLevelsTween:Play()
+
+        customChartSelectionIndex = 1
+        customSelectionPos = 0
+        if previewMusic ~= nil then 
+            previewMusic:stop()
+        end
+        
+        local metadata = love.filesystem.read(customCharts[customChartSelectionIndex].."/metadata.lua")
+        local loadedMetadata = loadstring(metadata)()
+
+        previewMusic = love.audio.newSource(customCharts[customChartSelectionIndex].."/song.ogg", "stream")
+        previewMusic:setVolume(0.1)
+        previewMusic:play()
+        previewMusic:seek(loadedMetadata.PreviewSongTime, "seconds")
+        
+        menuMusic:stop()
+        menuMusicSettings:stop()
     end
     
     settingsBtn = yan:TextButton(self.Screen, "settings", 50, "center", "center", "/ComicNeue.ttf")
@@ -207,7 +337,7 @@ function menu:Init()
     
     settingsHoverTween = yan:NewTween(settingsBtn, yan:TweenInfo(0.2, EasingStyle.QuadOut), {Size = UIVector2.new(0.5, 50, 0.15, 0), Color = Color.new(0.7,0.7,0.7,1)})
     settingsLeaveTween = yan:NewTween(settingsBtn, yan:TweenInfo(0.2, EasingStyle.QuadOut), {Size = UIVector2.new(0.5, 0, 0.15, 0), Color =  Color.new(0.5,0.5,0.5,1)})
-
+    
     settingsBtn.Color = Color.new(0.5,0.5,0.5,1)
     settingsBtn.TextColor = Color.new(1,1,1,1)
     settingsBtn.MouseEnter = function ()
@@ -506,7 +636,7 @@ function menu:Init()
 
 
 
-
+    
 
     customLevelsContainer = yan:Frame(self.Screen)
     customLevelsContainer.Size = UIVector2.new(1,0,1,0)
@@ -535,7 +665,9 @@ function menu:Init()
         --yan:NewTween(levelsContainer, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(0, 0, 0, 0)}):Play()
         yan:NewTween(mainPage, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(0,0,0,0)}):Play()
         yan:NewTween(customLevelsPage, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(1,0,0,0)}):Play()
-        
+        if previewMusic ~= nil then 
+            previewMusic:stop()
+        end
         menuMusic:play()
         menuMusicSettings:play()
         
@@ -544,6 +676,10 @@ function menu:Init()
         
         customLevelsBackBtn.Color = Color.new(1,1,1,1)
     end
+    
+    
+    
+    
     
     newLevelBtn = yan:ImageButton(self.Screen, "/img/new_level.png")
     newLevelBtn.Size = UIVector2.new(0,50,0,50)
@@ -568,6 +704,8 @@ function menu:Init()
     noLevelsLabel = yan:Label(self.Screen, "You have no custom levels! Try creating one by pressing the + button at the top.", 64, "center", "center", "/ComicNeue.ttf")
     noLevelsLabel.Parent = customLevelsPage
     noLevelsLabel.TextColor = Color.new(1,1,1,1)
+
+    
 
     newLevelPopup = yan:Frame(self.Screen)
     newLevelPopup.Position = UIVector2.new(0.5,0,1.5,0)
@@ -952,7 +1090,7 @@ function menu:Init()
         love.filesystem.createDirectory("/customLevels/"..nameInputter.Text)
         -- create metadata
         local metadataString = string.format("return {SongName = \"%s\", SongArtist = \"%s\", Charter = \"%s\",", nameInputter.Text, artistInputter.Text, mapperInputter.Text)
-        metadataString = metadataString..("BPM = 150, GooseSize = 2, PreviewStartTime = 0.0,")--todo make these modifiable
+        metadataString = metadataString..("BPM = 150, GooseSize = 2, PreviewSongTime = 0.0,")--todo make these modifiable
         metadataString = metadataString..string.format("DialogueTryAgain = \"%s\", DialogueOK = \"%s\", DialogueSuperb = \"%s\", DialoguePerfect = \"%s\"}", tryagainInput.Text, okayInput.Text, superbInput.Text, perfectInput.Text)
 
         love.filesystem.write("/customLevels/"..nameInputter.Text.."/metadata.lua", metadataString)
@@ -981,6 +1119,8 @@ function menu:Init()
         
         yan:NewTween(newLevelPopup, yan:TweenInfo(1, EasingStyle.BackIn), {Position = UIVector2.new(0.5,0,1.5,0)}):Play()
     end
+
+    RefreshCustomLevels()
 end
 
 function menu:Draw()
@@ -1034,8 +1174,13 @@ function menu:Update(dt)
                 if previewMusic ~= nil then 
                     previewMusic:stop()
                 end
-    
-                menu.playsong(charts[chartSelectionIndex])
+                
+                if page == "levels" then
+                    menu.playsong(charts[chartSelectionIndex])
+                else
+                    menu.playsong(customCharts[customChartSelectionIndex])
+                end
+                
 
                 self.Enabled = false
                 menuMusic:stop()
@@ -1141,12 +1286,52 @@ function menu:KeyPressed(key)
             --yan:NewTween(levelsContainer, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(0, 0, 0, 0)}):Play()
             yan:NewTween(mainPage, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(0,0,0,0)}):Play()
             yan:NewTween(customLevelsPage, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(1,0,0,0)}):Play()
-            
+            if previewMusic ~= nil then 
+                previewMusic:stop()
+            end
             menuMusic:play()
             menuMusicSettings:play()
             
             conductor.BPM = 128
             conductor:Init()
+        end
+
+        if key == "left" or key == "a" then
+            if customChartSelectionIndex > 1 then
+                customChartSelectionIndex = customChartSelectionIndex - 1
+                customSelectionPos = customSelectionPos + 1
+                yan:NewTween(customLevelsContainer, yan:TweenInfo(1, EasingStyle.BackOut), {Position = UIVector2.new(customSelectionPos, 0, 0, 0)}):Play()
+                
+                if previewMusic ~= nil then 
+                    previewMusic:stop()
+                end
+                
+                previewMusic = love.audio.newSource(customCharts[customChartSelectionIndex].."/song.ogg", "stream")
+                previewMusic:setVolume(settings:GetMusicVolume())
+                previewMusic:play()
+
+                local metadata = love.filesystem.read(customCharts[customChartSelectionIndex].."/metadata.lua")
+                local loadedMetadata = loadstring(metadata)()
+                previewMusic:seek(loadedMetadata.PreviewSongTime, "seconds")
+            end
+        elseif key == "right" or key == "d" then
+            if customChartSelectionIndex < #customCharts then
+                customChartSelectionIndex = customChartSelectionIndex + 1
+                customSelectionPos = customSelectionPos - 1
+                yan:NewTween(customLevelsContainer, yan:TweenInfo(1, EasingStyle.BackOut), {Position = UIVector2.new(customSelectionPos, 0, 0, 0)}):Play()
+
+                if previewMusic ~= nil then 
+                    previewMusic:stop()
+                end
+                
+                previewMusic = love.audio.newSource(customCharts[customChartSelectionIndex].."/song.ogg", "stream")
+                previewMusic:setVolume(settings:GetMusicVolume())
+                previewMusic:play()
+                
+                local metadata = love.filesystem.read(customCharts[customChartSelectionIndex].."/metadata.lua")
+                local loadedMetadata = loadstring(metadata)()
+                previewMusic:seek(loadedMetadata.PreviewSongTime, "seconds")
+            end
         end
     end
 end

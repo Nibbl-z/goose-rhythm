@@ -59,10 +59,42 @@ function StartSong(chart)
     loadedSong = love.audio.newSource(chart.."/song.ogg", "stream")
     conductor.BPM = loadedMetadata.BPM
    
+    local bgfileExt = ".png"
+    if love.filesystem.getInfo(chart.."/assets/bg.png") ~= nil then
+        bgfileExt = ".png"
+    elseif love.filesystem.getInfo(chart.."/assets/bg.jpg") ~= nil then
+        bgfileExt = ".jpg"
+    elseif love.filesystem.getInfo(chart.."/assets/bg.jpeg") ~= nil then
+        bgfileExt = ".jpeg"
+    elseif love.filesystem.getInfo(chart.."/assets/bg.bmp") ~= nil then
+        bgfileExt = ".bmp"
+    end
+        
+    local goosefileExt = ".png"
+    if love.filesystem.getInfo(chart.."/assets/goose.png") ~= nil then
+        goosefileExt = ".png"
+    elseif love.filesystem.getInfo(chart.."/assets/goose.jpg") ~= nil then
+        goosefileExt = ".jpg"
+    elseif love.filesystem.getInfo(chart.."/assets/goose.jpeg") ~= nil then
+        goosefileExt = ".jpeg"
+    elseif love.filesystem.getInfo(chart.."/assets/goose.bmp") ~= nil then
+        goosefileExt = ".bmp"
+    end
     
-    BGSprite = love.graphics.newImage(chart.."/assets/bg.png")
-    GooseSprite = love.graphics.newImage(chart.."/assets/goose.png")
-    GooseMissSprite = love.graphics.newImage(chart.."/assets/goose_miss.png")
+    local gooseMissFileExt = ".png"
+    if love.filesystem.getInfo(chart.."/assets/goose_miss.png") ~= nil then
+        gooseMissFileExt = ".png"
+    elseif love.filesystem.getInfo(chart.."/assets/goose_miss.jpg") ~= nil then
+        gooseMissFileExt = ".jpg"
+    elseif love.filesystem.getInfo(chart.."/assets/goose_miss.jpeg") ~= nil then
+        gooseMissFileExt = ".jpeg"
+    elseif love.filesystem.getInfo(chart.."/assets/goose_miss.bmp") ~= nil then
+        gooseMissFileExt = ".bmp"
+    end
+    
+    BGSprite = love.graphics.newImage(chart.."/assets/bg"..bgfileExt)
+    GooseSprite = love.graphics.newImage(chart.."/assets/goose"..goosefileExt)
+    GooseMissSprite = love.graphics.newImage(chart.."/assets/goose_miss"..gooseMissFileExt)
     goose:SetLoadedSprite(GooseSprite)
     
     if loadedMetadata.GooseSize ~= nil then
