@@ -418,11 +418,20 @@ function editor:Draw()
     end
     
     if dragging then
+        local startNote, startBeat, endNote, endBeat = dragStartNote, dragStartBeat, dragEndNote, dragEndBeat
+        
+        if dragStartNote >= dragEndNote then
+            startNote = dragEndNote
+            endNote = dragStartNote
+        end
+        
+        print(startNote)
+
         love.graphics.setColor(0.5,0.5,1, 0.5)
         love.graphics.rectangle("fill", 
-        (dragStartNote) * 70 + xOffset, 
+        (startNote) * 70 + xOffset, 
         (-dragStartBeat * pixelsPerBeat + 500) + scrollOffset, 
-        (dragEndNote - dragStartNote + 1) * 70 ,
+        (endNote - startNote + 1) * 70,
         ((-dragEndBeat * pixelsPerBeat + 470) + scrollOffset) - ((-dragStartBeat * pixelsPerBeat + 470) + scrollOffset)
     )
     end
