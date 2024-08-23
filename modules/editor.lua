@@ -55,6 +55,7 @@ local messageResetTime = 0
 local clipboard = {}
 
 function editor:LoadChart(c)
+    unsavedChanges = false
     chartPath = c
     local chartData = love.filesystem.read(c.."/chart.lua")
     chart = loadstring(chartData)()

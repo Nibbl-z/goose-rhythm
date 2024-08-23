@@ -35,7 +35,7 @@ local scrollY = 0
 local fadeDelay = 0
 local fading = nil
 
-local bgOffset = {Pos = 0, MusicVolume = 1, SettingsVolume = 0 }
+local bgOffset = {YPos = 0, MusicVolume = 1, SettingsVolume = 0, XPos = 0}
 
 local choosingKeybind = -1
 local choosingButton = nil
@@ -200,11 +200,13 @@ function RefreshCustomLevels()
         playButton.MouseDown = function ()
             sfx.Select:play()
             transitions:FadeIn(0.2)
-
+            
             fading = "play"
             fadeDelay = love.timer.getTime() + 0.5
             menuMusic:stop()
             menuMusicSettings:stop()
+            
+            
         end
 
         local editButton = yan:TextButton(menu.Screen, "Edit Chart", 30, "center", "center", "/ComicNeue.ttf")
@@ -432,6 +434,8 @@ function menu:Init()
         
         menuMusic:stop()
         menuMusicSettings:stop()
+        
+        yan:NewTween(bgOffset, yan:TweenInfo(1, EasingStyle.QuadInOut), {XPos = 400, MusicVolume = 1, SettingsVolume = 0}):Play()
     end 
     
     openEditor = yan:TextButton(self.Screen, "custom levels", 50, "center", "center", "/ComicNeue.ttf")
@@ -468,7 +472,7 @@ function menu:Init()
         if previewMusic ~= nil then 
             previewMusic:stop()
         end
-        
+        yan:NewTween(bgOffset, yan:TweenInfo(1, EasingStyle.QuadInOut), {XPos = 400, MusicVolume = 1, SettingsVolume = 0}):Play()
         if #customCharts > 0 then
             local metadata = love.filesystem.read(customCharts[customChartSelectionIndex].."/metadata.lua")
             local loadedMetadata = loadstring(metadata)()
@@ -513,7 +517,7 @@ function menu:Init()
         
         moveMainSettingsTween:Play()
         moveSettingsTween:Play()
-        yan:NewTween(bgOffset, yan:TweenInfo(1, EasingStyle.QuadInOut), {Pos = 400, MusicVolume = 0, SettingsVolume = 1}):Play()
+        yan:NewTween(bgOffset, yan:TweenInfo(1, EasingStyle.QuadInOut), {YPos = 400, MusicVolume = 0, SettingsVolume = 1}):Play()
     end
     
    
@@ -558,7 +562,7 @@ function menu:Init()
         if previewMusic ~= nil then 
             previewMusic:stop()
         end
-        
+        yan:NewTween(bgOffset, yan:TweenInfo(1, EasingStyle.QuadInOut), {XPos = 0, MusicVolume = 1, SettingsVolume = 0}):Play()
         menuMusic:play()
         menuMusicSettings:play()
 
@@ -674,7 +678,7 @@ function menu:Init()
         page = "main"
         yan:NewTween(settingsFrame, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(0, 0, 1, 0)}):Play()
         yan:NewTween(mainPage, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(0,0,0,0)}):Play()
-        yan:NewTween(bgOffset, yan:TweenInfo(1, EasingStyle.QuadInOut), {Pos = 0, MusicVolume = 1, SettingsVolume = 0}):Play()
+        yan:NewTween(bgOffset, yan:TweenInfo(1, EasingStyle.QuadInOut), {YPos = 0, MusicVolume = 1, SettingsVolume = 0}):Play()
 
         settings:Save()
 
@@ -819,9 +823,13 @@ function menu:Init()
         --yan:NewTween(levelsContainer, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(0, 0, 0, 0)}):Play()
         yan:NewTween(mainPage, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(0,0,0,0)}):Play()
         yan:NewTween(customLevelsPage, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(1,0,0,0)}):Play()
+        yan:NewTween(customLevelsContainer, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(0, 0, 0, 0)}):Play()
+        yan:NewTween(newLevelPopup, yan:TweenInfo(1, EasingStyle.BackIn), {Position = UIVector2.new(0.5,0,1.5,0)}):Play()
+
         if previewMusic ~= nil then 
             previewMusic:stop()
         end
+        yan:NewTween(bgOffset, yan:TweenInfo(1, EasingStyle.QuadInOut), {XPos = 0, MusicVolume = 1, SettingsVolume = 0}):Play()
         menuMusic:play()
         menuMusicSettings:play()
         
@@ -1358,7 +1366,7 @@ function menu:Init()
 end
 
 function menu:Draw()
-    love.graphics.draw(bgImage, bgQuad, (800 * -20) + scrollX, (600 * -20) + scrollY - bgOffset.Pos)
+    love.graphics.draw(bgImage, bgQuad, (800 * -20) + scrollX - bgOffset.XPos, (600 * -20) + scrollY - bgOffset.YPos)
     
     --scrollX = scrollX + 0.1
     scrollY = scrollY + 0.1
@@ -1496,7 +1504,7 @@ function menu:KeyPressed(key)
             yan:NewTween(levelsContainer, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(0, 0, 0, 0)}):Play()
             yan:NewTween(mainPage, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(0,0,0,0)}):Play()
             yan:NewTween(levelsPage, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(1,0,0,0)}):Play()
-            
+            yan:NewTween(bgOffset, yan:TweenInfo(1, EasingStyle.QuadInOut), {XPos = 0, MusicVolume = 1, SettingsVolume = 0}):Play()
             if previewMusic ~= nil then 
                 previewMusic:stop()
             end
@@ -1515,7 +1523,7 @@ function menu:KeyPressed(key)
             page = "main"
             yan:NewTween(settingsFrame, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(0, 0, 1, 0)}):Play()
             yan:NewTween(mainPage, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(0,0,0,0)}):Play()
-            yan:NewTween(bgOffset, yan:TweenInfo(1, EasingStyle.QuadInOut), {Pos = 0, MusicVolume = 1, SettingsVolume = 0}):Play()
+            yan:NewTween(bgOffset, yan:TweenInfo(1, EasingStyle.QuadInOut), {YPos = 0, MusicVolume = 1, SettingsVolume = 0}):Play()
             
             settings:Save()
         end
@@ -1529,6 +1537,7 @@ function menu:KeyPressed(key)
             yan:NewTween(mainPage, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(0,0,0,0)}):Play()
             yan:NewTween(customLevelsPage, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(1,0,0,0)}):Play()
             yan:NewTween(newLevelPopup, yan:TweenInfo(1, EasingStyle.BackIn), {Position = UIVector2.new(0.5,0,1.5,0)}):Play()
+            yan:NewTween(bgOffset, yan:TweenInfo(1, EasingStyle.QuadInOut), {XPos = 0, MusicVolume = 1, SettingsVolume = 0}):Play()
             if previewMusic ~= nil then 
                 previewMusic:stop()
             end
