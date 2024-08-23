@@ -81,7 +81,7 @@ end
 function PlaceNote()
     if beatQuadrant.b == nil then return end
     unsavedChanges = true
-    table.insert(chart, {B = beatQuadrant.b, N = quadrant, Y = beatQuadrant.y1})
+    table.insert(chart, {B = beatQuadrant.b, N = quadrant})
 end
 
 function DeleteNote()
@@ -335,12 +335,50 @@ function editor:KeyPressed(key)
         message = "Chart saved successfully!"
         messageResetTime = love.timer.getTime() + 3
     end
-
+    
     if (key == "c" and love.keyboard.isDown("lctrl")) or (key == "lctrl" and love.keyboard.isDown("c")) then
+        clipboard = {}
+        
         for _, v in ipairs(chart) do
             if v.S == true then
                 table.insert(clipboard, v)
             end
+        end
+    end
+
+    if (key == "x" and love.keyboard.isDown("lctrl")) or (key == "lctrl" and love.keyboard.isDown("x")) then
+        clipboard = {}
+        
+        for _, v in ipairs(chart) do
+            if v.S == true then
+                table.insert(clipboard, v)
+            end
+        end
+        
+        local i = 1
+        
+        while i <= #chart do
+            if chart[i].S == true then
+                table.remove(chart, i)
+            else
+                i = i + 1
+            end
+        end
+    end
+    
+    if (key == "v" and love.keyboard.isDown("lctrl")) or (key == "lctrl" and love.keyboard.isDown("v")) then
+        local lowestBeat = math.huge
+        
+        for _, v in ipairs(clipboard) do
+            if v.B < lowestBeat then
+                lowestBeat = v.B
+            end
+        end
+        
+        local beatSnap = math.floor((scrollOffset / 300) / snap + 0.5) * snap
+        
+        for _, v in ipairs(clipboard) do
+            table.insert(chart, {B = v.B - lowestBeat + beatSnap, N = v.N, D = v.D, S = true})
         end
     end
 
@@ -504,13 +542,21 @@ function editor:Draw()
         end
         
         print(startNote)
+        local sizeY = ((-dragEndBeat * pixelsPerBeat + 470) + scrollOffset) - ((-dragStartBeat * pixelsPerBeat + 470) + scrollOffset)
+        local posYAdder = 0
+        if sizeY == 0 then 
+            sizeY = 20 
+            posYAdder = -10
+        end
         
+        
+
         love.graphics.setColor(0.5,0.5,1, 0.5)
         love.graphics.rectangle("fill", 
         (startNote) * 70 + xOffset, 
-        (-dragStartBeat * pixelsPerBeat + 500) + scrollOffset, 
+        (-dragStartBeat * pixelsPerBeat + 500) + scrollOffset + posYAdder, 
         (endNote - startNote + 1) * 70,
-        ((-dragEndBeat * pixelsPerBeat + 470) + scrollOffset) - ((-dragStartBeat * pixelsPerBeat + 470) + scrollOffset)
+        sizeY
     )
     end
     
