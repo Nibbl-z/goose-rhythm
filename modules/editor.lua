@@ -52,6 +52,8 @@ local BGSprite
 local message = ""
 local messageResetTime = 0
 
+local clipboard = {}
+
 function editor:LoadChart(c)
     chartPath = c
     local chartData = love.filesystem.read(c.."/chart.lua")
@@ -174,7 +176,7 @@ function editor:Init()
     snapLabel.Position = UIVector2.new(0,-5,0,0)
     snapLabel.Size = UIVector2.new(1,0,1,0)
     snapLabel.TextColor = Color.new(1,1,1,1)
-
+    
     beatInput = yan:TextInputter(self.Screen, "0", 16, "left", "center", "/ComicNeue.ttf")
     beatInput.Position = UIVector2.new(1, -10, 0.05, 15)
     beatInput.Size = UIVector2.new(0.1,0,0.05,0)
@@ -332,6 +334,14 @@ function editor:KeyPressed(key)
         Export()
         message = "Chart saved successfully!"
         messageResetTime = love.timer.getTime() + 3
+    end
+
+    if (key == "c" and love.keyboard.isDown("lctrl")) or (key == "lctrl" and love.keyboard.isDown("c")) then
+        for _, v in ipairs(chart) do
+            if v.S == true then
+                table.insert(clipboard, v)
+            end
+        end
     end
 
     if (key == "delete") then
