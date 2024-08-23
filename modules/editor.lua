@@ -312,19 +312,21 @@ function editor:WheelMoved(x, y)
                 
                 chart[i].D = chart[i].D + snap * y
 
-                if chart[i].D < 0 then
+                if chart[i].D <= 0 then
                     chart[i].D = nil
                 end
                 
                 print(chart[i].D, snap * y)
-            end
-            
-            if v.D ~= nil then
-                for _, note in ipairs(chart) do
-                    if note.D ~= nil then
-                        local pX, pY, sX, sY = (note.N) * 70 + xOffset + 20, (-note.B * pixelsPerBeat + 500) + scrollOffset - note.D * 300, 20, note.D * 300
+            else
+                if v.D ~= nil then
+                    if v.D ~= nil then
+                        local pX, pY, sX, sY = (v.N) * 70 + xOffset + 20, (-v.B * pixelsPerBeat + 500) + scrollOffset - v.D * 300, 20, v.D * 300
                         if utils:CheckCollision(love.mouse.getX(), love.mouse.getY(), 1, 1, pX, pY, sX, sY) then
                             chart[i].D = chart[i].D + snap * y
+                            
+                            if chart[i].D <= 0 then
+                                chart[i].D = nil
+                            end
                         end
                     end 
                 end
