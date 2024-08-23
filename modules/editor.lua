@@ -104,11 +104,13 @@ function Export()
             result = result..", D = "..note.D
         end
         if i == #chart then
-            result = result.."}}"
+            result = result.."}"
         else
             result = result.."},"
         end
     end
+
+    result = result.."}"
     
     love.filesystem.write(chartPath.."/chart.lua", result)
 
@@ -482,7 +484,7 @@ end
 function editor:Draw()
     if BGSprite ~= nil then
         love.graphics.setColor(0.5,0.5,0.5,1)
-        love.graphics.draw(BGSprite)
+        love.graphics.draw(BGSprite, 0, 0, 0, 800 / BGSprite:getPixelWidth(), 600 / BGSprite:getPixelHeight())
     end
     love.graphics.setColor(1,1,1,1)
     

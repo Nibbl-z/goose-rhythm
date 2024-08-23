@@ -204,7 +204,9 @@ function conductor:LoadChart(c)
             self.Chart[combineIndex] = {B = v.B, N = {v.N}, H = {}, C = {}}
             
             if v.D ~= nil then
-                self.Chart[combineIndex].D = {[tostring(v.N)] = v.D}
+                if v.D ~= 0 then
+                    self.Chart[combineIndex].D = {[tostring(v.N)] = v.D}
+                end
             end
             --print(self.Chart[combineIndex])
         end
@@ -231,9 +233,9 @@ function conductor:LoadChart(c)
 end
 
 function conductor:GetChartEndBeat()
-    if #self.Chart == 0 then return end
+    if #self.Chart == 0 then return 2 end
     local beat = self.Chart[#self.Chart]
-
+    
     local beatEndTime = beat.B 
     
     if beat.D ~= nil then

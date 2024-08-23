@@ -370,9 +370,9 @@ function love.draw()
         menu:Draw()
     else
         if BGSprite ~= nil then
-            love.graphics.draw(BGSprite)
+            love.graphics.draw(BGSprite, 0, 0, 0, 800 / BGSprite:getPixelWidth(), 600 / BGSprite:getPixelHeight())
         end
-
+        
         goose:Draw()
 
         local circleXOffset = (love.graphics.getWidth() - 4 * 70) / 2 - 35

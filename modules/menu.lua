@@ -247,7 +247,9 @@ function RefreshCustomLevels()
             sfx.Select:play()
 
             createLevelMode = "edit"
+            
             yan:NewTween(newLevelPopup, yan:TweenInfo(1, EasingStyle.BackOut), {Position = UIVector2.new(0.5,0,0.5,0)}):Play()
+            createSongBtn.Text = "Edit Level"
             newLevelTitle.Text = "Editing "..loadedMetadata.SongName
 
             nameInputter.Text = loadedMetadata.SongName
@@ -851,6 +853,20 @@ function menu:Init()
         newLevelBtn.Color = Color.new(1,1,1,1)
         
         yan:NewTween(newLevelPopup, yan:TweenInfo(1, EasingStyle.BackOut), {Position = UIVector2.new(0.5,0,0.5,0)}):Play()
+        createLevelMode = "create"
+        createSongBtn.Text = "Create Level"
+        newLevelTitle.Text = "Creating New Level"
+
+        nameInputter.Text = ""
+        artistInputter.Text = ""
+        mapperInputter.Text = ""
+        bpmInputter.Text = ""
+        songPreviewTimeInputter.Text = ""
+        
+        tryagainInput.Text = ""
+        okayInput.Text = ""
+        superbInput.Text = ""
+        perfectInput.Text = ""
     end
 
     noLevelsLabel = yan:Label(self.Screen, "You have no custom levels! Try creating one by pressing the + button at the top.", 64, "center", "center", "/ComicNeue.ttf")
@@ -1509,9 +1525,10 @@ function menu:KeyPressed(key)
             menuStopMovingDelay = love.timer.getTime() + 1
             
             page = "main"
-            --yan:NewTween(levelsContainer, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(0, 0, 0, 0)}):Play()
+            yan:NewTween(customLevelsContainer, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(0, 0, 0, 0)}):Play()
             yan:NewTween(mainPage, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(0,0,0,0)}):Play()
             yan:NewTween(customLevelsPage, yan:TweenInfo(1, EasingStyle.QuadInOut), {Position = UIVector2.new(1,0,0,0)}):Play()
+            yan:NewTween(newLevelPopup, yan:TweenInfo(1, EasingStyle.BackIn), {Position = UIVector2.new(0.5,0,1.5,0)}):Play()
             if previewMusic ~= nil then 
                 previewMusic:stop()
             end

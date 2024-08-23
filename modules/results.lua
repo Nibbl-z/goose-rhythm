@@ -186,6 +186,10 @@ function results:Open(breadamnt, totalNotes, metadata, chartPath)
     accuracyPercent = math.ceil(accuracyPercent)
     
     accuracyPercent = accuracyPercent / 100
+
+    if conductor:GetBreadCount() == 0 then
+        accuracyPercent = 100
+    end
     
     if accuracyPercent <= 40 then
         rank.Image = love.graphics.newImage("/img/ranks/try_again.png")
