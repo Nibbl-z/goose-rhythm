@@ -233,6 +233,24 @@ end
 function editor:MouseReleased(x, y, button)
     if dragging then
         dragging = false
+        
+        local minBeat, maxBeat = dragStartBeat, dragEndBeat
+        local minNote, maxNote = dragStartNote, dragEndNote
+        
+        if dragStartBeat >= dragEndBeat then
+            minBeat = dragEndBeat
+            maxBeat = dragStartBeat
+        end
+        if dragStartNote >= dragEndNote then
+            minNote = dragEndNote
+            maxNote = dragStartNote
+        end
+
+        for _, v in ipairs(chart) do
+            if v.B >= minBeat and v.B <= maxBeat and v.N >= minNote and v.N <= maxNote then
+                v.S = true
+            end
+        end
     end
 end
 
@@ -304,6 +322,18 @@ function StopPlayback()
 end
 
 function editor:KeyPressed(key)
+    if (key == "d" and love.keyboard.isDown("lctrl")) or (key == "lctrl" and love.keyboard.isDown("d")) then
+        for _, v in ipairs(chart) do
+            v.S = nil
+        end
+    end
+
+    if (key == "s" and love.keyboard.isDown("lctrl")) or (key == "lctrl" and love.keyboard.isDown("s")) then
+        Export()
+        message = "Chart saved successfully!"
+        messageResetTime = love.timer.getTime() + 3
+    end
+
     if key == "escape" then
         pause.Type = "editor"
         pause.Paused = not pause.Paused
@@ -393,7 +423,7 @@ function editor:Draw()
         love.graphics.line(l.x1, l.y1 + scrollOffset, l.x2, l.y2 + scrollOffset)
     end
 
-    if quadrant ~= -1 and beatQuadrant.y1 ~= nil and not playing then
+    if quadrant ~= -1 and beatQuadrant.y1 ~= nil and not playing and not dragging then
         for i, v in ipairs(chart) do
             if v.B == beatQuadrant.b and v.N == quadrant then
                 love.graphics.draw(sprites.Crust, (quadrant) * 70 + xOffset, beatQuadrant.y1 + scrollOffset - 30, 0, 1.2, 1.2, 5, 5)
@@ -409,12 +439,20 @@ function editor:Draw()
     
     for _, note in ipairs(chart) do
         if note.D ~= nil then
-            love.graphics.setColor(1, 183/255, 135/255)
+            if note.S == true then
+                love.graphics.setColor(0,1,0)
+            else
+                love.graphics.setColor(1, 183/255, 135/255)
+            end
             love.graphics.rectangle("fill", (note.N) * 70 + xOffset + 20, (-note.B * pixelsPerBeat + 500) + scrollOffset - note.D * 300, 20, note.D * 300, 10, 10)
         end   
-        love.graphics.setColor(1,1,1,1)
-        love.graphics.draw(sprites.Bread, (note.N) * 70 + xOffset, (-note.B * pixelsPerBeat + 470) + scrollOffset)
 
+        if note.S == true then
+            love.graphics.setColor(0,1,0)
+        else
+            love.graphics.setColor(1,1,1)
+        end
+        love.graphics.draw(sprites.Bread, (note.N) * 70 + xOffset, (-note.B * pixelsPerBeat + 470) + scrollOffset)
     end
     
     if dragging then
@@ -426,7 +464,7 @@ function editor:Draw()
         end
         
         print(startNote)
-
+        
         love.graphics.setColor(0.5,0.5,1, 0.5)
         love.graphics.rectangle("fill", 
         (startNote) * 70 + xOffset, 
