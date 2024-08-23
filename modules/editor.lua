@@ -33,6 +33,12 @@ local maxVisibleBeat = 6
 
 local unsavedChanges = false
 
+local dragging = false
+local dragStartNote = -1
+local dragEndNote = -1
+local dragStartBeat = -1
+local dragEndBeat = -1
+
 local sprites = {
     Bread = love.graphics.newImage("/img/bread.png"),
     Crust = love.graphics.newImage("/img/crust.png")
@@ -209,15 +215,37 @@ function editor:Init()
 end
 
 function editor:MousePressed(x, y, button)
+    if love.keyboard.isDown("lctrl") then
+        if quadrant ~= -1 and beatQuadrant.b ~= nil then
+            dragging = true
+            dragStartNote = quadrant
+            dragStartBeat = beatQuadrant.b
+        end
+
+        return
+    end
     if quadrant ~= -1 then
         if button == 1 then PlaceNote() end
         if button == 2 then DeleteNote() end
     end
 end
 
+function editor:MouseReleased(x, y, button)
+    if dragging then
+        dragging = false
+    end
+end
+
 function editor:Update(dt)
     local mX, mY = love.mouse.getPosition()
     local csb = math.floor(scrollOffset / pixelsPerBeat)
+    if quadrant ~= -1 and dragging then
+        dragEndNote = quadrant
+    end
+
+    if dragging and beatQuadrant.b ~= nil then
+        dragEndBeat = beatQuadrant.b
+    end 
     
     minVisibleBeat = csb - 2
     maxVisibleBeat = csb + 4
@@ -294,8 +322,9 @@ function pause.HasSaved()
     return unsavedChanges
 end
 
+
 function editor:WheelMoved(x, y)
-    if love.keyboard.isDown("lctrl") then
+    if love.keyboard.isDown("lctrl") and not dragging then
         snapIndex = utils:Clamp(snapIndex + y, 1, #snaps)
         snap = snaps[snapIndex]
         snapInput.Text = tostring(math.floor(snap * 1000) / 1000)
@@ -385,10 +414,18 @@ function editor:Draw()
         end   
         love.graphics.setColor(1,1,1,1)
         love.graphics.draw(sprites.Bread, (note.N) * 70 + xOffset, (-note.B * pixelsPerBeat + 470) + scrollOffset)
-                       
+
     end
     
-    
+    if dragging then
+        love.graphics.setColor(0.5,0.5,1, 0.5)
+        love.graphics.rectangle("fill", 
+        (dragStartNote) * 70 + xOffset, 
+        (-dragStartBeat * pixelsPerBeat + 500) + scrollOffset, 
+        (dragEndNote - dragStartNote + 1) * 70 ,
+        ((-dragEndBeat * pixelsPerBeat + 470) + scrollOffset) - ((-dragStartBeat * pixelsPerBeat + 470) + scrollOffset)
+    )
+    end
     
     love.graphics.setColor(1,1,1,1)
 end

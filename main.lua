@@ -281,6 +281,12 @@ function love.mousepressed(x, y, button)
     editor:MousePressed(x, y, button)
 end
 
+function love.mousereleased(x, y, button)
+    if editor.Enabled then
+        editor:MouseReleased(x,y,button)
+    end
+end
+
 function love.wheelmoved(x, y)
     editor:WheelMoved(x, y)
 end
@@ -354,6 +360,7 @@ function love.mousemoved(x, y, dx, dy)
     if menu.Enabled == true then
         menu:MouseMoved(x,y, dx, dy)
     end
+
 end
 
 function love.draw()
