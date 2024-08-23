@@ -334,6 +334,37 @@ function editor:KeyPressed(key)
         messageResetTime = love.timer.getTime() + 3
     end
 
+    if (key == "delete") then
+        local i = 1
+        
+        while i <= #chart do
+            if chart[i].S == true then
+                table.remove(chart, i)
+            else
+                i = i + 1
+            end
+        end
+    end
+    
+    if (key == "up") then
+        for _, v in ipairs(chart) do
+            if v.S == true then
+                v.B = v.B + snap
+            end
+        end
+    end
+    
+    if (key == "down") then
+        for _, v in ipairs(chart) do
+            if v.S == true then
+                v.B = v.B - snap
+                if v.B <= 0 then
+                    v.B = 0
+                end
+            end
+        end
+    end
+    
     if key == "escape" then
         pause.Type = "editor"
         pause.Paused = not pause.Paused
@@ -351,7 +382,6 @@ end
 function pause.HasSaved()
     return unsavedChanges
 end
-
 
 function editor:WheelMoved(x, y)
     if love.keyboard.isDown("lctrl") and not dragging then
