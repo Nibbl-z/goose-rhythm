@@ -17,7 +17,6 @@ conductor.HoldingBeats = {nil, nil, nil, nil}
 conductor.TotalNotes = 0
 
 local settings = require("modules.settings")
-local utils = require("yan.utils")
 
 function conductor:Init()
     self.SongPosition = 0

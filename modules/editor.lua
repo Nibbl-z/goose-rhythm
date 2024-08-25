@@ -11,21 +11,17 @@ editor.Enabled = false
 
 local scrollOffset = 0
 local quadrant = -1
-local totalYOffset = 100
 local xOffset = (love.graphics.getWidth() - 4 * 70) / 2 - 60
 local snap = 0.5
-local beats = 8
 local beatQuadrant = {}
 
 local chart = {}
 local chartPath = ""
-local notePlaceLines = {}
 local lines = {}
 local pixelsPerBeat = 300
 
 local snapIndex = 2
 local snaps = {1, 1/2, 1/3, 1/4, 1/6, 1/8, 1/16}
-local song = "/charts/purplegoose/song.ogg"
 local playing = false
 
 local minVisibleBeat = 0

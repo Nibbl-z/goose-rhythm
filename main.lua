@@ -10,7 +10,6 @@ local pause = require("modules.pause")
 
 local started = false
 local startedSong = false
-local startDelay = 0
 
 local fading = false
 local fadingDelay = 0
