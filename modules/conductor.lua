@@ -358,6 +358,7 @@ function conductor:ReleaseHeldNote(key)
     if heldNote == nil then return end
     
     if heldNote.D[tostring(index)] == nil then return end
+    heldNote.Missed = true
     
     local time = self.SongPositionInBeats
     local diff = math.abs((heldNote.B + heldNote.D[tostring(index)]) - time)
