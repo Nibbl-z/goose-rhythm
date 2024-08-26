@@ -17,7 +17,6 @@ conductor.HoldingBeats = {nil, nil, nil, nil}
 conductor.TotalNotes = 0
 
 local settings = require("modules.settings")
-local utils = require("yan.utils")
 
 function conductor:Init()
     self.SongPosition = 0
@@ -359,6 +358,7 @@ function conductor:ReleaseHeldNote(key)
     if heldNote == nil then return end
     
     if heldNote.D[tostring(index)] == nil then return end
+    heldNote.Missed = true
     
     local time = self.SongPositionInBeats
     local diff = math.abs((heldNote.B + heldNote.D[tostring(index)]) - time)

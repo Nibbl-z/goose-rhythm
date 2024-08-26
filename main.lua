@@ -10,7 +10,6 @@ local pause = require("modules.pause")
 
 local started = false
 local startedSong = false
-local startDelay = 0
 
 local fading = false
 local fadingDelay = 0
@@ -103,7 +102,7 @@ function StartSong(chart)
         goose.Size = Vector2.new(2,2)
     end
     
-    metronome = love.audio.newSource("/select.wav", "static")
+    metronome = love.audio.newSource("/sfx/select.wav", "static")
     loadedSong:setVolume(settings:GetMusicVolume())
     
     startedSong = false
@@ -416,17 +415,18 @@ function love.draw()
                 
                 if v.D ~= nil then
                     for _, n in ipairs(v.N) do
-                        if v.D[tostring(n)] ~= nil then
+                        if v.D[tostring(n)] ~= nil and v.Missed ~= true then
                             love.graphics.stencil(function ()
                                 love.graphics.rectangle("fill", 0,0,800,470)
                             end, "replace", 1)
                             love.graphics.setStencilTest("greater", 0)
                             love.graphics.setColor(1, 183/255, 135/255)
                             love.graphics.rectangle("fill",
-                            n * 70 + circleXOffset - 10, 
-                            (v.B - conductor.SongPositionInBeats) * -settings.NoteSpeed + 440 - v.D[tostring(n)] * settings.NoteSpeed,
-                            20,
-                            v.D[tostring(n)] * settings.NoteSpeed, 10, 10)
+                                n * 70 + circleXOffset - 10, 
+                                (v.B - conductor.SongPositionInBeats) * -settings.NoteSpeed + 440 - v.D[tostring(n)] * settings.NoteSpeed,
+                                20,
+                                v.D[tostring(n)] * settings.NoteSpeed, 10, 10
+                            )
                             love.graphics.setColor(1,1,1,1)
                         end
                        
